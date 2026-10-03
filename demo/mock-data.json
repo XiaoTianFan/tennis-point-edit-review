@@ -1,0 +1,6421 @@
+{
+  "synthetic": true,
+  "warning": "Fictional data only. No real observation or speed measurement.",
+  "players": {
+    "A": "Player A",
+    "B": "Player B"
+  },
+  "points": [
+    {
+      "pointId": "DEMO001",
+      "setNumber": 1,
+      "server": "A",
+      "winner": "A",
+      "serveNumber": 1,
+      "ending": "FE",
+      "shots": 6,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "B",
+          "zone": "deep"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "inside"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "deep"
+        }
+      ],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      },
+      "terminalError": true,
+      "errorAssessment": {
+        "reviewed": true,
+        "classification": "FE",
+        "opponentPressure": "imposed",
+        "basis": "incoming_ball_and_available_response",
+        "reason": "Synthetic classification for demo only",
+        "confidence": "synthetic",
+        "evidence": {
+          "synthetic": true
+        }
+      }
+    },
+    {
+      "pointId": "DEMO002",
+      "setNumber": 1,
+      "server": "A",
+      "winner": "B",
+      "serveNumber": 1,
+      "ending": "W",
+      "shots": 8,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "inside"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "deep"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "inside"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        }
+      ],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      }
+    },
+    {
+      "pointId": "DEMO003",
+      "setNumber": 1,
+      "server": "A",
+      "winner": "A",
+      "serveNumber": 2,
+      "ending": "UE",
+      "shots": 12,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "B",
+          "zone": "inside"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "deep"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "inside"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "deep"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "inside"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "deep"
+        }
+      ],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      },
+      "terminalError": true,
+      "errorAssessment": {
+        "reviewed": true,
+        "classification": "UE",
+        "opponentPressure": "not_evidenced",
+        "basis": "incoming_ball_and_available_response",
+        "reason": "Synthetic classification for demo only",
+        "confidence": "synthetic",
+        "evidence": {
+          "synthetic": true
+        }
+      }
+    },
+    {
+      "pointId": "DEMO004",
+      "setNumber": 1,
+      "server": "A",
+      "winner": "B",
+      "serveNumber": 1,
+      "ending": "FE",
+      "shots": 5,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "deep"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "inside"
+        }
+      ],
+      "netPlayers": [
+        "B"
+      ],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      },
+      "terminalError": true,
+      "errorAssessment": {
+        "reviewed": true,
+        "classification": "FE",
+        "opponentPressure": "imposed",
+        "basis": "incoming_ball_and_available_response",
+        "reason": "Synthetic classification for demo only",
+        "confidence": "synthetic",
+        "evidence": {
+          "synthetic": true
+        }
+      }
+    },
+    {
+      "pointId": "DEMO005",
+      "setNumber": 1,
+      "server": "A",
+      "winner": "A",
+      "serveNumber": 1,
+      "ending": "ACE",
+      "shots": 1,
+      "statsIncluded": true,
+      "positionsAfterServe": [],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "ace",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      }
+    },
+    {
+      "pointId": "DEMO006",
+      "setNumber": 1,
+      "server": "A",
+      "winner": "A",
+      "serveNumber": 2,
+      "ending": "UE",
+      "shots": 10,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "inside"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "deep"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "inside"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "deep"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        }
+      ],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      },
+      "terminalError": true,
+      "errorAssessment": {
+        "reviewed": true,
+        "classification": "UE",
+        "opponentPressure": "not_evidenced",
+        "basis": "incoming_ball_and_available_response",
+        "reason": "Synthetic classification for demo only",
+        "confidence": "synthetic",
+        "evidence": {
+          "synthetic": true
+        }
+      }
+    },
+    {
+      "pointId": "DEMO007",
+      "setNumber": 1,
+      "server": "B",
+      "winner": "B",
+      "serveNumber": 1,
+      "ending": "FE",
+      "shots": 4,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "A",
+          "zone": "inside"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "deep"
+        }
+      ],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      },
+      "terminalError": true,
+      "errorAssessment": {
+        "reviewed": true,
+        "classification": "FE",
+        "opponentPressure": "imposed",
+        "basis": "incoming_ball_and_available_response",
+        "reason": "Synthetic classification for demo only",
+        "confidence": "synthetic",
+        "evidence": {
+          "synthetic": true
+        }
+      }
+    },
+    {
+      "pointId": "DEMO008",
+      "setNumber": 1,
+      "server": "B",
+      "winner": "A",
+      "serveNumber": 1,
+      "ending": "W",
+      "shots": 6,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "deep"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "inside"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        }
+      ],
+      "netPlayers": [
+        "A"
+      ],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      }
+    },
+    {
+      "pointId": "DEMO009",
+      "setNumber": 1,
+      "server": "B",
+      "winner": "B",
+      "serveNumber": 2,
+      "ending": "UE",
+      "shots": 10,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "A",
+          "zone": "deep"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "inside"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "deep"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "inside"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "deep"
+        }
+      ],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      },
+      "terminalError": true,
+      "errorAssessment": {
+        "reviewed": true,
+        "classification": "UE",
+        "opponentPressure": "not_evidenced",
+        "basis": "incoming_ball_and_available_response",
+        "reason": "Synthetic classification for demo only",
+        "confidence": "synthetic",
+        "evidence": {
+          "synthetic": true
+        }
+      }
+    },
+    {
+      "pointId": "DEMO010",
+      "setNumber": 1,
+      "server": "B",
+      "winner": "A",
+      "serveNumber": 1,
+      "ending": "FE",
+      "shots": 3,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "inside"
+        }
+      ],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      },
+      "terminalError": true,
+      "errorAssessment": {
+        "reviewed": true,
+        "classification": "FE",
+        "opponentPressure": "imposed",
+        "basis": "incoming_ball_and_available_response",
+        "reason": "Synthetic classification for demo only",
+        "confidence": "synthetic",
+        "evidence": {
+          "synthetic": true
+        }
+      }
+    },
+    {
+      "pointId": "DEMO011",
+      "setNumber": 1,
+      "server": "B",
+      "winner": "B",
+      "serveNumber": 1,
+      "ending": "W",
+      "shots": 5,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "A",
+          "zone": "inside"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "deep"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        }
+      ],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      }
+    },
+    {
+      "pointId": "DEMO012",
+      "setNumber": 1,
+      "server": "B",
+      "winner": "B",
+      "serveNumber": 2,
+      "ending": "UE",
+      "shots": 8,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "deep"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "inside"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "deep"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        }
+      ],
+      "netPlayers": [
+        "B"
+      ],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      },
+      "terminalError": true,
+      "errorAssessment": {
+        "reviewed": true,
+        "classification": "UE",
+        "opponentPressure": "not_evidenced",
+        "basis": "incoming_ball_and_available_response",
+        "reason": "Synthetic classification for demo only",
+        "confidence": "synthetic",
+        "evidence": {
+          "synthetic": true
+        }
+      }
+    },
+    {
+      "pointId": "DEMO013",
+      "setNumber": 1,
+      "server": "A",
+      "winner": "A",
+      "serveNumber": 1,
+      "ending": "FE",
+      "shots": 12,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "B",
+          "zone": "deep"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "inside"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "deep"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "inside"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "deep"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "inside"
+        }
+      ],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      },
+      "terminalError": true,
+      "errorAssessment": {
+        "reviewed": true,
+        "classification": "FE",
+        "opponentPressure": "imposed",
+        "basis": "incoming_ball_and_available_response",
+        "reason": "Synthetic classification for demo only",
+        "confidence": "synthetic",
+        "evidence": {
+          "synthetic": true
+        }
+      }
+    },
+    {
+      "pointId": "DEMO014",
+      "setNumber": 1,
+      "server": "A",
+      "winner": "B",
+      "serveNumber": 1,
+      "ending": "W",
+      "shots": 4,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "inside"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        }
+      ],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      }
+    },
+    {
+      "pointId": "DEMO015",
+      "setNumber": 1,
+      "server": "A",
+      "winner": "A",
+      "serveNumber": 2,
+      "ending": "ACE",
+      "shots": 1,
+      "statsIncluded": true,
+      "positionsAfterServe": [],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "ace",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      }
+    },
+    {
+      "pointId": "DEMO016",
+      "setNumber": 1,
+      "server": "A",
+      "winner": "B",
+      "serveNumber": 1,
+      "ending": "FE",
+      "shots": 11,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "deep"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "inside"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "deep"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "inside"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "deep"
+        }
+      ],
+      "netPlayers": [
+        "B"
+      ],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      },
+      "terminalError": true,
+      "errorAssessment": {
+        "reviewed": true,
+        "classification": "FE",
+        "opponentPressure": "imposed",
+        "basis": "incoming_ball_and_available_response",
+        "reason": "Synthetic classification for demo only",
+        "confidence": "synthetic",
+        "evidence": {
+          "synthetic": true
+        }
+      }
+    },
+    {
+      "pointId": "DEMO017",
+      "setNumber": 1,
+      "server": "A",
+      "winner": "A",
+      "serveNumber": 1,
+      "ending": "W",
+      "shots": 3,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "B",
+          "zone": "deep"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        }
+      ],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      }
+    },
+    {
+      "pointId": "DEMO018",
+      "setNumber": 1,
+      "server": "A",
+      "winner": "A",
+      "serveNumber": 2,
+      "ending": "UE",
+      "shots": 6,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "inside"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "deep"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        }
+      ],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      },
+      "terminalError": true,
+      "errorAssessment": {
+        "reviewed": true,
+        "classification": "UE",
+        "opponentPressure": "not_evidenced",
+        "basis": "incoming_ball_and_available_response",
+        "reason": "Synthetic classification for demo only",
+        "confidence": "synthetic",
+        "evidence": {
+          "synthetic": true
+        }
+      }
+    },
+    {
+      "pointId": "DEMO019",
+      "setNumber": 1,
+      "server": "B",
+      "winner": "A",
+      "serveNumber": 1,
+      "ending": "FE",
+      "shots": 9,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "A",
+          "zone": "inside"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "deep"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "inside"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "deep"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        }
+      ],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      },
+      "terminalError": true,
+      "errorAssessment": {
+        "reviewed": true,
+        "classification": "FE",
+        "opponentPressure": "imposed",
+        "basis": "incoming_ball_and_available_response",
+        "reason": "Synthetic classification for demo only",
+        "confidence": "synthetic",
+        "evidence": {
+          "synthetic": true
+        }
+      }
+    },
+    {
+      "pointId": "DEMO020",
+      "setNumber": 1,
+      "server": "B",
+      "winner": "B",
+      "serveNumber": 1,
+      "ending": "ACE",
+      "shots": 1,
+      "statsIncluded": true,
+      "positionsAfterServe": [],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "ace",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      }
+    },
+    {
+      "pointId": "DEMO021",
+      "setNumber": 1,
+      "server": "B",
+      "winner": "A",
+      "serveNumber": 2,
+      "ending": "UE",
+      "shots": 5,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "A",
+          "zone": "deep"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "inside"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        }
+      ],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      },
+      "terminalError": true,
+      "errorAssessment": {
+        "reviewed": true,
+        "classification": "UE",
+        "opponentPressure": "not_evidenced",
+        "basis": "incoming_ball_and_available_response",
+        "reason": "Synthetic classification for demo only",
+        "confidence": "synthetic",
+        "evidence": {
+          "synthetic": true
+        }
+      }
+    },
+    {
+      "pointId": "DEMO022",
+      "setNumber": 1,
+      "server": "B",
+      "winner": "B",
+      "serveNumber": 1,
+      "ending": "FE",
+      "shots": 8,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "inside"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "deep"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "inside"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        }
+      ],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      },
+      "terminalError": true,
+      "errorAssessment": {
+        "reviewed": true,
+        "classification": "FE",
+        "opponentPressure": "imposed",
+        "basis": "incoming_ball_and_available_response",
+        "reason": "Synthetic classification for demo only",
+        "confidence": "synthetic",
+        "evidence": {
+          "synthetic": true
+        }
+      }
+    },
+    {
+      "pointId": "DEMO023",
+      "setNumber": 1,
+      "server": "B",
+      "winner": "A",
+      "serveNumber": 1,
+      "ending": "W",
+      "shots": 12,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "A",
+          "zone": "inside"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "deep"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "inside"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "deep"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "inside"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "deep"
+        }
+      ],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      }
+    },
+    {
+      "pointId": "DEMO024",
+      "setNumber": 1,
+      "server": "B",
+      "winner": "A",
+      "serveNumber": 2,
+      "ending": "DF",
+      "shots": 0,
+      "statsIncluded": true,
+      "positionsAfterServe": [],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": false,
+        "returnOutcome": "not_applicable",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      }
+    },
+    {
+      "pointId": "DEMO025",
+      "setNumber": 1,
+      "server": "A",
+      "winner": "B",
+      "serveNumber": 1,
+      "ending": "FE",
+      "shots": 7,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "B",
+          "zone": "deep"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "inside"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "deep"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        }
+      ],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      },
+      "terminalError": true,
+      "errorAssessment": {
+        "reviewed": true,
+        "classification": "FE",
+        "opponentPressure": "imposed",
+        "basis": "incoming_ball_and_available_response",
+        "reason": "Synthetic classification for demo only",
+        "confidence": "synthetic",
+        "evidence": {
+          "synthetic": true
+        }
+      }
+    },
+    {
+      "pointId": "DEMO026",
+      "setNumber": 1,
+      "server": "A",
+      "winner": "A",
+      "serveNumber": 1,
+      "ending": "W",
+      "shots": 11,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "inside"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "deep"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "inside"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "deep"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "inside"
+        }
+      ],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      }
+    },
+    {
+      "pointId": "DEMO027",
+      "setNumber": 1,
+      "server": "A",
+      "winner": "B",
+      "serveNumber": 2,
+      "ending": "UE",
+      "shots": 3,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "B",
+          "zone": "inside"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        }
+      ],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      },
+      "terminalError": true,
+      "errorAssessment": {
+        "reviewed": true,
+        "classification": "UE",
+        "opponentPressure": "not_evidenced",
+        "basis": "incoming_ball_and_available_response",
+        "reason": "Synthetic classification for demo only",
+        "confidence": "synthetic",
+        "evidence": {
+          "synthetic": true
+        }
+      }
+    },
+    {
+      "pointId": "DEMO028",
+      "setNumber": 1,
+      "server": "A",
+      "winner": "A",
+      "serveNumber": 1,
+      "ending": "FE",
+      "shots": 6,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "deep"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "inside"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        }
+      ],
+      "netPlayers": [
+        "A"
+      ],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      },
+      "terminalError": true,
+      "errorAssessment": {
+        "reviewed": true,
+        "classification": "FE",
+        "opponentPressure": "imposed",
+        "basis": "incoming_ball_and_available_response",
+        "reason": "Synthetic classification for demo only",
+        "confidence": "synthetic",
+        "evidence": {
+          "synthetic": true
+        }
+      }
+    },
+    {
+      "pointId": "DEMO029",
+      "setNumber": 1,
+      "server": "A",
+      "winner": "B",
+      "serveNumber": 1,
+      "ending": "W",
+      "shots": 10,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "B",
+          "zone": "deep"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "inside"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "deep"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "inside"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "deep"
+        }
+      ],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      }
+    },
+    {
+      "pointId": "DEMO030",
+      "setNumber": 1,
+      "server": "A",
+      "winner": "B",
+      "serveNumber": 2,
+      "ending": "DF",
+      "shots": 0,
+      "statsIncluded": true,
+      "positionsAfterServe": [],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": false,
+        "returnOutcome": "not_applicable",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      }
+    },
+    {
+      "pointId": "DEMO031",
+      "setNumber": 1,
+      "server": "B",
+      "winner": "A",
+      "serveNumber": 1,
+      "ending": "FE",
+      "shots": 5,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "A",
+          "zone": "inside"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "deep"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        }
+      ],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      },
+      "terminalError": true,
+      "errorAssessment": {
+        "reviewed": true,
+        "classification": "FE",
+        "opponentPressure": "imposed",
+        "basis": "incoming_ball_and_available_response",
+        "reason": "Synthetic classification for demo only",
+        "confidence": "synthetic",
+        "evidence": {
+          "synthetic": true
+        }
+      }
+    },
+    {
+      "pointId": "DEMO032",
+      "setNumber": 1,
+      "server": "B",
+      "winner": "B",
+      "serveNumber": 1,
+      "ending": "W",
+      "shots": 9,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "deep"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "inside"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "deep"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "inside"
+        }
+      ],
+      "netPlayers": [
+        "B"
+      ],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      }
+    },
+    {
+      "pointId": "DEMO033",
+      "setNumber": 1,
+      "server": "B",
+      "winner": "A",
+      "serveNumber": 2,
+      "ending": "UE",
+      "shots": 11,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "A",
+          "zone": "deep"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "inside"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "deep"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "inside"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "deep"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        }
+      ],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      },
+      "terminalError": true,
+      "errorAssessment": {
+        "reviewed": true,
+        "classification": "UE",
+        "opponentPressure": "not_evidenced",
+        "basis": "incoming_ball_and_available_response",
+        "reason": "Synthetic classification for demo only",
+        "confidence": "synthetic",
+        "evidence": {
+          "synthetic": true
+        }
+      }
+    },
+    {
+      "pointId": "DEMO034",
+      "setNumber": 1,
+      "server": "B",
+      "winner": "B",
+      "serveNumber": 1,
+      "ending": "FE",
+      "shots": 4,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "A",
+          "zone": "near"
+        },
+        {
+          "player": "B",
+          "zone": "inside"
+        },
+        {
+          "player": "A",
+          "zone": "near"
+        }
+      ],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      },
+      "terminalError": true,
+      "errorAssessment": {
+        "reviewed": true,
+        "classification": "FE",
+        "opponentPressure": "imposed",
+        "basis": "incoming_ball_and_available_response",
+        "reason": "Synthetic classification for demo only",
+        "confidence": "synthetic",
+        "evidence": {
+          "synthetic": true
+        }
+      }
+    },
+    {
+      "pointId": "DEMO035",
+      "setNumber": 1,
+      "server": "B",
+      "winner": "A",
+      "serveNumber": 1,
+      "ending": "W",
+      "shots": 8,
+      "statsIncluded": true,
+      "positionsAfterServe": [
+        {
+          "player": "A",
+          "zone": "inside"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "deep"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "inside"
+        },
+        {
+          "player": "B",
+          "zone": "near"
+        },
+        {
+          "player": "A",
+          "zone": "deep"
+        }
+      ],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": true,
+        "returnOutcome": "in",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      }
+    },
+    {
+      "pointId": "DEMO036",
+      "setNumber": 1,
+      "server": "B",
+      "winner": "A",
+      "serveNumber": 2,
+      "ending": "DF",
+      "shots": 0,
+      "statsIncluded": true,
+      "positionsAfterServe": [],
+      "netPlayers": [],
+      "synthetic": true,
+      "serveReturn": {
+        "reviewed": true,
+        "serveIn": false,
+        "returnOutcome": "not_applicable",
+        "returnWinner": false,
+        "evidence": {
+          "synthetic": true,
+          "note": "Generated fixture; no video observation"
+        }
+      }
+    }
+  ],
+  "shotEvents": [
+    {
+      "pointId": "DEMO001",
+      "shotIndex": 1,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO001",
+      "shotIndex": 2,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO001",
+      "shotIndex": 3,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO001",
+      "shotIndex": 4,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO001",
+      "shotIndex": 5,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO001",
+      "shotIndex": 6,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "FH",
+      "errorDirection": "net",
+      "terminalErrorMotion": "moving",
+      "motionEvidence": {
+        "synthetic": true
+      }
+    },
+    {
+      "pointId": "DEMO002",
+      "shotIndex": 1,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO002",
+      "shotIndex": 2,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO002",
+      "shotIndex": 3,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO002",
+      "shotIndex": 4,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO002",
+      "shotIndex": 5,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO002",
+      "shotIndex": 6,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO002",
+      "shotIndex": 7,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO002",
+      "shotIndex": 8,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "FH",
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO003",
+      "shotIndex": 1,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO003",
+      "shotIndex": 2,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO003",
+      "shotIndex": 3,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO003",
+      "shotIndex": 4,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO003",
+      "shotIndex": 5,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO003",
+      "shotIndex": 6,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO003",
+      "shotIndex": 7,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO003",
+      "shotIndex": 8,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO003",
+      "shotIndex": 9,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO003",
+      "shotIndex": 10,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO003",
+      "shotIndex": 11,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO003",
+      "shotIndex": 12,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "BH",
+      "errorDirection": "net",
+      "terminalErrorMotion": "moving",
+      "motionEvidence": {
+        "synthetic": true
+      }
+    },
+    {
+      "pointId": "DEMO004",
+      "shotIndex": 1,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO004",
+      "shotIndex": 2,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO004",
+      "shotIndex": 3,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO004",
+      "shotIndex": 4,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO004",
+      "shotIndex": 5,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "BH",
+      "errorDirection": "out",
+      "terminalErrorMotion": "stationary",
+      "motionEvidence": {
+        "synthetic": true
+      }
+    },
+    {
+      "pointId": "DEMO005",
+      "shotIndex": 1,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "FH",
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO006",
+      "shotIndex": 1,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO006",
+      "shotIndex": 2,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO006",
+      "shotIndex": 3,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO006",
+      "shotIndex": 4,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO006",
+      "shotIndex": 5,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO006",
+      "shotIndex": 6,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO006",
+      "shotIndex": 7,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO006",
+      "shotIndex": 8,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO006",
+      "shotIndex": 9,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO006",
+      "shotIndex": 10,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "FH",
+      "errorDirection": "out",
+      "terminalErrorMotion": "moving",
+      "motionEvidence": {
+        "synthetic": true
+      }
+    },
+    {
+      "pointId": "DEMO007",
+      "shotIndex": 1,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO007",
+      "shotIndex": 2,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO007",
+      "shotIndex": 3,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO007",
+      "shotIndex": 4,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "FH",
+      "errorDirection": "net",
+      "terminalErrorMotion": "moving",
+      "motionEvidence": {
+        "synthetic": true
+      }
+    },
+    {
+      "pointId": "DEMO008",
+      "shotIndex": 1,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO008",
+      "shotIndex": 2,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO008",
+      "shotIndex": 3,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO008",
+      "shotIndex": 4,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO008",
+      "shotIndex": 5,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO008",
+      "shotIndex": 6,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "BH",
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO009",
+      "shotIndex": 1,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO009",
+      "shotIndex": 2,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO009",
+      "shotIndex": 3,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO009",
+      "shotIndex": 4,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO009",
+      "shotIndex": 5,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO009",
+      "shotIndex": 6,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO009",
+      "shotIndex": 7,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO009",
+      "shotIndex": 8,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO009",
+      "shotIndex": 9,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO009",
+      "shotIndex": 10,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "BH",
+      "errorDirection": "net",
+      "terminalErrorMotion": "moving",
+      "motionEvidence": {
+        "synthetic": true
+      }
+    },
+    {
+      "pointId": "DEMO010",
+      "shotIndex": 1,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO010",
+      "shotIndex": 2,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO010",
+      "shotIndex": 3,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "FH",
+      "errorDirection": "out",
+      "terminalErrorMotion": "moving",
+      "motionEvidence": {
+        "synthetic": true
+      }
+    },
+    {
+      "pointId": "DEMO011",
+      "shotIndex": 1,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO011",
+      "shotIndex": 2,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO011",
+      "shotIndex": 3,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO011",
+      "shotIndex": 4,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO011",
+      "shotIndex": 5,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "FH",
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO012",
+      "shotIndex": 1,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO012",
+      "shotIndex": 2,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO012",
+      "shotIndex": 3,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO012",
+      "shotIndex": 4,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO012",
+      "shotIndex": 5,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO012",
+      "shotIndex": 6,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO012",
+      "shotIndex": 7,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO012",
+      "shotIndex": 8,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "FH",
+      "errorDirection": "out",
+      "terminalErrorMotion": "stationary",
+      "motionEvidence": {
+        "synthetic": true
+      }
+    },
+    {
+      "pointId": "DEMO013",
+      "shotIndex": 1,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO013",
+      "shotIndex": 2,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO013",
+      "shotIndex": 3,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO013",
+      "shotIndex": 4,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO013",
+      "shotIndex": 5,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO013",
+      "shotIndex": 6,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO013",
+      "shotIndex": 7,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO013",
+      "shotIndex": 8,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO013",
+      "shotIndex": 9,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO013",
+      "shotIndex": 10,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO013",
+      "shotIndex": 11,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO013",
+      "shotIndex": 12,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "BH",
+      "errorDirection": "net",
+      "terminalErrorMotion": "moving",
+      "motionEvidence": {
+        "synthetic": true
+      }
+    },
+    {
+      "pointId": "DEMO014",
+      "shotIndex": 1,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO014",
+      "shotIndex": 2,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO014",
+      "shotIndex": 3,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO014",
+      "shotIndex": 4,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "BH",
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO015",
+      "shotIndex": 1,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "FH",
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO016",
+      "shotIndex": 1,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO016",
+      "shotIndex": 2,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO016",
+      "shotIndex": 3,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO016",
+      "shotIndex": 4,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO016",
+      "shotIndex": 5,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO016",
+      "shotIndex": 6,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO016",
+      "shotIndex": 7,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO016",
+      "shotIndex": 8,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO016",
+      "shotIndex": 9,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO016",
+      "shotIndex": 10,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO016",
+      "shotIndex": 11,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "FH",
+      "errorDirection": "out",
+      "terminalErrorMotion": "stationary",
+      "motionEvidence": {
+        "synthetic": true
+      }
+    },
+    {
+      "pointId": "DEMO017",
+      "shotIndex": 1,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO017",
+      "shotIndex": 2,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO017",
+      "shotIndex": 3,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "FH",
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO018",
+      "shotIndex": 1,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO018",
+      "shotIndex": 2,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO018",
+      "shotIndex": 3,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO018",
+      "shotIndex": 4,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO018",
+      "shotIndex": 5,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO018",
+      "shotIndex": 6,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "BH",
+      "errorDirection": "out",
+      "terminalErrorMotion": "moving",
+      "motionEvidence": {
+        "synthetic": true
+      }
+    },
+    {
+      "pointId": "DEMO019",
+      "shotIndex": 1,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO019",
+      "shotIndex": 2,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO019",
+      "shotIndex": 3,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO019",
+      "shotIndex": 4,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO019",
+      "shotIndex": 5,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO019",
+      "shotIndex": 6,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO019",
+      "shotIndex": 7,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO019",
+      "shotIndex": 8,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO019",
+      "shotIndex": 9,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "BH",
+      "errorDirection": "net",
+      "terminalErrorMotion": "moving",
+      "motionEvidence": {
+        "synthetic": true
+      }
+    },
+    {
+      "pointId": "DEMO020",
+      "shotIndex": 1,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "FH",
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO021",
+      "shotIndex": 1,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO021",
+      "shotIndex": 2,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO021",
+      "shotIndex": 3,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO021",
+      "shotIndex": 4,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO021",
+      "shotIndex": 5,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "FH",
+      "errorDirection": "net",
+      "terminalErrorMotion": "moving",
+      "motionEvidence": {
+        "synthetic": true
+      }
+    },
+    {
+      "pointId": "DEMO022",
+      "shotIndex": 1,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO022",
+      "shotIndex": 2,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO022",
+      "shotIndex": 3,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO022",
+      "shotIndex": 4,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO022",
+      "shotIndex": 5,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO022",
+      "shotIndex": 6,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO022",
+      "shotIndex": 7,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO022",
+      "shotIndex": 8,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "FH",
+      "errorDirection": "out",
+      "terminalErrorMotion": "moving",
+      "motionEvidence": {
+        "synthetic": true
+      }
+    },
+    {
+      "pointId": "DEMO023",
+      "shotIndex": 1,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO023",
+      "shotIndex": 2,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO023",
+      "shotIndex": 3,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO023",
+      "shotIndex": 4,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO023",
+      "shotIndex": 5,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO023",
+      "shotIndex": 6,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO023",
+      "shotIndex": 7,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO023",
+      "shotIndex": 8,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO023",
+      "shotIndex": 9,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO023",
+      "shotIndex": 10,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO023",
+      "shotIndex": 11,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO023",
+      "shotIndex": 12,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "BH",
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO025",
+      "shotIndex": 1,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO025",
+      "shotIndex": 2,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO025",
+      "shotIndex": 3,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO025",
+      "shotIndex": 4,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO025",
+      "shotIndex": 5,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO025",
+      "shotIndex": 6,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO025",
+      "shotIndex": 7,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "FH",
+      "errorDirection": "net",
+      "terminalErrorMotion": "moving",
+      "motionEvidence": {
+        "synthetic": true
+      }
+    },
+    {
+      "pointId": "DEMO026",
+      "shotIndex": 1,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO026",
+      "shotIndex": 2,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO026",
+      "shotIndex": 3,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO026",
+      "shotIndex": 4,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO026",
+      "shotIndex": 5,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO026",
+      "shotIndex": 6,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO026",
+      "shotIndex": 7,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO026",
+      "shotIndex": 8,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO026",
+      "shotIndex": 9,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO026",
+      "shotIndex": 10,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO026",
+      "shotIndex": 11,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "FH",
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO027",
+      "shotIndex": 1,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO027",
+      "shotIndex": 2,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO027",
+      "shotIndex": 3,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "FH",
+      "errorDirection": "net",
+      "terminalErrorMotion": "moving",
+      "motionEvidence": {
+        "synthetic": true
+      }
+    },
+    {
+      "pointId": "DEMO028",
+      "shotIndex": 1,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO028",
+      "shotIndex": 2,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO028",
+      "shotIndex": 3,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO028",
+      "shotIndex": 4,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO028",
+      "shotIndex": 5,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO028",
+      "shotIndex": 6,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "BH",
+      "errorDirection": "out",
+      "terminalErrorMotion": "stationary",
+      "motionEvidence": {
+        "synthetic": true
+      }
+    },
+    {
+      "pointId": "DEMO029",
+      "shotIndex": 1,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO029",
+      "shotIndex": 2,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO029",
+      "shotIndex": 3,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO029",
+      "shotIndex": 4,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO029",
+      "shotIndex": 5,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO029",
+      "shotIndex": 6,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO029",
+      "shotIndex": 7,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO029",
+      "shotIndex": 8,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO029",
+      "shotIndex": 9,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO029",
+      "shotIndex": 10,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "BH",
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO031",
+      "shotIndex": 1,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO031",
+      "shotIndex": 2,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO031",
+      "shotIndex": 3,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO031",
+      "shotIndex": 4,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO031",
+      "shotIndex": 5,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "FH",
+      "errorDirection": "net",
+      "terminalErrorMotion": "moving",
+      "motionEvidence": {
+        "synthetic": true
+      }
+    },
+    {
+      "pointId": "DEMO032",
+      "shotIndex": 1,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO032",
+      "shotIndex": 2,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO032",
+      "shotIndex": 3,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO032",
+      "shotIndex": 4,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO032",
+      "shotIndex": 5,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO032",
+      "shotIndex": 6,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO032",
+      "shotIndex": 7,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO032",
+      "shotIndex": 8,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO032",
+      "shotIndex": 9,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "FH",
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO033",
+      "shotIndex": 1,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO033",
+      "shotIndex": 2,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO033",
+      "shotIndex": 3,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO033",
+      "shotIndex": 4,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO033",
+      "shotIndex": 5,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO033",
+      "shotIndex": 6,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO033",
+      "shotIndex": 7,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO033",
+      "shotIndex": 8,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO033",
+      "shotIndex": 9,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO033",
+      "shotIndex": 10,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO033",
+      "shotIndex": 11,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "BH",
+      "errorDirection": "net",
+      "terminalErrorMotion": "moving",
+      "motionEvidence": {
+        "synthetic": true
+      }
+    },
+    {
+      "pointId": "DEMO034",
+      "shotIndex": 1,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO034",
+      "shotIndex": 2,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO034",
+      "shotIndex": 3,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "out"
+    },
+    {
+      "pointId": "DEMO034",
+      "shotIndex": 4,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "BH",
+      "errorDirection": "out",
+      "terminalErrorMotion": "moving",
+      "motionEvidence": {
+        "synthetic": true
+      }
+    },
+    {
+      "pointId": "DEMO035",
+      "shotIndex": 1,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO035",
+      "shotIndex": 2,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO035",
+      "shotIndex": 3,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO035",
+      "shotIndex": 4,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO035",
+      "shotIndex": 5,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO035",
+      "shotIndex": 6,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO035",
+      "shotIndex": 7,
+      "hitter": "B",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": null,
+      "errorDirection": "net"
+    },
+    {
+      "pointId": "DEMO035",
+      "shotIndex": 8,
+      "hitter": "A",
+      "countsAsShot": true,
+      "evidence": {
+        "synthetic": true
+      },
+      "hand": "FH",
+      "errorDirection": "net"
+    }
+  ],
+  "serveEstimates": [
+    {
+      "setNumber": 1,
+      "serveId": "DEMO001-S1",
+      "serverId": "A",
+      "pointId": "DEMO001",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 114,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO002-S1",
+      "serverId": "A",
+      "pointId": "DEMO002",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 116,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO003-S1",
+      "serverId": "A",
+      "pointId": "DEMO003",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 118,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO003-S2",
+      "serverId": "A",
+      "pointId": "DEMO003",
+      "serveNumber": 2,
+      "launchSpeedKphEstimate": 94,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO004-S1",
+      "serverId": "A",
+      "pointId": "DEMO004",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 120,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO005-S1",
+      "serverId": "A",
+      "pointId": "DEMO005",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 122,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO006-S1",
+      "serverId": "A",
+      "pointId": "DEMO006",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 124,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO006-S2",
+      "serverId": "A",
+      "pointId": "DEMO006",
+      "serveNumber": 2,
+      "launchSpeedKphEstimate": 100,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO007-S1",
+      "serverId": "B",
+      "pointId": "DEMO007",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 102,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO008-S1",
+      "serverId": "B",
+      "pointId": "DEMO008",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 104,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO009-S1",
+      "serverId": "B",
+      "pointId": "DEMO009",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 106,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO009-S2",
+      "serverId": "B",
+      "pointId": "DEMO009",
+      "serveNumber": 2,
+      "launchSpeedKphEstimate": 82,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO010-S1",
+      "serverId": "B",
+      "pointId": "DEMO010",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 108,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO011-S1",
+      "serverId": "B",
+      "pointId": "DEMO011",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 110,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO012-S1",
+      "serverId": "B",
+      "pointId": "DEMO012",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 112,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO012-S2",
+      "serverId": "B",
+      "pointId": "DEMO012",
+      "serveNumber": 2,
+      "launchSpeedKphEstimate": 88,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO013-S1",
+      "serverId": "A",
+      "pointId": "DEMO013",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 124,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO014-S1",
+      "serverId": "A",
+      "pointId": "DEMO014",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 112,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO015-S1",
+      "serverId": "A",
+      "pointId": "DEMO015",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 114,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO015-S2",
+      "serverId": "A",
+      "pointId": "DEMO015",
+      "serveNumber": 2,
+      "launchSpeedKphEstimate": 90,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO016-S1",
+      "serverId": "A",
+      "pointId": "DEMO016",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 116,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO017-S1",
+      "serverId": "A",
+      "pointId": "DEMO017",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 118,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO018-S1",
+      "serverId": "A",
+      "pointId": "DEMO018",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 120,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO018-S2",
+      "serverId": "A",
+      "pointId": "DEMO018",
+      "serveNumber": 2,
+      "launchSpeedKphEstimate": 96,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO019-S1",
+      "serverId": "B",
+      "pointId": "DEMO019",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 112,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO020-S1",
+      "serverId": "B",
+      "pointId": "DEMO020",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 114,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO021-S1",
+      "serverId": "B",
+      "pointId": "DEMO021",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 102,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO021-S2",
+      "serverId": "B",
+      "pointId": "DEMO021",
+      "serveNumber": 2,
+      "launchSpeedKphEstimate": 78,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO022-S1",
+      "serverId": "B",
+      "pointId": "DEMO022",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 104,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO023-S1",
+      "serverId": "B",
+      "pointId": "DEMO023",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 106,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO024-S1",
+      "serverId": "B",
+      "pointId": "DEMO024",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 108,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO024-S2",
+      "serverId": "B",
+      "pointId": "DEMO024",
+      "serveNumber": 2,
+      "launchSpeedKphEstimate": 84,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO025-S1",
+      "serverId": "A",
+      "pointId": "DEMO025",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 120,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO026-S1",
+      "serverId": "A",
+      "pointId": "DEMO026",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 122,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO027-S1",
+      "serverId": "A",
+      "pointId": "DEMO027",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 124,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO027-S2",
+      "serverId": "A",
+      "pointId": "DEMO027",
+      "serveNumber": 2,
+      "launchSpeedKphEstimate": 100,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO028-S1",
+      "serverId": "A",
+      "pointId": "DEMO028",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 112,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO029-S1",
+      "serverId": "A",
+      "pointId": "DEMO029",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 114,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO030-S1",
+      "serverId": "A",
+      "pointId": "DEMO030",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 116,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO030-S2",
+      "serverId": "A",
+      "pointId": "DEMO030",
+      "serveNumber": 2,
+      "launchSpeedKphEstimate": 92,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO031-S1",
+      "serverId": "B",
+      "pointId": "DEMO031",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 108,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO032-S1",
+      "serverId": "B",
+      "pointId": "DEMO032",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 110,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO033-S1",
+      "serverId": "B",
+      "pointId": "DEMO033",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 112,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO033-S2",
+      "serverId": "B",
+      "pointId": "DEMO033",
+      "serveNumber": 2,
+      "launchSpeedKphEstimate": 88,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO034-S1",
+      "serverId": "B",
+      "pointId": "DEMO034",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 114,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO035-S1",
+      "serverId": "B",
+      "pointId": "DEMO035",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 102,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO036-S1",
+      "serverId": "B",
+      "pointId": "DEMO036",
+      "serveNumber": 1,
+      "launchSpeedKphEstimate": 104,
+      "method": "synthetic_demo",
+      "synthetic": true
+    },
+    {
+      "setNumber": 1,
+      "serveId": "DEMO036-S2",
+      "serverId": "B",
+      "pointId": "DEMO036",
+      "serveNumber": 2,
+      "launchSpeedKphEstimate": 80,
+      "method": "synthetic_demo",
+      "synthetic": true
+    }
+  ],
+  "panels": [
+    {
+      "page": 1,
+      "title": "比赛总览与关键分",
+      "eyebrow": "OVERVIEW",
+      "durationSeconds": 8.0,
+      "rows": [
+        {
+          "key": "scoreGames",
+          "label": "最终局分",
+          "a": "4",
+          "b": "2",
+          "comparison": "higher",
+          "highlight": "A",
+          "comparisonValues": {
+            "A": 4,
+            "B": 2
+          }
+        },
+        {
+          "key": "pointsWon",
+          "label": "总得分",
+          "a": "20",
+          "b": "16",
+          "comparison": "higher",
+          "highlight": "A",
+          "comparisonValues": {
+            "A": 20,
+            "B": 16
+          }
+        },
+        {
+          "key": "servicePointsWon",
+          "label": "发球分赢分率",
+          "a": "55.6%  (10/18)",
+          "b": "44.4%  (8/18)",
+          "comparison": "higher",
+          "highlight": "A",
+          "comparisonValues": {
+            "A": {
+              "numerator": 10,
+              "denominator": 18,
+              "percent": 55.6
+            },
+            "B": {
+              "numerator": 8,
+              "denominator": 18,
+              "percent": 44.4
+            }
+          }
+        },
+        {
+          "key": "held",
+          "label": "保发局 / 发球局",
+          "a": "66.7%  (2/3)",
+          "b": "33.3%  (1/3)",
+          "comparison": "higher",
+          "highlight": "A",
+          "comparisonValues": {
+            "A": {
+              "numerator": 2,
+              "denominator": 3,
+              "percent": 66.7
+            },
+            "B": {
+              "numerator": 1,
+              "denominator": 3,
+              "percent": 33.3
+            }
+          }
+        },
+        {
+          "key": "broken",
+          "label": "破发局 / 接发局",
+          "a": "66.7%  (2/3)",
+          "b": "33.3%  (1/3)",
+          "comparison": "higher",
+          "highlight": "A",
+          "comparisonValues": {
+            "A": {
+              "numerator": 2,
+              "denominator": 3,
+              "percent": 66.7
+            },
+            "B": {
+              "numerator": 1,
+              "denominator": 3,
+              "percent": 33.3
+            }
+          }
+        },
+        {
+          "key": "breakSaved",
+          "label": "破发点挽救率",
+          "a": "0%  (0/1)",
+          "b": "0%  (0/2)",
+          "comparison": "higher",
+          "highlight": null,
+          "comparisonValues": {
+            "A": {
+              "numerator": 0,
+              "denominator": 1,
+              "percent": 0.0
+            },
+            "B": {
+              "numerator": 0,
+              "denominator": 2,
+              "percent": 0.0
+            }
+          }
+        },
+        {
+          "key": "breakConverted",
+          "label": "破发点兑现率",
+          "a": "100%  (2/2)",
+          "b": "100%  (1/1)",
+          "comparison": "higher",
+          "highlight": null,
+          "comparisonValues": {
+            "A": {
+              "numerator": 2,
+              "denominator": 2,
+              "percent": 100.0
+            },
+            "B": {
+              "numerator": 1,
+              "denominator": 1,
+              "percent": 100.0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "page": 2,
+      "title": "发球与第三拍",
+      "eyebrow": "SERVE + 1",
+      "durationSeconds": 8.0,
+      "rows": [
+        {
+          "key": "aces",
+          "label": "ACE",
+          "a": "2",
+          "b": "1",
+          "comparison": "higher",
+          "highlight": "A",
+          "comparisonValues": {
+            "A": 2,
+            "B": 1
+          }
+        },
+        {
+          "key": "doubleFaults",
+          "label": "双误",
+          "a": "1",
+          "b": "2",
+          "comparison": "lower",
+          "highlight": "A",
+          "comparisonValues": {
+            "A": 1,
+            "B": 2
+          }
+        },
+        {
+          "key": "firstServeIn",
+          "label": "一发进球率",
+          "a": "66.7%  (12/18)",
+          "b": "66.7%  (12/18)",
+          "comparison": "higher",
+          "highlight": null,
+          "comparisonValues": {
+            "A": {
+              "numerator": 12,
+              "denominator": 18,
+              "percent": 66.7
+            },
+            "B": {
+              "numerator": 12,
+              "denominator": 18,
+              "percent": 66.7
+            }
+          }
+        },
+        {
+          "key": "secondServeIn",
+          "label": "二发进球率",
+          "a": "83.3%  (5/6)",
+          "b": "66.7%  (4/6)",
+          "comparison": "higher",
+          "highlight": "A",
+          "comparisonValues": {
+            "A": {
+              "numerator": 5,
+              "denominator": 6,
+              "percent": 83.3
+            },
+            "B": {
+              "numerator": 4,
+              "denominator": 6,
+              "percent": 66.7
+            }
+          }
+        },
+        {
+          "key": "firstServeWon",
+          "label": "一发得分率",
+          "a": "50%  (6/12)",
+          "b": "50%  (6/12)",
+          "comparison": "higher",
+          "highlight": null,
+          "comparisonValues": {
+            "A": {
+              "numerator": 6,
+              "denominator": 12,
+              "percent": 50.0
+            },
+            "B": {
+              "numerator": 6,
+              "denominator": 12,
+              "percent": 50.0
+            }
+          }
+        },
+        {
+          "key": "secondServeWon",
+          "label": "二发得分率",
+          "a": "66.7%  (4/6)",
+          "b": "33.3%  (2/6)",
+          "comparison": "higher",
+          "highlight": "A",
+          "comparisonValues": {
+            "A": {
+              "numerator": 4,
+              "denominator": 6,
+              "percent": 66.7
+            },
+            "B": {
+              "numerator": 2,
+              "denominator": 6,
+              "percent": 33.3
+            }
+          }
+        },
+        {
+          "key": "servePlusOneWon",
+          "label": "第三拍后赢分率",
+          "a": "53.3%  (8/15)",
+          "b": "46.7%  (7/15)",
+          "comparison": "higher",
+          "highlight": "A",
+          "comparisonValues": {
+            "A": {
+              "numerator": 8,
+              "denominator": 15,
+              "percent": 53.3
+            },
+            "B": {
+              "numerator": 7,
+              "denominator": 15,
+              "percent": 46.7
+            }
+          }
+        },
+        {
+          "key": "servePlusOneErrors",
+          "label": "第三拍直接失误",
+          "a": "1",
+          "b": "1",
+          "comparison": "lower",
+          "highlight": null,
+          "comparisonValues": {
+            "A": 1,
+            "B": 1
+          }
+        },
+        {
+          "key": "fastestServeLaunchKph",
+          "label": "最高发球初速 · 估算",
+          "a": "约 124 km/h",
+          "b": "约 114 km/h",
+          "comparison": "higher",
+          "highlight": "A",
+          "comparisonValues": {
+            "A": 124,
+            "B": 114
+          }
+        },
+        {
+          "key": "firstServeMeanLaunchKph",
+          "label": "一发平均初速 · 估算",
+          "a": "约 118 km/h",
+          "b": "约 108 km/h",
+          "comparison": "higher",
+          "highlight": "A",
+          "comparisonValues": {
+            "A": 118.11111111111111,
+            "B": 107.66666666666667
+          }
+        },
+        {
+          "key": "secondServeMeanLaunchKph",
+          "label": "二发平均初速 · 估算",
+          "a": "约 95 km/h",
+          "b": "约 83 km/h",
+          "comparison": "higher",
+          "highlight": "A",
+          "comparisonValues": {
+            "A": 95.33333333333333,
+            "B": 83.33333333333333
+          }
+        }
+      ]
+    },
+    {
+      "page": 3,
+      "title": "接发表现",
+      "eyebrow": "RETURN",
+      "durationSeconds": 8.0,
+      "rows": [
+        {
+          "key": "returnIn",
+          "label": "有效接发率",
+          "a": "93.8%  (15/16)",
+          "b": "88.2%  (15/17)",
+          "comparison": "higher",
+          "highlight": "A",
+          "comparisonValues": {
+            "A": {
+              "numerator": 15,
+              "denominator": 16,
+              "percent": 93.8
+            },
+            "B": {
+              "numerator": 15,
+              "denominator": 17,
+              "percent": 88.2
+            }
+          }
+        },
+        {
+          "key": "returnFirstIn",
+          "label": "一发有效接发率",
+          "a": "91.7%  (11/12)",
+          "b": "91.7%  (11/12)",
+          "comparison": "higher",
+          "highlight": null,
+          "comparisonValues": {
+            "A": {
+              "numerator": 11,
+              "denominator": 12,
+              "percent": 91.7
+            },
+            "B": {
+              "numerator": 11,
+              "denominator": 12,
+              "percent": 91.7
+            }
+          }
+        },
+        {
+          "key": "returnSecondIn",
+          "label": "二发有效接发率",
+          "a": "100%  (4/4)",
+          "b": "80%  (4/5)",
+          "comparison": "higher",
+          "highlight": "A",
+          "comparisonValues": {
+            "A": {
+              "numerator": 4,
+              "denominator": 4,
+              "percent": 100.0
+            },
+            "B": {
+              "numerator": 4,
+              "denominator": 5,
+              "percent": 80.0
+            }
+          }
+        },
+        {
+          "key": "returnFirstWon",
+          "label": "接一发得分率",
+          "a": "50%  (6/12)",
+          "b": "50%  (6/12)",
+          "comparison": "higher",
+          "highlight": null,
+          "comparisonValues": {
+            "A": {
+              "numerator": 6,
+              "denominator": 12,
+              "percent": 50.0
+            },
+            "B": {
+              "numerator": 6,
+              "denominator": 12,
+              "percent": 50.0
+            }
+          }
+        },
+        {
+          "key": "returnSecondWon",
+          "label": "接二发得分率",
+          "a": "66.7%  (4/6)",
+          "b": "33.3%  (2/6)",
+          "comparison": "higher",
+          "highlight": "A",
+          "comparisonValues": {
+            "A": {
+              "numerator": 4,
+              "denominator": 6,
+              "percent": 66.7
+            },
+            "B": {
+              "numerator": 2,
+              "denominator": 6,
+              "percent": 33.3
+            }
+          }
+        },
+        {
+          "key": "returnWinners",
+          "label": "接发制胜分",
+          "a": "0",
+          "b": "0",
+          "comparison": "higher",
+          "highlight": null,
+          "comparisonValues": {
+            "A": 0,
+            "B": 0
+          }
+        }
+      ]
+    },
+    {
+      "page": 4,
+      "title": "回合与击球结果",
+      "eyebrow": "RALLY & SHOTS",
+      "durationSeconds": 8.0,
+      "rows": [
+        {
+          "key": "shortWinRate",
+          "label": "1–4 拍赢分率",
+          "a": "44.4%  (4/9)",
+          "b": "55.6%  (5/9)",
+          "comparison": "higher",
+          "highlight": "B",
+          "comparisonValues": {
+            "A": {
+              "numerator": 4,
+              "denominator": 9,
+              "percent": 44.4
+            },
+            "B": {
+              "numerator": 5,
+              "denominator": 9,
+              "percent": 55.6
+            }
+          },
+          "sub": "回合占比 27.3%  (9/33)"
+        },
+        {
+          "key": "mediumWinRate",
+          "label": "5–8 拍赢分率",
+          "a": "53.8%  (7/13)",
+          "b": "46.2%  (6/13)",
+          "comparison": "higher",
+          "highlight": "A",
+          "comparisonValues": {
+            "A": {
+              "numerator": 7,
+              "denominator": 13,
+              "percent": 53.8
+            },
+            "B": {
+              "numerator": 6,
+              "denominator": 13,
+              "percent": 46.2
+            }
+          },
+          "sub": "回合占比 39.4%  (13/33)"
+        },
+        {
+          "key": "longWinRate",
+          "label": "9+ 拍赢分率",
+          "a": "63.6%  (7/11)",
+          "b": "36.4%  (4/11)",
+          "comparison": "higher",
+          "highlight": "A",
+          "comparisonValues": {
+            "A": {
+              "numerator": 7,
+              "denominator": 11,
+              "percent": 63.6
+            },
+            "B": {
+              "numerator": 4,
+              "denominator": 11,
+              "percent": 36.4
+            }
+          },
+          "sub": "回合占比 33.3%  (11/33)"
+        },
+        {
+          "key": "winners",
+          "label": "制胜分 · 不含 ACE",
+          "a": "5",
+          "b": "5",
+          "comparison": "higher",
+          "highlight": null,
+          "comparisonValues": {
+            "A": 5,
+            "B": 5
+          },
+          "asub": "正手 3 · 反手 2",
+          "bsub": "正手 3 · 反手 2"
+        },
+        {
+          "key": "UE",
+          "label": "非受迫性失误 UE",
+          "a": "3",
+          "b": "5",
+          "comparison": "lower",
+          "highlight": "A",
+          "comparisonValues": {
+            "A": 3,
+            "B": 5
+          },
+          "asub": "正手 2 · 反手 1",
+          "bsub": "正手 2 · 反手 3"
+        },
+        {
+          "key": "FE",
+          "label": "受迫性失误 FE",
+          "a": "6",
+          "b": "6",
+          "comparison": "lower",
+          "highlight": null,
+          "comparisonValues": {
+            "A": 6,
+            "B": 6
+          },
+          "asub": "正手 4 · 反手 2",
+          "bsub": "正手 3 · 反手 3"
+        },
+        {
+          "key": "errorNet",
+          "label": "失误下网占比",
+          "a": "44.4%  (4/9)",
+          "b": "63.6%  (7/11)",
+          "comparison": "neutral",
+          "highlight": null,
+          "comparisonValues": {
+            "A": {
+              "numerator": 4,
+              "denominator": 9,
+              "percent": 44.4
+            },
+            "B": {
+              "numerator": 7,
+              "denominator": 11,
+              "percent": 63.6
+            }
+          }
+        },
+        {
+          "key": "errorOut",
+          "label": "失误出界占比",
+          "a": "55.6%  (5/9)",
+          "b": "36.4%  (4/11)",
+          "comparison": "neutral",
+          "highlight": null,
+          "comparisonValues": {
+            "A": {
+              "numerator": 5,
+              "denominator": 9,
+              "percent": 55.6
+            },
+            "B": {
+              "numerator": 4,
+              "denominator": 11,
+              "percent": 36.4
+            }
+          }
+        }
+      ]
+    },
+    {
+      "page": 5,
+      "title": "击球位置与上网",
+      "eyebrow": "COURT & NET",
+      "durationSeconds": 8.0,
+      "rows": [
+        {
+          "key": "ueMoving",
+          "label": "UE · 移动中击球",
+          "a": "2",
+          "b": "5",
+          "comparison": "neutral",
+          "highlight": null,
+          "comparisonValues": {
+            "A": 2,
+            "B": 5
+          }
+        },
+        {
+          "key": "ueStationary",
+          "label": "UE · 站定击球",
+          "a": "1",
+          "b": "0",
+          "comparison": "neutral",
+          "highlight": null,
+          "comparisonValues": {
+            "A": 1,
+            "B": 0
+          }
+        },
+        {
+          "key": "deep",
+          "label": "底线后深区击球占比",
+          "a": "29.5%  (28/95)",
+          "b": "20.8%  (20/96)",
+          "comparison": "neutral",
+          "highlight": null,
+          "comparisonValues": {
+            "A": {
+              "numerator": 28,
+              "denominator": 95,
+              "percent": 29.5
+            },
+            "B": {
+              "numerator": 20,
+              "denominator": 96,
+              "percent": 20.8
+            }
+          }
+        },
+        {
+          "key": "near",
+          "label": "底线附近击球占比",
+          "a": "41.1%  (39/95)",
+          "b": "59.4%  (57/96)",
+          "comparison": "neutral",
+          "highlight": null,
+          "comparisonValues": {
+            "A": {
+              "numerator": 39,
+              "denominator": 95,
+              "percent": 41.1
+            },
+            "B": {
+              "numerator": 57,
+              "denominator": 96,
+              "percent": 59.4
+            }
+          }
+        },
+        {
+          "key": "inside",
+          "label": "场内击球占比",
+          "a": "29.5%  (28/95)",
+          "b": "19.8%  (19/96)",
+          "comparison": "neutral",
+          "highlight": null,
+          "comparisonValues": {
+            "A": {
+              "numerator": 28,
+              "denominator": 95,
+              "percent": 29.5
+            },
+            "B": {
+              "numerator": 19,
+              "denominator": 96,
+              "percent": 19.8
+            }
+          }
+        },
+        {
+          "key": "netApproaches",
+          "label": "上网次数",
+          "a": "2",
+          "b": "4",
+          "comparison": "neutral",
+          "highlight": null,
+          "comparisonValues": {
+            "A": 2,
+            "B": 4
+          }
+        },
+        {
+          "key": "netWon",
+          "label": "网前得分率",
+          "a": "100%  (2/2)",
+          "b": "100%  (4/4)",
+          "comparison": "higher",
+          "highlight": null,
+          "comparisonValues": {
+            "A": {
+              "numerator": 2,
+              "denominator": 2,
+              "percent": 100.0
+            },
+            "B": {
+              "numerator": 4,
+              "denominator": 4,
+              "percent": 100.0
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "pointCount": 36,
+    "metrics": {
+      "A": {
+        "aces": 2,
+        "doubleFaults": 1,
+        "firstServeIn": {
+          "numerator": 12,
+          "denominator": 18,
+          "percent": 66.7
+        },
+        "secondServeIn": {
+          "numerator": 5,
+          "denominator": 6,
+          "percent": 83.3
+        },
+        "firstServeWon": {
+          "numerator": 6,
+          "denominator": 12,
+          "percent": 50.0
+        },
+        "secondServeWon": {
+          "numerator": 4,
+          "denominator": 6,
+          "percent": 66.7
+        },
+        "held": {
+          "numerator": 2,
+          "denominator": 3,
+          "percent": 66.7
+        },
+        "returnFirstWon": {
+          "numerator": 6,
+          "denominator": 12,
+          "percent": 50.0
+        },
+        "returnSecondWon": {
+          "numerator": 4,
+          "denominator": 6,
+          "percent": 66.7
+        },
+        "breakSaved": {
+          "numerator": 0,
+          "denominator": 1,
+          "percent": 0.0
+        },
+        "breakConverted": {
+          "numerator": 2,
+          "denominator": 2,
+          "percent": 100.0
+        },
+        "broken": {
+          "numerator": 2,
+          "denominator": 3,
+          "percent": 66.7
+        },
+        "winners": 5,
+        "UE": 3,
+        "FE": 6,
+        "netApproaches": 2,
+        "netWon": {
+          "numerator": 2,
+          "denominator": 2,
+          "percent": 100.0
+        },
+        "pointsWon": 20,
+        "fastestMeasuredValidServe": null,
+        "firstServeMeanKph": null,
+        "secondServeMeanKph": null,
+        "shortWon": 6,
+        "mediumWon": 7,
+        "longWon": 7,
+        "deep": {
+          "numerator": 28,
+          "denominator": 95,
+          "percent": 29.5
+        },
+        "near": {
+          "numerator": 39,
+          "denominator": 95,
+          "percent": 41.1
+        },
+        "inside": {
+          "numerator": 28,
+          "denominator": 95,
+          "percent": 29.5
+        },
+        "coverage": {
+          "firstSpeedSamples": 0,
+          "secondSpeedSamples": 0,
+          "knownPositions": 95,
+          "unknownPositions": 0
+        },
+        "servicePointsWon": {
+          "numerator": 10,
+          "denominator": 18,
+          "percent": 55.6
+        },
+        "unclassifiedErrors": 0,
+        "scoreGames": 4,
+        "serveDirectRate": {
+          "numerator": 2,
+          "denominator": 18,
+          "percent": 11.1
+        },
+        "returnIn": {
+          "numerator": 15,
+          "denominator": 16,
+          "percent": 93.8
+        },
+        "returnFirstIn": {
+          "numerator": 11,
+          "denominator": 12,
+          "percent": 91.7
+        },
+        "returnSecondIn": {
+          "numerator": 4,
+          "denominator": 4,
+          "percent": 100.0
+        },
+        "returnWinners": 0,
+        "servePlusOneWon": {
+          "numerator": 8,
+          "denominator": 15,
+          "percent": 53.3
+        },
+        "servePlusOneErrors": 1,
+        "terminalHands": {
+          "W": {
+            "FH": 3,
+            "BH": 2,
+            "other": 0,
+            "unknown": 0
+          },
+          "UE": {
+            "FH": 2,
+            "BH": 1,
+            "other": 0,
+            "unknown": 0
+          },
+          "FE": {
+            "FH": 4,
+            "BH": 2,
+            "other": 0,
+            "unknown": 0
+          }
+        },
+        "errorDirections": {
+          "net": 4,
+          "out": 5,
+          "unknown": 0
+        },
+        "errorNet": {
+          "numerator": 4,
+          "denominator": 9,
+          "percent": 44.4
+        },
+        "errorOut": {
+          "numerator": 5,
+          "denominator": 9,
+          "percent": 55.6
+        },
+        "errorMotionCounts": {
+          "moving": 6,
+          "stationary": 3,
+          "unknown": 0
+        },
+        "errorMoving": {
+          "numerator": 6,
+          "denominator": 9,
+          "percent": 66.7
+        },
+        "errorStationary": {
+          "numerator": 3,
+          "denominator": 9,
+          "percent": 33.3
+        },
+        "ueMotionCounts": {
+          "moving": 2,
+          "stationary": 1,
+          "unknown": 0
+        },
+        "ueMoving": 2,
+        "ueStationary": 1,
+        "shortWinRate": {
+          "numerator": 4,
+          "denominator": 9,
+          "percent": 44.4
+        },
+        "mediumWinRate": {
+          "numerator": 7,
+          "denominator": 13,
+          "percent": 53.8
+        },
+        "longWinRate": {
+          "numerator": 7,
+          "denominator": 11,
+          "percent": 63.6
+        }
+      },
+      "B": {
+        "aces": 1,
+        "doubleFaults": 2,
+        "firstServeIn": {
+          "numerator": 12,
+          "denominator": 18,
+          "percent": 66.7
+        },
+        "secondServeIn": {
+          "numerator": 4,
+          "denominator": 6,
+          "percent": 66.7
+        },
+        "firstServeWon": {
+          "numerator": 6,
+          "denominator": 12,
+          "percent": 50.0
+        },
+        "secondServeWon": {
+          "numerator": 2,
+          "denominator": 6,
+          "percent": 33.3
+        },
+        "held": {
+          "numerator": 1,
+          "denominator": 3,
+          "percent": 33.3
+        },
+        "returnFirstWon": {
+          "numerator": 6,
+          "denominator": 12,
+          "percent": 50.0
+        },
+        "returnSecondWon": {
+          "numerator": 2,
+          "denominator": 6,
+          "percent": 33.3
+        },
+        "breakSaved": {
+          "numerator": 0,
+          "denominator": 2,
+          "percent": 0.0
+        },
+        "breakConverted": {
+          "numerator": 1,
+          "denominator": 1,
+          "percent": 100.0
+        },
+        "broken": {
+          "numerator": 1,
+          "denominator": 3,
+          "percent": 33.3
+        },
+        "winners": 5,
+        "UE": 5,
+        "FE": 6,
+        "netApproaches": 4,
+        "netWon": {
+          "numerator": 4,
+          "denominator": 4,
+          "percent": 100.0
+        },
+        "pointsWon": 16,
+        "fastestMeasuredValidServe": null,
+        "firstServeMeanKph": null,
+        "secondServeMeanKph": null,
+        "shortWon": 6,
+        "mediumWon": 6,
+        "longWon": 4,
+        "deep": {
+          "numerator": 20,
+          "denominator": 96,
+          "percent": 20.8
+        },
+        "near": {
+          "numerator": 57,
+          "denominator": 96,
+          "percent": 59.4
+        },
+        "inside": {
+          "numerator": 19,
+          "denominator": 96,
+          "percent": 19.8
+        },
+        "coverage": {
+          "firstSpeedSamples": 0,
+          "secondSpeedSamples": 0,
+          "knownPositions": 96,
+          "unknownPositions": 0
+        },
+        "servicePointsWon": {
+          "numerator": 8,
+          "denominator": 18,
+          "percent": 44.4
+        },
+        "unclassifiedErrors": 0,
+        "scoreGames": 2,
+        "serveDirectRate": {
+          "numerator": 1,
+          "denominator": 18,
+          "percent": 5.6
+        },
+        "returnIn": {
+          "numerator": 15,
+          "denominator": 17,
+          "percent": 88.2
+        },
+        "returnFirstIn": {
+          "numerator": 11,
+          "denominator": 12,
+          "percent": 91.7
+        },
+        "returnSecondIn": {
+          "numerator": 4,
+          "denominator": 5,
+          "percent": 80.0
+        },
+        "returnWinners": 0,
+        "servePlusOneWon": {
+          "numerator": 7,
+          "denominator": 15,
+          "percent": 46.7
+        },
+        "servePlusOneErrors": 1,
+        "terminalHands": {
+          "W": {
+            "FH": 3,
+            "BH": 2,
+            "other": 0,
+            "unknown": 0
+          },
+          "UE": {
+            "FH": 2,
+            "BH": 3,
+            "other": 0,
+            "unknown": 0
+          },
+          "FE": {
+            "FH": 3,
+            "BH": 3,
+            "other": 0,
+            "unknown": 0
+          }
+        },
+        "errorDirections": {
+          "net": 7,
+          "out": 4,
+          "unknown": 0
+        },
+        "errorNet": {
+          "numerator": 7,
+          "denominator": 11,
+          "percent": 63.6
+        },
+        "errorOut": {
+          "numerator": 4,
+          "denominator": 11,
+          "percent": 36.4
+        },
+        "errorMotionCounts": {
+          "moving": 10,
+          "stationary": 1,
+          "unknown": 0
+        },
+        "errorMoving": {
+          "numerator": 10,
+          "denominator": 11,
+          "percent": 90.9
+        },
+        "errorStationary": {
+          "numerator": 1,
+          "denominator": 11,
+          "percent": 9.1
+        },
+        "ueMotionCounts": {
+          "moving": 5,
+          "stationary": 0,
+          "unknown": 0
+        },
+        "ueMoving": 5,
+        "ueStationary": 0,
+        "shortWinRate": {
+          "numerator": 5,
+          "denominator": 9,
+          "percent": 55.6
+        },
+        "mediumWinRate": {
+          "numerator": 6,
+          "denominator": 13,
+          "percent": 46.2
+        },
+        "longWinRate": {
+          "numerator": 4,
+          "denominator": 11,
+          "percent": 36.4
+        }
+      }
+    },
+    "rawCounts": {
+      "A": {
+        "servicePoints": 18,
+        "pointsWon": 20,
+        "serve1Points": 12,
+        "serve1Won": 6,
+        "mediumWon": 7,
+        "serve2Points": 6,
+        "serve2Won": 4,
+        "longWon": 7,
+        "FE": 6,
+        "aces": 2,
+        "shortWon": 6,
+        "return1Points": 12,
+        "return1Won": 6,
+        "winners": 5,
+        "netApproaches": 2,
+        "netWon": 2,
+        "return2Points": 6,
+        "return2Won": 4,
+        "UE": 3,
+        "breakChances": 2,
+        "breakConverted": 2,
+        "doubleFaults": 1,
+        "breakFaced": 1,
+        "breakSaved": 0,
+        "serviceGames": 3,
+        "held": 2,
+        "returnGames": 3,
+        "broken": 2
+      },
+      "B": {
+        "return1Points": 12,
+        "return1Won": 6,
+        "FE": 6,
+        "pointsWon": 16,
+        "winners": 5,
+        "mediumWon": 6,
+        "return2Points": 6,
+        "return2Won": 2,
+        "UE": 5,
+        "netApproaches": 4,
+        "netWon": 4,
+        "servicePoints": 18,
+        "serve1Points": 12,
+        "serve1Won": 6,
+        "shortWon": 6,
+        "serve2Points": 6,
+        "serve2Won": 2,
+        "longWon": 4,
+        "aces": 1,
+        "doubleFaults": 2,
+        "breakFaced": 2,
+        "breakSaved": 0,
+        "breakChances": 1,
+        "breakConverted": 1,
+        "returnGames": 3,
+        "broken": 1,
+        "serviceGames": 3,
+        "held": 1
+      }
+    },
+    "serveReturnAudit": {
+      "metrics": {
+        "A": {
+          "serveDirectRate": {
+            "numerator": 2,
+            "denominator": 18,
+            "percent": 11.1
+          },
+          "returnIn": {
+            "numerator": 15,
+            "denominator": 16,
+            "percent": 93.8
+          },
+          "returnFirstIn": {
+            "numerator": 11,
+            "denominator": 12,
+            "percent": 91.7
+          },
+          "returnSecondIn": {
+            "numerator": 4,
+            "denominator": 4,
+            "percent": 100.0
+          },
+          "returnWinners": 0
+        },
+        "B": {
+          "serveDirectRate": {
+            "numerator": 1,
+            "denominator": 18,
+            "percent": 5.6
+          },
+          "returnIn": {
+            "numerator": 15,
+            "denominator": 17,
+            "percent": 88.2
+          },
+          "returnFirstIn": {
+            "numerator": 11,
+            "denominator": 12,
+            "percent": 91.7
+          },
+          "returnSecondIn": {
+            "numerator": 4,
+            "denominator": 5,
+            "percent": 80.0
+          },
+          "returnWinners": 0
+        }
+      },
+      "rawCounts": {
+        "A": {
+          "servicePoints": 18,
+          "serveDirect": 2,
+          "legalServesFaced": 16,
+          "legalServe1Faced": 12,
+          "returnsIn": 15,
+          "return1In": 11,
+          "returnWinners": 0,
+          "legalServe2Faced": 4,
+          "return2In": 4
+        },
+        "B": {
+          "legalServesFaced": 17,
+          "legalServe1Faced": 12,
+          "returnsIn": 15,
+          "return1In": 11,
+          "returnWinners": 0,
+          "legalServe2Faced": 5,
+          "return2In": 4,
+          "servicePoints": 18,
+          "serveDirect": 1
+        }
+      },
+      "coverage": {
+        "effectivePoints": 36,
+        "reviewedPoints": 36,
+        "missingPointIds": [],
+        "complete": true
+      }
+    },
+    "scope": "FICTIONAL DEMONSTRATION ONLY",
+    "disclaimer": "数据统计为 AI 生成，可能有误差",
+    "diagnostics": {
+      "metrics": {
+        "A": {
+          "servePlusOneWon": {
+            "numerator": 8,
+            "denominator": 15,
+            "percent": 53.3
+          },
+          "servePlusOneErrors": 1,
+          "terminalHands": {
+            "W": {
+              "FH": 3,
+              "BH": 2,
+              "other": 0,
+              "unknown": 0
+            },
+            "UE": {
+              "FH": 2,
+              "BH": 1,
+              "other": 0,
+              "unknown": 0
+            },
+            "FE": {
+              "FH": 4,
+              "BH": 2,
+              "other": 0,
+              "unknown": 0
+            }
+          },
+          "errorDirections": {
+            "net": 4,
+            "out": 5,
+            "unknown": 0
+          },
+          "errorNet": {
+            "numerator": 4,
+            "denominator": 9,
+            "percent": 44.4
+          },
+          "errorOut": {
+            "numerator": 5,
+            "denominator": 9,
+            "percent": 55.6
+          },
+          "errorMotionCounts": {
+            "moving": 6,
+            "stationary": 3,
+            "unknown": 0
+          },
+          "errorMoving": {
+            "numerator": 6,
+            "denominator": 9,
+            "percent": 66.7
+          },
+          "errorStationary": {
+            "numerator": 3,
+            "denominator": 9,
+            "percent": 33.3
+          },
+          "unclassifiedErrors": 0,
+          "ueMotionCounts": {
+            "moving": 2,
+            "stationary": 1,
+            "unknown": 0
+          },
+          "ueMoving": 2,
+          "ueStationary": 1,
+          "shortWinRate": {
+            "numerator": 4,
+            "denominator": 9,
+            "percent": 44.4
+          },
+          "mediumWinRate": {
+            "numerator": 7,
+            "denominator": 13,
+            "percent": 53.8
+          },
+          "longWinRate": {
+            "numerator": 7,
+            "denominator": 11,
+            "percent": 63.6
+          }
+        },
+        "B": {
+          "servePlusOneWon": {
+            "numerator": 7,
+            "denominator": 15,
+            "percent": 46.7
+          },
+          "servePlusOneErrors": 1,
+          "terminalHands": {
+            "W": {
+              "FH": 3,
+              "BH": 2,
+              "other": 0,
+              "unknown": 0
+            },
+            "UE": {
+              "FH": 2,
+              "BH": 3,
+              "other": 0,
+              "unknown": 0
+            },
+            "FE": {
+              "FH": 3,
+              "BH": 3,
+              "other": 0,
+              "unknown": 0
+            }
+          },
+          "errorDirections": {
+            "net": 7,
+            "out": 4,
+            "unknown": 0
+          },
+          "errorNet": {
+            "numerator": 7,
+            "denominator": 11,
+            "percent": 63.6
+          },
+          "errorOut": {
+            "numerator": 4,
+            "denominator": 11,
+            "percent": 36.4
+          },
+          "errorMotionCounts": {
+            "moving": 10,
+            "stationary": 1,
+            "unknown": 0
+          },
+          "errorMoving": {
+            "numerator": 10,
+            "denominator": 11,
+            "percent": 90.9
+          },
+          "errorStationary": {
+            "numerator": 1,
+            "denominator": 11,
+            "percent": 9.1
+          },
+          "unclassifiedErrors": 0,
+          "ueMotionCounts": {
+            "moving": 5,
+            "stationary": 0,
+            "unknown": 0
+          },
+          "ueMoving": 5,
+          "ueStationary": 0,
+          "shortWinRate": {
+            "numerator": 5,
+            "denominator": 9,
+            "percent": 55.6
+          },
+          "mediumWinRate": {
+            "numerator": 6,
+            "denominator": 13,
+            "percent": 46.2
+          },
+          "longWinRate": {
+            "numerator": 4,
+            "denominator": 11,
+            "percent": 36.4
+          }
+        }
+      },
+      "rallyDistribution": {
+        "short": {
+          "numerator": 9,
+          "denominator": 33,
+          "percent": 27.3
+        },
+        "medium": {
+          "numerator": 13,
+          "denominator": 33,
+          "percent": 39.4
+        },
+        "long": {
+          "numerator": 11,
+          "denominator": 33,
+          "percent": 33.3
+        }
+      },
+      "includedPoints": 36,
+      "rallyPoints": 33,
+      "zeroShotDoubleFaults": 3,
+      "shotCount": 224
+    },
+    "launchSpeedsBySet": [
+      {
+        "setNumber": 1,
+        "serverId": "A",
+        "count": 24,
+        "allServeMeanKphEstimate": 112.41666666666667,
+        "firstServeMeanKphEstimate": 118.11111111111111,
+        "secondServeMeanKphEstimate": 95.33333333333333,
+        "firstServeCount": 18,
+        "secondServeCount": 6,
+        "fastestServeKphEstimate": 124,
+        "fastestServeId": "DEMO006-S1",
+        "imputedCount": 0
+      },
+      {
+        "setNumber": 1,
+        "serverId": "B",
+        "count": 24,
+        "allServeMeanKphEstimate": 101.58333333333333,
+        "firstServeMeanKphEstimate": 107.66666666666667,
+        "secondServeMeanKphEstimate": 83.33333333333333,
+        "firstServeCount": 18,
+        "secondServeCount": 6,
+        "fastestServeKphEstimate": 114,
+        "fastestServeId": "DEMO020-S1",
+        "imputedCount": 0
+      }
+    ],
+    "legacyFlightSpeedFields": "fastestMeasuredValidServe,firstServeMeanKph,secondServeMeanKph: geometric sample diagnostics only"
+  },
+  "previewScore": {
+    "pointId": "DEMO034",
+    "server": "B",
+    "winner": "B",
+    "before": {
+      "points": {
+        "A": 2,
+        "B": 1
+      },
+      "display": {
+        "A": "30",
+        "B": "15"
+      },
+      "games": {
+        "A": 3,
+        "B": 2
+      },
+      "sets": {
+        "A": 0,
+        "B": 0
+      },
+      "badge": ""
+    },
+    "breakPoint": false,
+    "after": {
+      "points": {
+        "A": 2,
+        "B": 2
+      },
+      "games": {
+        "A": 3,
+        "B": 2
+      },
+      "sets": {
+        "A": 0,
+        "B": 0
+      }
+    }
+  }
+}

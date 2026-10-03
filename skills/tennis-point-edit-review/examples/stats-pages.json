@@ -1,0 +1,354 @@
+[
+  {
+    "page": 1,
+    "title": "比赛总览与关键分",
+    "eyebrow": "OVERVIEW",
+    "durationSeconds": 8.0,
+    "rows": [
+      {
+        "key": "scoreGames",
+        "label": "最终局分",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      },
+      {
+        "key": "pointsWon",
+        "label": "总得分",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      },
+      {
+        "key": "servicePointsWon",
+        "label": "发球分赢分率",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      },
+      {
+        "key": "held",
+        "label": "保发局 / 发球局",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      },
+      {
+        "key": "broken",
+        "label": "破发局 / 接发局",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      },
+      {
+        "key": "breakSaved",
+        "label": "破发点挽救率",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      },
+      {
+        "key": "breakConverted",
+        "label": "破发点兑现率",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      }
+    ]
+  },
+  {
+    "page": 2,
+    "title": "发球与第三拍",
+    "eyebrow": "SERVE + 1",
+    "durationSeconds": 8.0,
+    "rows": [
+      {
+        "key": "aces",
+        "label": "ACE",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      },
+      {
+        "key": "doubleFaults",
+        "label": "双误",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "lower",
+        "highlight": null
+      },
+      {
+        "key": "firstServeIn",
+        "label": "一发进球率",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      },
+      {
+        "key": "secondServeIn",
+        "label": "二发进球率",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      },
+      {
+        "key": "firstServeWon",
+        "label": "一发得分率",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      },
+      {
+        "key": "secondServeWon",
+        "label": "二发得分率",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      },
+      {
+        "key": "servePlusOneWon",
+        "label": "第三拍后赢分率",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      },
+      {
+        "key": "servePlusOneErrors",
+        "label": "第三拍直接失误",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "lower",
+        "highlight": null
+      },
+      {
+        "key": "fastestServeLaunchKph",
+        "label": "最高发球初速 · 估算",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      },
+      {
+        "key": "firstServeMeanLaunchKph",
+        "label": "一发平均初速 · 估算",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      },
+      {
+        "key": "secondServeMeanLaunchKph",
+        "label": "二发平均初速 · 估算",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      }
+    ]
+  },
+  {
+    "page": 3,
+    "title": "接发表现",
+    "eyebrow": "RETURN",
+    "durationSeconds": 8.0,
+    "rows": [
+      {
+        "key": "returnIn",
+        "label": "有效接发率",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      },
+      {
+        "key": "returnFirstIn",
+        "label": "一发有效接发率",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      },
+      {
+        "key": "returnSecondIn",
+        "label": "二发有效接发率",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      },
+      {
+        "key": "returnFirstWon",
+        "label": "接一发得分率",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      },
+      {
+        "key": "returnSecondWon",
+        "label": "接二发得分率",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      },
+      {
+        "key": "returnWinners",
+        "label": "接发制胜分",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      }
+    ]
+  },
+  {
+    "page": 4,
+    "title": "回合与击球结果",
+    "eyebrow": "RALLY & SHOTS",
+    "durationSeconds": 8.0,
+    "rows": [
+      {
+        "key": "shortWinRate",
+        "label": "1–4 拍赢分率",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      },
+      {
+        "key": "mediumWinRate",
+        "label": "5–8 拍赢分率",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      },
+      {
+        "key": "longWinRate",
+        "label": "9+ 拍赢分率",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      },
+      {
+        "key": "winners",
+        "label": "制胜分 · 不含 ACE",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      },
+      {
+        "key": "UE",
+        "label": "非受迫性失误 UE",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "lower",
+        "highlight": null
+      },
+      {
+        "key": "FE",
+        "label": "受迫性失误 FE",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "lower",
+        "highlight": null
+      },
+      {
+        "key": "errorNet",
+        "label": "失误下网占比",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "neutral",
+        "highlight": null
+      },
+      {
+        "key": "errorOut",
+        "label": "失误出界占比",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "neutral",
+        "highlight": null
+      }
+    ]
+  },
+  {
+    "page": 5,
+    "title": "击球位置与上网",
+    "eyebrow": "COURT & NET",
+    "durationSeconds": 8.0,
+    "rows": [
+      {
+        "key": "ueMoving",
+        "label": "UE · 移动中击球",
+        "a": "1",
+        "b": "1",
+        "comparison": "neutral",
+        "highlight": null
+      },
+      {
+        "key": "ueStationary",
+        "label": "UE · 站定击球",
+        "a": "1",
+        "b": "1",
+        "comparison": "neutral",
+        "highlight": null
+      },
+      {
+        "key": "deep",
+        "label": "底线后深区击球占比",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "neutral",
+        "highlight": null
+      },
+      {
+        "key": "near",
+        "label": "底线附近击球占比",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "neutral",
+        "highlight": null
+      },
+      {
+        "key": "inside",
+        "label": "场内击球占比",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "neutral",
+        "highlight": null
+      },
+      {
+        "key": "netApproaches",
+        "label": "上网次数",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "neutral",
+        "highlight": null
+      },
+      {
+        "key": "netWon",
+        "label": "网前得分率",
+        "a": "待计算",
+        "b": "待计算",
+        "comparison": "higher",
+        "highlight": null
+      }
+    ]
+  }
+]

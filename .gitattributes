@@ -1,0 +1,6 @@
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.webp binary
+# Preserve archived skill text, including its existing final blank lines.
+skills/tennis-point-edit-review/** whitespace=-blank-at-eof

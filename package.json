@@ -1,0 +1,22 @@
+{
+  "name": "tennis-match-edit",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Evidence-based tennis editing agent skill and reproducible UI demonstrations",
+  "license": "MIT",
+  "scripts": {
+    "demo:data": "python demo/build_mock.py",
+    "demo:build": "npm run demo:data && node demo/build.cjs",
+    "demo:capture": "npm run demo:build && node demo/capture.cjs",
+    "check": "python tools/validate.py"
+  },
+  "devDependencies": {
+    "@playwright/cli": "0.1.22",
+    "esbuild": "0.28.2",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

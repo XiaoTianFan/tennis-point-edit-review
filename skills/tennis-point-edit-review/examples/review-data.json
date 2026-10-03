@@ -1,0 +1,63 @@
+{
+  "source": "SAMPLE_TENNIS_VIDEO",
+  "ledgerRevision": "sample-v1",
+  "timelineName": "网球待复核 · 示例",
+  "players": [
+    {
+      "id": "A",
+      "name": "选手甲"
+    },
+    {
+      "id": "B",
+      "name": "选手乙"
+    }
+  ],
+  "rows": [
+    {
+      "pointId": "P001",
+      "reviewId": "R001",
+      "serverId": "A",
+      "reviewStartSeconds": 0,
+      "mainStartSeconds": 15,
+      "sourceRangesSeconds": [
+        [
+          32,
+          45
+        ]
+      ],
+      "reason": "示例：落点被遮挡，须确认首次落地点。",
+      "countingIssueRequired": false,
+      "initial": {},
+      "gameNumber": 1,
+      "serveNumber": 1
+    },
+    {
+      "pointId": "P002",
+      "reviewId": "R002",
+      "serverId": "B",
+      "reviewStartSeconds": 14,
+      "mainStartSeconds": 32,
+      "sourceRangesSeconds": [
+        [
+          56,
+          62
+        ]
+      ],
+      "reason": "示例：两次发球证据需连看，AI预填并非用户确认。",
+      "countingIssueRequired": true,
+      "initial": {
+        "scoringPlayerId": "A",
+        "deadBallType": "net",
+        "doubleFaultConfirmed": true
+      },
+      "gameNumber": 1,
+      "serveNumber": 2
+    }
+  ]
+}
+
+
+
+
+
+

@@ -1,0 +1,557 @@
+{
+  "schema": "tennis-ui-template/v1",
+  "version": "2026.10.03-v18",
+  "referenceCanvas": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30
+  },
+  "defaultPolicy": "Use for tennis without a separately specified UI skill/style; explicit request and confirmed project style take precedence.",
+  "components": {
+    "scoreboard": {
+      "codeFile": "examples/scoreboard.jsx",
+      "naturalSize": {
+        "width": 440,
+        "height": 132
+      },
+      "placement1080p": {
+        "left": 48,
+        "top": 900,
+        "width": 440,
+        "height": 132
+      },
+      "properties": [
+        {
+          "key": "font",
+          "label": "字体",
+          "defaultValue": "Noto Sans SC",
+          "type": "font"
+        },
+        {
+          "key": "panel",
+          "label": "面板颜色",
+          "defaultValue": "#142C42",
+          "type": "color"
+        },
+        {
+          "key": "header",
+          "label": "标题颜色",
+          "defaultValue": "#0A1B2B",
+          "type": "color"
+        },
+        {
+          "key": "accent",
+          "label": "强调颜色",
+          "defaultValue": "#DAF36D",
+          "type": "color"
+        },
+        {
+          "key": "ink",
+          "label": "文字颜色",
+          "defaultValue": "#F5F7FA",
+          "type": "color"
+        },
+        {
+          "key": "transparentBackground",
+          "label": "透明背景",
+          "defaultValue": false,
+          "type": "boolean"
+        },
+        {
+          "key": "nameA",
+          "label": "选手一",
+          "defaultValue": "选手甲",
+          "type": "text"
+        },
+        {
+          "key": "nameB",
+          "label": "选手二",
+          "defaultValue": "选手乙",
+          "type": "text"
+        },
+        {
+          "key": "rule",
+          "label": "顶部说明",
+          "defaultValue": "无占先 · P001",
+          "type": "text"
+        },
+        {
+          "key": "gamesLabel",
+          "label": "局标题",
+          "defaultValue": "局",
+          "type": "text"
+        },
+        {
+          "key": "pointsLabel",
+          "label": "分标题",
+          "defaultValue": "分",
+          "type": "text"
+        },
+        {
+          "key": "gamesA",
+          "label": "选手一局分",
+          "defaultValue": "0",
+          "type": "text"
+        },
+        {
+          "key": "gamesB",
+          "label": "选手二局分",
+          "defaultValue": "0",
+          "type": "text"
+        },
+        {
+          "key": "pointsA",
+          "label": "选手一小分",
+          "defaultValue": "0",
+          "type": "text"
+        },
+        {
+          "key": "pointsB",
+          "label": "选手二小分",
+          "defaultValue": "0",
+          "type": "text"
+        },
+        {
+          "key": "server",
+          "label": "发球方",
+          "defaultValue": "A",
+          "type": "text"
+        }
+      ],
+      "motion": "continuous without per-cut restart",
+      "sha256": "822cb46a6471b2ae29b58131ca1352ac4a9f3b15068171f80ac9e720f3f2c188"
+    },
+    "serveLabel": {
+      "codeFile": "examples/serve-label.jsx",
+      "naturalSize": {
+        "width": 200,
+        "height": 54
+      },
+      "placement1080p": {
+        "left": 1672,
+        "top": 48,
+        "width": 200,
+        "height": 54
+      },
+      "properties": [
+        {
+          "key": "font",
+          "label": "字体",
+          "defaultValue": "Noto Sans SC",
+          "type": "font"
+        },
+        {
+          "key": "panel",
+          "label": "底色",
+          "defaultValue": "#0A1B2B",
+          "type": "color"
+        },
+        {
+          "key": "ink",
+          "label": "文字",
+          "defaultValue": "#F5F7FA",
+          "type": "color"
+        },
+        {
+          "key": "accent",
+          "label": "强调",
+          "defaultValue": "#DAF36D",
+          "type": "color"
+        },
+        {
+          "key": "label",
+          "label": "内容",
+          "defaultValue": "一发",
+          "type": "text"
+        },
+        {
+          "key": "transparentBackground",
+          "label": "透明背景",
+          "type": "boolean",
+          "defaultValue": false
+        }
+      ],
+      "motion": "continuous without per-cut restart",
+      "sha256": "a06265a1861d31853a471023804470dc6be0d1653f7df07eef24b66f6a375a20",
+      "timingPolicy": "Main edit only: show serve number before contact; change to double fault only after verified fault. End on the identical frame as serveSpeed. No repeated entrance. Review location labels remain persistent."
+    },
+    "explanation": {
+      "codeFile": "examples/explanation.jsx",
+      "naturalSize": {
+        "width": 980,
+        "height": 132
+      },
+      "placement1080p": {
+        "left": 48,
+        "top": 48,
+        "width": 784,
+        "height": 105.6
+      },
+      "properties": [
+        {
+          "defaultValue": "Noto Sans SC",
+          "key": "font",
+          "label": "字体",
+          "type": "font"
+        },
+        {
+          "defaultValue": "#0A1B2B",
+          "key": "header",
+          "label": "标题颜色",
+          "type": "color"
+        },
+        {
+          "defaultValue": "#DAF36D",
+          "key": "accent",
+          "label": "强调颜色",
+          "type": "color"
+        },
+        {
+          "defaultValue": "#F5F7FA",
+          "key": "ink",
+          "label": "文字颜色",
+          "type": "color"
+        },
+        {
+          "defaultValue": false,
+          "key": "transparentBackground",
+          "label": "透明背景",
+          "type": "boolean"
+        },
+        {
+          "defaultValue": "情况说明",
+          "key": "title",
+          "label": "标题",
+          "type": "text"
+        },
+        {
+          "defaultValue": "以已核实的逐分结果为准；现场采用的局归属另行说明。",
+          "key": "detail",
+          "label": "说明",
+          "type": "text"
+        }
+      ],
+      "motion": "continuous without per-cut restart",
+      "sha256": "dfa3e6c5d2e0918f042918a532a43cfa211aab765b663434e655f31c495fb7bd",
+      "sizingPolicy": "Use template_pack to estimate required height, then verify actual font wrapping and bottom padding; shorten excessive notes."
+    },
+    "statsPanel": {
+      "codeFile": "examples/stats-panel.jsx",
+      "naturalSize": {
+        "width": 1600,
+        "height": 900
+      },
+      "placement1080p": {
+        "left": 240,
+        "top": 135,
+        "width": 1440,
+        "height": 810
+      },
+      "properties": [
+        {
+          "defaultValue": "比赛总览与关键分",
+          "key": "title",
+          "label": "统计主题",
+          "type": "text"
+        },
+        {
+          "defaultValue": "OVERVIEW",
+          "key": "eyebrow",
+          "label": "分类标识",
+          "type": "text"
+        },
+        {
+          "defaultValue": "1 / 5",
+          "key": "pageNumber",
+          "label": "页码",
+          "type": "text"
+        },
+        {
+          "defaultValue": "全盘技术统计",
+          "key": "subtitle",
+          "label": "比赛结果",
+          "type": "text"
+        },
+        {
+          "defaultValue": "选手甲",
+          "key": "nameA",
+          "label": "选手A",
+          "type": "text"
+        },
+        {
+          "defaultValue": "选手乙",
+          "key": "nameB",
+          "label": "选手B",
+          "type": "text"
+        },
+        {
+          "defaultValue": "[{\"key\": \"scoreGames\", \"label\": \"最终局分\", \"a\": \"待计算\", \"b\": \"待计算\", \"comparison\": \"higher\", \"highlight\": null}, {\"key\": \"pointsWon\", \"label\": \"总得分\", \"a\": \"待计算\", \"b\": \"待计算\", \"comparison\": \"higher\", \"highlight\": null}, {\"key\": \"servicePointsWon\", \"label\": \"发球分赢分率\", \"a\": \"待计算\", \"b\": \"待计算\", \"comparison\": \"higher\", \"highlight\": null}, {\"key\": \"held\", \"label\": \"保发局 / 发球局\", \"a\": \"待计算\", \"b\": \"待计算\", \"comparison\": \"higher\", \"highlight\": null}, {\"key\": \"broken\", \"label\": \"破发局 / 接发局\", \"a\": \"待计算\", \"b\": \"待计算\", \"comparison\": \"higher\", \"highlight\": null}, {\"key\": \"breakSaved\", \"label\": \"破发点挽救率\", \"a\": \"待计算\", \"b\": \"待计算\", \"comparison\": \"higher\", \"highlight\": null}, {\"key\": \"breakConverted\", \"label\": \"破发点兑现率\", \"a\": \"待计算\", \"b\": \"待计算\", \"comparison\": \"higher\", \"highlight\": null}]",
+          "key": "rows",
+          "label": "统计行数据",
+          "type": "text"
+        },
+        {
+          "defaultValue": "比分与总分来自已采用的逐分账本。",
+          "key": "footnote",
+          "label": "统计口径",
+          "type": "text"
+        },
+        {
+          "defaultValue": "分级统计与现场局归属例外分别记录。",
+          "key": "footnote2",
+          "label": "补充说明",
+          "type": "text"
+        },
+        {
+          "defaultValue": "数据统计为 AI 生成，可能有误差",
+          "key": "disclaimer",
+          "label": "统计说明",
+          "type": "text"
+        },
+        {
+          "defaultValue": "#142C42F2",
+          "key": "panel",
+          "label": "面板颜色",
+          "type": "color"
+        },
+        {
+          "defaultValue": "#0A1B2B",
+          "key": "header",
+          "label": "表头颜色",
+          "type": "color"
+        },
+        {
+          "defaultValue": "#F5F7FA",
+          "key": "ink",
+          "label": "文字颜色",
+          "type": "color"
+        },
+        {
+          "defaultValue": "#DAF36D",
+          "key": "accent",
+          "label": "强调色",
+          "type": "color"
+        },
+        {
+          "defaultValue": "Noto Sans SC",
+          "key": "font",
+          "label": "字体",
+          "type": "font"
+        },
+        {
+          "defaultValue": 240,
+          "key": "panelFrames",
+          "label": "本页帧数",
+          "type": "number"
+        },
+        {
+          "defaultValue": false,
+          "key": "transparentBackground",
+          "label": "透明底色",
+          "type": "boolean"
+        }
+      ],
+      "motion": "brief page fade; 8 seconds each, 40 seconds total at default five pages",
+      "sha256": "1d15489b5ee376a0bee7d3074f825a36ab9b6ce953d00c1712592a9819ea8919",
+      "rowCounts": [
+        7,
+        11,
+        6,
+        8,
+        7
+      ],
+      "comparisonContract": "higher/lower/neutral from raw values; accent on better main value only; ties and distributions neutral"
+    },
+    "reviewLabel": {
+      "codeFile": "examples/review-label.jsx",
+      "naturalSize": {
+        "width": 740,
+        "height": 62
+      },
+      "placement1080p": {
+        "left": 1132,
+        "top": 48,
+        "width": 740,
+        "height": 62
+      },
+      "properties": [
+        {
+          "key": "font",
+          "label": "字体",
+          "type": "font",
+          "defaultValue": "Noto Sans SC"
+        },
+        {
+          "key": "panel",
+          "label": "底色",
+          "type": "color",
+          "defaultValue": "#0A1B2B"
+        },
+        {
+          "key": "ink",
+          "label": "文字",
+          "type": "color",
+          "defaultValue": "#F5F7FA"
+        },
+        {
+          "key": "accent",
+          "label": "强调色",
+          "type": "color",
+          "defaultValue": "#DAF36D"
+        },
+        {
+          "key": "transparentBackground",
+          "label": "透明背景",
+          "type": "boolean",
+          "defaultValue": false
+        },
+        {
+          "key": "phaseLabel",
+          "label": "phaseLabel",
+          "type": "text",
+          "defaultValue": "第1局"
+        },
+        {
+          "key": "serverPrefix",
+          "label": "serverPrefix",
+          "type": "text",
+          "defaultValue": "发球："
+        },
+        {
+          "key": "serverName",
+          "label": "serverName",
+          "type": "text",
+          "defaultValue": "选手甲"
+        },
+        {
+          "key": "serveLabel",
+          "label": "serveLabel",
+          "type": "text",
+          "defaultValue": "一发"
+        }
+      ],
+      "motion": "none; continuous across cuts within the same point",
+      "sha256": "93dce69e89052a9e7c7a0461670a617601adf969f157cb9117ca3012fa0e5ca8"
+    },
+    "reviewId": {
+      "codeFile": "examples/review-id.jsx",
+      "naturalSize": {
+        "width": 270,
+        "height": 58
+      },
+      "placement1080p": {
+        "left": 48,
+        "top": 48,
+        "width": 270,
+        "height": 58
+      },
+      "properties": [
+        {
+          "key": "font",
+          "label": "字体",
+          "type": "font",
+          "defaultValue": "Noto Sans SC"
+        },
+        {
+          "key": "panel",
+          "label": "底色",
+          "type": "color",
+          "defaultValue": "#0A1B2B"
+        },
+        {
+          "key": "ink",
+          "label": "文字",
+          "type": "color",
+          "defaultValue": "#F5F7FA"
+        },
+        {
+          "key": "accent",
+          "label": "强调色",
+          "type": "color",
+          "defaultValue": "#DAF36D"
+        },
+        {
+          "key": "transparentBackground",
+          "label": "透明背景",
+          "type": "boolean",
+          "defaultValue": false
+        },
+        {
+          "key": "reviewId",
+          "label": "reviewId",
+          "type": "text",
+          "defaultValue": "R001"
+        },
+        {
+          "key": "pointId",
+          "label": "pointId",
+          "type": "text",
+          "defaultValue": "P001"
+        }
+      ],
+      "motion": "none; continuous across cuts within the same point",
+      "sha256": "75b662125c6843563c06c60c45e9c3909c938ec3915b8c6c7781d3cb9e8130dc"
+    },
+    "serveSpeed": {
+      "codeFile": "examples/serve-speed.jsx",
+      "naturalSize": {
+        "width": 200,
+        "height": 42
+      },
+      "placement1080p": {
+        "left": 1672,
+        "top": 102,
+        "width": 200,
+        "height": 42
+      },
+      "properties": [
+        {
+          "key": "font",
+          "label": "字体",
+          "type": "font",
+          "defaultValue": "Noto Sans SC"
+        },
+        {
+          "key": "panel",
+          "label": "背景",
+          "type": "color",
+          "defaultValue": "#142C42"
+        },
+        {
+          "key": "accent",
+          "label": "强调色",
+          "type": "color",
+          "defaultValue": "#DAF36D"
+        },
+        {
+          "key": "ink",
+          "label": "文字",
+          "type": "color",
+          "defaultValue": "#F5F7FA"
+        },
+        {
+          "key": "qualifier",
+          "label": "估值标识",
+          "type": "text",
+          "defaultValue": "约"
+        },
+        {
+          "key": "speed",
+          "label": "本次发球初速",
+          "type": "text",
+          "defaultValue": "80"
+        },
+        {
+          "key": "unit",
+          "label": "单位",
+          "type": "text",
+          "defaultValue": "km/h"
+        }
+      ],
+      "timingPolicy": "Show only after verified outgoing ball. Shared end with serveLabel = earliest of start+3 output seconds, retained clip end, point end, next serve. Fault state never restarts timer.",
+      "sha256": "d7b3648ecdd953dd37ed6a414efd30fa78e53b91607e3188ba24504b4828053c"
+    }
+  },
+  "metricCount": 33,
+  "statsPages": "examples/stats-pages.json"
+}

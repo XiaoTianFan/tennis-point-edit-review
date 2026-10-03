@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<title>网球逐分复核</title><style>
+*{box-sizing:border-box}body{margin:0;color:#142c42;background:#f2f5f6;font:15px/1.55 system-ui,sans-serif}header{padding:24px;background:#0a1b2b;color:#f5f7fa;border-top:4px solid #daf36d}h1{font-size:26px;margin:0 0 8px}main{padding:20px;max-width:1680px;margin:auto}button,input,textarea,select{font:inherit}button{cursor:pointer;padding:8px 14px}textarea{width:100%;min-height:60px}small,.reason{color:#536979}.toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:14px}.wrap{overflow:auto;max-height:70vh;border:1px solid #cbd6df}table{border-collapse:separate;border-spacing:0;width:100%;min-width:1300px;background:white}th,td{padding:10px;border-bottom:1px solid #d9e1e7}thead th{position:sticky;top:0;background:#142c42;color:white;z-index:2}thead th:first-child{width:35%;min-width:430px}tbody th{text-align:left;font-weight:400}td{min-width:84px;text-align:center;border-left:1px solid #ecf0f3}.pick{display:block;cursor:pointer;position:relative}.pick input{position:absolute;opacity:0}.pick span{display:block;padding:16px 5px;border:1px solid #b9c8d2;border-radius:4px}.pick input:checked+span{background:#daf36d;color:#0a1b2b;font-weight:700}.pick input:disabled+span{opacity:.35}.pick input:focus-visible+span,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #3175ae;outline-offset:2px}.rowhead{display:flex;justify-content:space-between;gap:10px}.rowhead strong{font-size:18px}.record-meta{margin:6px 0;color:#142c42;font-weight:600}.checks{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}.checks label{font-size:12px}.reason{margin:5px 0;font-size:13px}.resolved{box-shadow:inset 4px 0 #8d9d49}.search-match{outline:2px solid #3175ae;outline-offset:-2px}.unresolved{box-shadow:inset 4px 0 #be821c}.replay{box-shadow:inset 4px 0 #3175ae}#export{margin-top:20px;padding:20px;background:white;border:1px solid #cbd6df}#copy{background:#142c42;color:white;border:0;padding:14px 20px}#output{height:200px;font:12px/1.5 monospace}#message{min-height:24px;margin-top:10px}details{margin-top:8px}summary{cursor:pointer}[hidden]{display:none!important}
+</style></head><body><header><h1 id="title">网球逐分复核</h1><div id="context"></div><p>编号统一为 R编号 / P编号；每条记录常显局次和发球方，● 表示发球方。所有记录始终保留原位，选择结果后不会隐藏或重排。每行单选得分方或“人工无法确定”，再选已知死球类型；人工无法归属会留空胜者，交由后续计分约束逆推。整分重打不计分；擦网重发写备注，保留最终有效回合结果。双误未勾选不表示否认双误。</p></header><main>
+<div class="toolbar"><strong id="progress"></strong><input id="search" aria-label="查找回合" placeholder="查找编号或疑点（高亮，不隐藏）"><small id="search-status" role="status" aria-live="polite">全部记录常驻显示</small><small id="save">草稿仅保存在本浏览器</small><a href="#export">复制结果</a></div>
+<div class="wrap" tabindex="0" aria-label="可滚动复核表"><table><thead><tr id="head"><th scope="col">回合与证据定位</th></tr></thead><tbody id="rows"></tbody></table></div>
+<section id="export"><p>复制全部列表（包含未完成、已完成及待逆推记录），然后粘贴到 agent 对话中，以便修正比分与统计。单行已复核不代表整局计分矛盾已经解决。</p><button id="copy" type="button">复制整个列表的复核结果</button><div id="message" role="status" aria-live="polite"></div><details id="manual"><summary>查看结果 / 手动复制</summary><textarea id="output" readonly aria-label="完整复核结果"></textarea></details></section></main>
+<script id="data" type="application/json">__DATA__</script><script>
+'use strict';
+const DATA=JSON.parse(document.getElementById('data').textContent),PLAYERS=DATA.players;
+const CAUSES=[['out','出界'],['net','下网'],['two_bounces','两跳'],['replay','重打'],['ace','ACE'],['winner','制胜分'],['other','其他']];
+const $=id=>document.getElementById(id),answers={},nodes=new Map();
+const el=(tag,text,attrs={})=>{const n=document.createElement(tag);if(text!==null)n.textContent=text;for(const[k,v]of Object.entries(attrs))n.setAttribute(k,v);return n;};
+const key='tennis-review:'+DATA.source+':'+DATA.ledgerRevision;
+const blank=()=>({scoringPlayerId:null,winnerUndetermined:false,deadBallType:null,doubleFaultConfirmed:null,extra:false,reviewConfirmed:false,countingIssueResolved:false,note:'',updatedAt:null});
+const validPlayer=id=>PLAYERS.some(p=>p.id===id);
+function normalized(raw){const x={...blank(),...raw};if(!validPlayer(x.scoringPlayerId))x.scoringPlayerId=null;if(!CAUSES.some(c=>c[0]===x.deadBallType))x.deadBallType=null;x.doubleFaultConfirmed=x.doubleFaultConfirmed===true?true:null;x.extra=x.extra===true;x.reviewConfirmed=x.reviewConfirmed===true;x.countingIssueResolved=x.countingIssueResolved===true;x.note=typeof x.note==='string'?x.note:'';x.winnerUndetermined=x.winnerUndetermined===true;if(x.deadBallType==='replay')x.winnerUndetermined=false;if(x.winnerUndetermined){x.scoringPlayerId=null;x.doubleFaultConfirmed=null;if(x.deadBallType==='ace')x.deadBallType=null;}return x;}
+let saved={};try{saved=JSON.parse(localStorage.getItem(key)||'{}')}catch{}
+$('title').textContent=PLAYERS.map(p=>p.name).join(' × ')+' · 逐分复核';
+$('context').textContent=DATA.source+' · '+DATA.timelineName;
+for(const p of PLAYERS)$('head').append(el('th',p.name,{scope:'col'}));$('head').append(el('th','人工无法确定',{scope:'col'}));for(const c of CAUSES)$('head').append(el('th',c[1],{scope:'col'}));
+function state(r,x){if(!x.reviewConfirmed)return (x.scoringPlayerId||x.deadBallType||x.note)?'partial':'pending';if(x.winnerUndetermined)return 'unresolved';if(r.countingIssueRequired&&!x.countingIssueResolved)return 'partial';if(x.deadBallType==='replay')return 'replay';return x.scoringPlayerId&&x.deadBallType?'resolved':'partial';}
+function done(r,x){return ['resolved','replay','unresolved'].includes(state(r,x));}
+for(const r of DATA.rows){
+ const x=normalized(saved[r.pointId]||{...r.initial,reviewConfirmed:false});answers[r.pointId]=x;
+ const tr=el('tr',null,{'data-point':r.pointId}),info=el('th',null,{scope:'row'}),top=el('div',null,{class:'rowhead'}),status=el('small','');
+ top.append(el('strong',r.reviewId+' / '+r.pointId),status);info.append(top);
+ const game=Number.isInteger(r.gameNumber)&&r.gameNumber>0?'第'+r.gameNumber+'局':'局次待核';
+ const set=Number.isInteger(r.setNumber)&&r.setNumber>0?'第'+r.setNumber+'盘 · ':'';
+ const server=PLAYERS.find(p=>p.id===r.serverId);
+ const serveText=n=>n===1?'一发':n===2?'二发':'发次待核';
+ const serves=Array.isArray(r.serveNumbers)&&r.serveNumbers.length?r.serveNumbers.map(serveText).join('→'):serveText(r.serveNumber);
+ info.append(el('div',set+game+' · ● 发球：'+(server?server.name:'待核')+' · '+serves,{class:'record-meta'}));
+ info.append(el('div','复核 '+r.reviewStartSeconds.toFixed(1)+' 秒 · 主剪 '+r.mainStartSeconds.toFixed(1)+' 秒',{class:'reason'}));
+ info.append(el('div','原片 '+r.sourceRangesSeconds.map(t=>t.map(v=>v.toFixed(2)).join('–')).join(' / ')+' 秒',{class:'reason'}));
+ info.append(el('p',r.reason,{class:'reason'}));
+ const checks=el('div',null,{class:'checks'}),controls={};
+ const check=(field,label)=>{const lab=el('label',null),input=el('input',null,{type:'checkbox','data-field':field});lab.append(input,document.createTextNode(' '+label));checks.append(lab);controls[field]=input;};
+ check('doubleFaultConfirmed','确认双误');check('extra','已完局多打 · 不计分');check('reviewConfirmed','本行已复核');if(r.countingIssueRequired)check('countingIssueResolved','计分疑点已核对');
+ const note=el('textarea',null,{'data-field':'note','aria-label':r.pointId+' 补充备注',placeholder:'注明擦网、现场判罚、可见依据或其他原因'});info.append(checks,note);tr.append(info);
+ const radios=[];
+ for(const[field,choices]of [['scoringPlayerId',[...PLAYERS.map(p=>[p.id,p.name+'得分']),['undetermined','人工无法确定']]],['deadBallType',CAUSES]])for(const[value,label]of choices){
+  const td=el('td',null),lab=el('label',null,{class:'pick'}),input=el('input',null,{type:'radio',name:field+'-'+r.pointId,value,'data-field':field,'aria-label':r.pointId+' '+label});
+  lab.append(input,el('span',field==='scoringPlayerId'&&value!=='undetermined'?'得分':label));td.append(lab);tr.append(td);radios.push(input);
+ }
+ $('rows').append(tr);nodes.set(r.pointId,{tr,status,controls,note,radios});
+}
+function sync(r){const x=answers[r.pointId],n=nodes.get(r.pointId),s=state(r,x);n.status.textContent={pending:'待填写',partial:'待复核 / 未完整',resolved:'已复核',unresolved:'已人工复核 · 待逆推',replay:'重打 · 不计分'}[s];n.tr.className=s;if(s==='unresolved'&&x.extra)n.status.textContent='已人工复核 · 归属未知（多打不计分）';
+for(const[field,input]of Object.entries(n.controls))input.checked=!!x[field];n.controls.doubleFaultConfirmed.disabled=x.deadBallType==='replay';n.controls.extra.disabled=x.deadBallType==='replay';n.note.value=x.note;
+for(const input of n.radios){input.checked=input.value==='undetermined'?x.winnerUndetermined:x[input.dataset.field]===input.value;input.disabled=input.dataset.field==='scoringPlayerId'&&x.deadBallType==='replay';}}
+function buildPayload(){return{schema:'tennis-point-review/v1',source:DATA.source,ledgerRevision:DATA.ledgerRevision,timelineName:DATA.timelineName,exportedAt:new Date().toISOString(),totalRows:DATA.rows.length,unresolvedRows:DATA.rows.filter(r=>state(r,answers[r.pointId])==='unresolved').length,inferenceRequiredRows:DATA.rows.filter(r=>state(r,answers[r.pointId])==='unresolved'&&!answers[r.pointId].extra).length,completedRows:DATA.rows.filter(r=>done(r,answers[r.pointId])).length,rows:DATA.rows.map(r=>{const x=answers[r.pointId];return{reviewId:r.reviewId,pointId:r.pointId,serverId:r.serverId,winnerUndetermined:x.winnerUndetermined,inferenceRequired:x.winnerUndetermined&&x.reviewConfirmed&&!x.extra,scoringPlayerId:x.deadBallType==='replay'||x.winnerUndetermined?null:x.scoringPlayerId,scoringPlayer:PLAYERS.find(p=>p.id===x.scoringPlayerId)?.name||null,deadBallType:x.deadBallType,deadBallLabel:CAUSES.find(c=>c[0]===x.deadBallType)?.[1]||null,doubleFaultConfirmed:x.doubleFaultConfirmed===true?true:null,countsTowardScore:x.extra||x.deadBallType==='replay'?false:null,countingStatus:x.extra?'extra':x.deadBallType==='replay'?'replay':null,reviewConfirmed:x.reviewConfirmed,countingIssueRequired:!!r.countingIssueRequired,countingIssueResolved:r.countingIssueRequired?x.countingIssueResolved:null,status:state(r,x),note:x.note,updatedAt:x.updatedAt};})};}
+function exportText(){return '网球逐分复核结果（按 pointId 回填；pending/partial保持待核；unresolved为人工无法归属待逆推；replay和extra不计分；未标双误不代表否认双误）\n'+JSON.stringify(buildPayload(),null,2);}
+function refresh(){
+ const query=$('search').value.trim().toLowerCase();let matches=0;
+ for(const r of DATA.rows){const x=answers[r.pointId],n=nodes.get(r.pointId);n.tr.hidden=false;
+  const match=!!query&&[r.pointId,r.reviewId,'第'+r.gameNumber+'局',r.reason,x.note].join(' ').toLowerCase().includes(query);
+  n.tr.classList.toggle('search-match',match);if(match)matches++;
+ }
+ const required=DATA.rows.filter(r=>r.reviewRequired!==false),reviewed=required.filter(r=>done(r,answers[r.pointId])).length;
+ const unresolved=DATA.rows.filter(r=>state(r,answers[r.pointId])==='unresolved'&&!answers[r.pointId].extra).length;
+ $('progress').textContent=reviewed+' / '+required.length+' 已人工复核 · 全表 '+DATA.rows.length+' 条 · '+unresolved+' 项待逆推';
+ $('search-status').textContent=query?matches+' 处匹配；全部记录仍显示，回车定位':'全部记录常驻显示';
+ $('output').value=exportText();
+}
+function changed(r){answers[r.pointId].updatedAt=new Date().toISOString();sync(r);try{localStorage.setItem(key,JSON.stringify(answers));$('save').textContent='草稿已保存于本浏览器'}catch{$('save').textContent='无法保存草稿，请及时复制'}refresh();}
+$('rows').addEventListener('change',e=>{const tr=e.target.closest('[data-point]');if(!tr)return;const r=DATA.rows.find(r=>r.pointId===tr.dataset.point),x=answers[r.pointId],field=e.target.dataset.field;if(!field)return;
+if(field==='note')x.note=e.target.value;else if(e.target.type==='checkbox')x[field]=field==='doubleFaultConfirmed'?(e.target.checked?true:null):e.target.checked;else if(field==='scoringPlayerId'){x.winnerUndetermined=e.target.value==='undetermined';x.scoringPlayerId=x.winnerUndetermined?null:e.target.value;if(x.winnerUndetermined){x.doubleFaultConfirmed=null;x.countingIssueResolved=false;if(x.deadBallType==='ace')x.deadBallType=null;}}else x[field]=e.target.value;
+if(field!=='reviewConfirmed'&&field!=='note')x.reviewConfirmed=true;
+if(field==='deadBallType'&&x.deadBallType==='replay'){x.scoringPlayerId=null;x.winnerUndetermined=false;x.doubleFaultConfirmed=null;x.extra=false;}
+if(field==='deadBallType'&&x.deadBallType==='ace'){x.scoringPlayerId=r.serverId;x.winnerUndetermined=false;x.doubleFaultConfirmed=null;}
+if(field==='scoringPlayerId'&&x.deadBallType==='ace'&&x.scoringPlayerId!==r.serverId)x.deadBallType=null;
+if(field==='doubleFaultConfirmed'&&x.doubleFaultConfirmed){x.winnerUndetermined=false;x.scoringPlayerId=PLAYERS.find(p=>p.id!==r.serverId).id;if(['ace','winner','two_bounces','replay'].includes(x.deadBallType))x.deadBallType=null;}
+if(field==='scoringPlayerId'&&x.scoringPlayerId===r.serverId)x.doubleFaultConfirmed=null;
+if(field==='deadBallType'&&['winner','two_bounces'].includes(x.deadBallType))x.doubleFaultConfirmed=null;
+changed(r);});
+$('rows').addEventListener('input',e=>{if(e.target.dataset.field!=='note')return;const r=DATA.rows.find(r=>r.pointId===e.target.closest('[data-point]').dataset.point);answers[r.pointId].note=e.target.value;changed(r);});
+$('search').addEventListener('input',refresh);
+$('search').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();document.querySelector('#rows tr.search-match')?.scrollIntoView({block:'center'});}});
+$('copy').addEventListener('click',async()=>{const text=exportText();$('output').value=text;let ok=false;try{await navigator.clipboard.writeText(text);ok=true}catch{}if(!ok){$('manual').open=true;$('output').focus();$('output').select();try{ok=document.execCommand('copy')}catch{}}$('message').textContent=ok?'已复制整个列表，请粘贴到 agent 对话中修正比分与统计。':'完整结果已选中，请按 Ctrl+C（Mac用⌘C），再粘贴到 agent 对话中。';});
+for(const r of DATA.rows)sync(r);refresh();
+</script></body></html>
+
+
+
+
+
+

@@ -1,0 +1,41 @@
+{
+  "scopes": [
+    {
+      "source": "example_video",
+      "startUs": 0,
+      "endUs": 3000000
+    }
+  ],
+  "intervals": [
+    {
+      "source": "example_video",
+      "startUs": 0,
+      "endUs": 1000000,
+      "kind": "serve_fault",
+      "pointId": "P001",
+      "reviewed": true,
+      "retained": false,
+      "reason": "主剪省略一发失误，证据保留"
+    },
+    {
+      "source": "example_video",
+      "startUs": 1000000,
+      "endUs": 2000000,
+      "kind": "waiting",
+      "reviewed": true,
+      "retained": false,
+      "reason": "发球间准备"
+    },
+    {
+      "source": "example_video",
+      "startUs": 2000000,
+      "endUs": 3000000,
+      "kind": "rally",
+      "pointId": "P001",
+      "reviewed": true,
+      "retained": true
+    }
+  ]
+}
+
+
