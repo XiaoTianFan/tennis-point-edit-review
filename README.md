@@ -23,6 +23,8 @@ illustration. No match footage, player identities or measured serve speeds are i
 The workflow begins with a short introduction unless the user opts out. The agent
 does the detailed checking; the user sees only remaining material uncertainties.
 
+Current skill revision: **2026.10.04-v19**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, optional 3D fitting, quality checks and fallbacks.
+
 ## Preview
 
 ![Serve and third-shot panel with derived mock statistics](docs/images/stats-serve.png)

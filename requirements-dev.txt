@@ -1,3 +1,4 @@
 # Optional frame-evidence and court-mapping checks.
 numpy>=1.26,<3
 opencv-python-headless>=4.9,<5
+scipy>=1.11,<2

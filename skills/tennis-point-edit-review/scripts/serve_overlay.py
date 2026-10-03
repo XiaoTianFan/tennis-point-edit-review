@@ -60,6 +60,15 @@ def build_plan(records, fps):
                 states[0]['endFrame']=fault_frame
                 states.append(dict(startFrame=fault_frame,endFrame=end,label='二发 · 双误'))
             else:fault_after_window=True
+        if 'letConfirmedUs' in r:
+            confirmed=r['letConfirmedUs']
+            if r['eventType']!='let' or type(confirmed) is not int or confirmed<r['confirmedPostContactUs'] or 'doubleFaultConfirmedUs' in r:
+                raise ValueError('Let label requires independent later let evidence and cannot be a double fault')
+            let_frame=c['startFrame']+math.floor(Fraction(confirmed-c['sourceInUs'],1000000)*fps/rate)+1
+            if let_frame<end:
+                states[0]['endFrame']=let_frame
+                states.append(dict(startFrame=let_frame,endFrame=end,label=label+' · 擦网'))
+            else:fault_after_window=True
         out.append(dict(setNumber=r['setNumber'],pointId=r['pointId'],serveId=r['serveId'],startFrame=start,endFrame=end,durationFrames=end-start,
                         labelStartFrame=c['startFrame'],labelEndFrame=end,labelStates=states,outcomeAfterOverlayWindow=fault_after_window,
                         qualifier='补估' if method=='model_imputed' else '约',speed=str(math.floor(speed+.5)),unit='km/h',statsIncluded=r['statsIncluded']))
@@ -69,5 +78,4 @@ if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('input');p.add_argument('output');a=p.parse_args()
     d=json.loads(Path(a.input).read_text(encoding='utf-8-sig'))
     Path(a.output).write_text(json.dumps(build_plan(d['records'],d['fps']),ensure_ascii=False,indent=2),encoding='utf8')
-
 

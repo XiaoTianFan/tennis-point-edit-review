@@ -79,3 +79,9 @@ python scripts/serve_overlay.py input.json plan.json。输入fps（支持整数�
 ## 接发数据完整性边界
 
 新增统计由 [接发汇总助手](../scripts/serve_return_stats.py) 消费agent逐分视觉标注；模板在证据未齐时拒绝把缺失绘成0。用户不需额外填写接发技术字段，定义与分母见 [统计口径](statistics.md)。
+
+## v19 估速取证工具
+
+依[发球估速取证](serve-speed-audit.md)使用 serve_event_audit.audit_attempts 核对发次与真实触拍资格，speed_evidence.estimate_endpoint 验证事件夹逼并计算物理敏感性，partial_trajectory.fit_partial 与 alternating_holdouts 产生并检验三维候选，speed_evidence.assess_partial_quality 决定候选是否可采用。三维工具另需 NumPy、SciPy；其余新增工具使用标准库。speed_evidence.impute_same_group 只从同组独立证据补估。通过 build_speed_case.py 重建匿名合成示例，不将示例当实测。
+
+serve_overlay 新增可选 letConfirmedUs（源片整数微秒），只在 eventType=let 使用，且不得同时标双误。大标签在重发判定证实之后改字，球速与共同退出点保持原计时；确认过晚只记录 outcomeAfterOverlayWindow。真实发球挥空的无速度标签例外见[显示说明](serve-speed-overlay.md)。

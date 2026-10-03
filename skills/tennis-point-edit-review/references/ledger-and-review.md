@@ -49,7 +49,7 @@ completedRows 表示已完成本轮人工复核的行数，可以包含 unresolv
 
 
 ## 动作候选与实际发球分离
-分内分别保存 actualServeEvents 与 nonServeEvents（如 shadow_swing、aborted_toss_caught），并记录源时间、触球证据和判别来源。非发球事件不计入发球次数、失误、拍数、有效分或统计分母。旧版本把非发球事件误标一发时，保留更正历史，重排真实发次，并同步 HTML、复核时间线和主剪中受影响的提示；不能让旧 serveNumbers 覆盖用户明确的文字更正。总分存在矛盾时不借调整发次暗中新增一分。
+分内分别保存 actualServeEvents 与 nonServeEvents（如 shadow_swing、aborted_toss_caught），并记录源时间、触球证据和判别来源。非发球准备事件不计入发球次数、失误、拍数、有效分或统计分母。真正尝试发球却挥空另记 serve_miss：算该次失误、可能构成双误，不计实际触拍且没有球速；保存尝试时刻，不捏造触拍时刻。countsAsServeOpportunity 与 speedApplicable/included 分开记录，统计纳入仍依当前比赛范围。旧版本把非发球事件误标一发时，保留更正历史，重排真实发次，并同步 HTML、复核时间线和主剪中受影响的提示；不能让旧 serveNumbers 覆盖用户明确的文字更正。总分存在矛盾时不借调整发次暗中新增一分。
 
 见 [覆盖与编号谱系](coverage-and-exceptions.md)：原片覆盖、候选合并/拆分及字段依赖由agent内部核查；不增加用户逐字段确认负担。
 

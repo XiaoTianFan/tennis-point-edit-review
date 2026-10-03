@@ -39,7 +39,7 @@ npm run demo:capture
 python tools/validate.py
 ```
 
-维护细则与发球物理模型在 `references/`，正式模板在 `examples/`。本次发布保留v18完整包及迁移对照；具体比赛的姓名、视频和路径不作为固定要求。
+维护细则与发球物理模型在 `references/`，正式模板在 `examples/`。当前版本 **2026.10.04-v19** 保留全部正式模板与迁移对照，新增事件取证、擦网分段、三维候选质量检查及补估工具；详见[中英文球速方法说明](docs/serve-speed-explained.md)。具体比赛的姓名、视频和路径不作为固定要求。
 
 账户保存版本没有可以直接交给 Git 的目录地址。建议以本仓库作可版本管理的维护源。也支持先修改账户版本，再由 agent 完整取回、差异比较、合并、验证和提交；不会自动同步，更不会自动公开到 GitHub。详见[双向同步流程](docs/synchronization.md)。
 

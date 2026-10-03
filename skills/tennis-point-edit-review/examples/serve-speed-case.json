@@ -1,0 +1,168 @@
+{
+  "schema": "tennis-speed-study/synthetic-v1",
+  "synthetic": true,
+  "warning": "Synthetic regression example, not a real-footage accuracy benchmark",
+  "input": {
+    "eventType": "let",
+    "ballIdentityVerified": true,
+    "crossesEarlierCollision": false,
+    "contact": {
+      "kind": "racket_contact",
+      "verified": true,
+      "estimateSeconds": 10,
+      "bracketSeconds": [
+        9.99,
+        10.01
+      ],
+      "note": "Synthetic event bracket"
+    },
+    "endpoint": {
+      "kind": "first_net_impact",
+      "verified": true,
+      "estimateSeconds": 10.7,
+      "bracketSeconds": [
+        10.69,
+        10.709999999999999
+      ],
+      "note": "Synthetic event bracket"
+    },
+    "horizontalDistanceMetres": {
+      "value": 12,
+      "range": [
+        11,
+        13
+      ],
+      "basis": "Synthetic court geometry"
+    },
+    "contactHeightMetres": {
+      "value": 2.7,
+      "range": [
+        2.45,
+        2.95
+      ],
+      "basis": "Synthetic contact height"
+    },
+    "endpointHeightMetres": {
+      "value": 0.94,
+      "range": [
+        0.89,
+        0.99
+      ],
+      "basis": "Synthetic net contact"
+    },
+    "dragPerM": {
+      "value": 0.02,
+      "range": [
+        0.012,
+        0.028
+      ],
+      "basis": "Illustrative physical prior"
+    },
+    "liftPerM": {
+      "value": 0,
+      "range": [
+        -0.004,
+        0.004
+      ],
+      "basis": "Illustrative unknown-spin perturbation"
+    }
+  },
+  "corrected": {
+    "launchSpeedKphEstimate": 69.86581024288095,
+    "initialVelocityMS": [
+      19.39292912262174,
+      0.743322614368766
+    ],
+    "model": "gravity + quadratic drag + stated signed lift",
+    "parameters": {
+      "dragPerM": 0.02,
+      "liftPerM": 0.0,
+      "gravityMS2": 9.81
+    },
+    "endpointResidualM": 2.3340841080065118e-06,
+    "method": "endpoint_physics",
+    "flightSeconds": 0.6999999999999993,
+    "flightSecondsRange": [
+      0.6799999999999997,
+      0.7199999999999989
+    ],
+    "horizontalMeanFlightKph": 61.71428571428578,
+    "sensitivityRangeKph": [
+      58.68365298863158,
+      83.41308562538019
+    ],
+    "sensitivityType": "Declared parameter-corner envelope; not calibrated probability or absolute accuracy",
+    "ballIdentityVerified": true,
+    "flightSegmentVerified": true,
+    "evidence": {
+      "eventType": "let",
+      "ballIdentityVerified": true,
+      "crossesEarlierCollision": false,
+      "contact": {
+        "kind": "racket_contact",
+        "verified": true,
+        "estimateSeconds": 10,
+        "bracketSeconds": [
+          9.99,
+          10.01
+        ],
+        "note": "Synthetic event bracket"
+      },
+      "endpoint": {
+        "kind": "first_net_impact",
+        "verified": true,
+        "estimateSeconds": 10.7,
+        "bracketSeconds": [
+          10.69,
+          10.709999999999999
+        ],
+        "note": "Synthetic event bracket"
+      },
+      "horizontalDistanceMetres": {
+        "value": 12,
+        "range": [
+          11,
+          13
+        ],
+        "basis": "Synthetic court geometry"
+      },
+      "contactHeightMetres": {
+        "value": 2.7,
+        "range": [
+          2.45,
+          2.95
+        ],
+        "basis": "Synthetic contact height"
+      },
+      "endpointHeightMetres": {
+        "value": 0.94,
+        "range": [
+          0.89,
+          0.99
+        ],
+        "basis": "Synthetic net contact"
+      },
+      "dragPerM": {
+        "value": 0.02,
+        "range": [
+          0.012,
+          0.028
+        ],
+        "basis": "Illustrative physical prior"
+      },
+      "liftPerM": {
+        "value": 0,
+        "range": [
+          -0.004,
+          0.004
+        ],
+        "basis": "Illustrative unknown-spin perturbation"
+      }
+    }
+  },
+  "rejectedEarlierEndpointHypothesis": {
+    "assumedFlightSeconds": 0.4,
+    "unvalidatedNumericalSpeed": 122.64209843016334,
+    "reason": "Hypothesized endpoint 10.40 is outside observed bracket 10.69-10.71"
+  }
+}

@@ -5,10 +5,13 @@ not a radar reading. No automatic unlabelled filling of missing observations.
 """
 import math
 from collections import defaultdict
+from serve_event_audit import require_speed_eligible
 
 def flight(vx, vz, height, duration, *, drag=.020, lift=0., gravity=9.81, steps=100):
     """2D vertical-plane RK4, quadratic drag and signed transverse lift."""
-    if duration<=0 or height<0 or drag<0:raise ValueError('Invalid physical input')
+    if not all(isinstance(x,(int,float)) and not isinstance(x,bool) and math.isfinite(x) for x in (vx,vz,height,duration,drag,lift,gravity)):
+        raise ValueError('Finite physical inputs required')
+    if duration<=0 or height<0 or drag<0 or gravity<0 or type(steps) is not int or steps<=0:raise ValueError('Invalid physical input')
     q=[0.,height,vx,vz];dt=duration/steps
     def deriv(s):
         x,z,u,w=s;v=math.hypot(u,w)
@@ -25,7 +28,9 @@ def reconstruct(distance, duration, height, end_height=0., *, drag=.020, lift=0.
     Identifiability is conditional on supplied drag/lift and geometry. Vary them
     for a sensitivity interval; do not call it a calibrated confidence interval.
     """
-    if distance<=0 or duration<=0:raise ValueError('Positive distance and time required')
+    if not all(isinstance(x,(int,float)) and not isinstance(x,bool) and math.isfinite(x) for x in (distance,duration,height,end_height,drag,lift,gravity)):
+        raise ValueError('Finite physical inputs required')
+    if distance<=0 or duration<=0 or height<0 or end_height<0 or drag<0 or gravity<0:raise ValueError('Invalid physical input')
     v=[distance/duration,(end_height-height)/duration+gravity*duration/2]
     for _ in range(20):
         q=flight(*v,height,duration,drag=drag,lift=lift,gravity=gravity)
@@ -46,13 +51,13 @@ def aggregate_serves(records):
     """Each included physical serve gets one vote; never select an error bound."""
     groups=defaultdict(list);seen=set()
     for r in records:
-        if not r.get('included',True):continue
+        if not require_speed_eligible(r):continue
         key=(r['setNumber'],r['serveId'])
         if key in seen:raise ValueError('Duplicate serve in set')
         seen.add(key)
         value=r.get('launchSpeedKphEstimate')
-        if value is None or not math.isfinite(value) or value<=0:raise ValueError('Complete per-serve estimates required; obtain evidence or explicitly labelled model imputation first')
-        if r['serveNumber'] not in (1,2):raise ValueError('Unresolved serve number')
+        if isinstance(value,bool) or not isinstance(value,(int,float)) or not math.isfinite(value) or value<=0:raise ValueError('Complete per-serve estimates required; obtain evidence or explicitly labelled model imputation first')
+        if type(r['serveNumber']) is not int or r['serveNumber'] not in (1,2):raise ValueError('Unresolved serve number')
         if r.get('method')=='model_imputed' and not r.get('imputationBasis'):raise ValueError('Imputation requires disclosed supporting population')
         groups[(r['setNumber'],r['serverId'])].append(r)
     out=[]
@@ -67,6 +72,5 @@ def aggregate_serves(records):
           'fastestServeKphEstimate':best['launchSpeedKphEstimate'],'fastestServeId':best['serveId'],
           'imputedCount':sum(r.get('method')=='model_imputed' for r in rr)})
     return out
-
 
 

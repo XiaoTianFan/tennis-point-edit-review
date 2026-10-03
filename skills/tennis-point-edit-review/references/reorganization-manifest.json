@@ -22,9 +22,12 @@
       "id": "R003",
       "sourceLine": 13,
       "target": "SKILL.md",
-      "requiredTextSha256": "4136b86d887a8b0ed6284e3c4d6d5ff32a8486604e0ed2d2c096ec74c4422aa6",
+      "requiredTextSha256": "1e56da2d5a5717dd2fc684f3f7fdc28d71beea47e06636c30c52164c6ff76c39",
       "status": "relocated_or_equivalent",
-      "requiredTextPrefixLength": 146
+      "requiredTextPrefixLength": 144,
+      "priorRequiredTextSha256": "4136b86d887a8b0ed6284e3c4d6d5ff32a8486604e0ed2d2c096ec74c4422aa6",
+      "priorRequiredTextPrefixLength": 146,
+      "amendment": "v19: update the package revision while preserving the adopted task-routing and visual-template priority rule."
     },
     {
       "id": "R004",
@@ -102,9 +105,12 @@
       "id": "R013",
       "sourceLine": 30,
       "target": "references/adjudication.md",
-      "requiredTextSha256": "98c49dd3056a183edd25b1940caff4d3cc08067ce05708c6cae315808853c3ad",
+      "requiredTextSha256": "d3999ea3e91f99313cec03cad31a11fc62c9972ed88afd675d1fe4d6853dff78",
       "status": "relocated_or_equivalent",
-      "requiredTextPrefixLength": 180
+      "requiredTextPrefixLength": 182,
+      "priorRequiredTextSha256": "98c49dd3056a183edd25b1940caff4d3cc08067ce05708c6cae315808853c3ad",
+      "priorRequiredTextPrefixLength": 180,
+      "amendment": "v19: distinguish abandoned preparation from an attempted service miss; preserve observed-contact requirements."
     },
     {
       "id": "R014",
@@ -443,7 +449,8 @@
     {
       "path": "references/serve-speed-model.md",
       "originalSha256": "c0184343c837c66cfc6c26f3d104b8fa794867ab74c4caa684256e3ecdcab3ae",
-      "status": "unchanged"
+      "status": "revised_v19",
+      "revisionNote": "Intentional serve-speed methodology update; original digest retained for history."
     },
     {
       "path": "references/serve-speed-overlay.md",
@@ -523,7 +530,8 @@
     {
       "path": "scripts/launch_speed.py",
       "originalSha256": "2bb5d392ea966b9030993a1c465a5d1b971c8aae827c6514e1a559d34691149c",
-      "status": "unchanged"
+      "status": "revised_v19",
+      "revisionNote": "Intentional serve-speed methodology update; original digest retained for history."
     },
     {
       "path": "scripts/package_check.py",
@@ -548,7 +556,8 @@
     {
       "path": "scripts/serve_overlay.py",
       "originalSha256": "38954c3ed21efd31869852ccee55cc5e860d6287a59aa20fff3c96e526947758",
-      "status": "unchanged"
+      "status": "revised_v19",
+      "revisionNote": "Intentional serve-speed methodology update; original digest retained for history."
     },
     {
       "path": "scripts/serve_return_stats.py",
@@ -563,7 +572,8 @@
     {
       "path": "scripts/speed_quality.py",
       "originalSha256": "8e4175ddf202ed3c61206ef771744a1347d8aa969570d005cfad6bc82c7823d3",
-      "status": "unchanged"
+      "status": "revised_v19",
+      "revisionNote": "Intentional serve-speed methodology update; original digest retained for history."
     },
     {
       "path": "scripts/stats_aggregate.py",

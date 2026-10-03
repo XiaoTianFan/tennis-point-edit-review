@@ -8,7 +8,7 @@ The repository layout references these projects; their source code was not copie
 
 Development dependencies are installed by the package manager, not vendored:
 React / React DOM (MIT), esbuild (MIT), Playwright CLI (Apache-2.0),
-NumPy (BSD-3-Clause), OpenCV (Apache-2.0).
+NumPy (BSD-3-Clause), SciPy (BSD-3-Clause), OpenCV (Apache-2.0).
 Inspect installed packages for their full license notices.
 
 The skill links to ITF, LTA, ATP and physics sources for definitions and methods.

@@ -1,11 +1,12 @@
 """Agent-side model diagnostics. No new human review form or automatic exclusions."""
 from collections import defaultdict
 import math
+from serve_event_audit import require_speed_eligible
 
 def audit_speed_quality(records):
     groups=defaultdict(list); seen=set(); flags=[]
     for r in records:
-        if not r.get('included',True):continue
+        if not require_speed_eligible(r):continue
         key=(r['setNumber'],r['serveId'])
         if key in seen:raise ValueError('Duplicate serve')
         seen.add(key)
@@ -30,5 +31,4 @@ def audit_speed_quality(records):
         if best.get('method')=='model_imputed':flags.append({'serveId':best['serveId'],'issue':'highest_central_estimate_is_imputed_not_visually_ranked'})
         elif best.get('fastestCandidateReviewed') is not True:flags.append({'serveId':best['serveId'],'issue':'agent_must_reinspect_fastest_candidate'})
     return {'groups':results,'agentChecks':flags,'requiresUserForm':False}
-
 
