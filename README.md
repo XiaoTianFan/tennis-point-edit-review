@@ -72,7 +72,7 @@ tools/                          Validation, packaging and conflict-aware snapsho
 ```
 
 The package retains the adopted v18 rules and historical preservation map.
-Repository release `0.1.0` and skill revision `2026.10.03-v18` are separate labels.
+Repository release `0.1.0` and skill revision `2026.10.03-v18.1` are separate labels.
 
 ## Reproduce the demonstrations
 

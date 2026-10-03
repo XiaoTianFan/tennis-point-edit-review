@@ -2,6 +2,8 @@
 
 脚本不连接编辑器、不编辑时间线，也不携带原项目绝对路径或素材ID。路径通过参数传入。Python基础脚本用标准库；逐帧和单应映射需要OpenCV及NumPy。浏览器复核页离线运行，无外部库。
 
+这些辅助脚本不是完整剪辑器；缺少编辑器时，由agent按[跨环境执行与能力补齐](../SKILL.md#跨环境执行与能力补齐)另建执行层，不能把辅助脚本的职责边界误读为必须使用ChatCut。
+
 ## 数据与命令
 - 构建网页：python scripts/review_io.py build review-data.json review.html。输入形状见 examples/review-data.json；只填当前待审分，行序匹配复核时间线。每行提供 reviewId、pointId、gameNumber（必要时 setNumber）、serverId 和 serveNumber；记录含一发与二发的连续证据时可用 serveNumbers=[1,2] 表达。R/P 映射与时间线共用，局次和发球方逐行常显。局次为正整数，未知值留 null；发次不明也留 null，不借显示默认值猜填。输出为可独立使用的交互列表，不需要嵌入或附带视频，不增加视频转码/导出步骤；录像在对应复核时间线查看。
 - 合并用户结果：python scripts/review_io.py merge ledger.json exported-review.txt ledger-next.json。输出新文件；输入账本需 source、ledgerRevision、players、points。旧结构先显式适配，绝不靠行号猜测。

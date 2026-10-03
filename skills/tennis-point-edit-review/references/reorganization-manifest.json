@@ -22,9 +22,9 @@
       "id": "R003",
       "sourceLine": 13,
       "target": "SKILL.md",
-      "requiredTextSha256": "1322ef49e7c88230b8cf7849f0a0fabfe11fb1ff43fb0b1704463d8e2e98bf35",
+      "requiredTextSha256": "4136b86d887a8b0ed6284e3c4d6d5ff32a8486604e0ed2d2c096ec74c4422aa6",
       "status": "relocated_or_equivalent",
-      "requiredTextPrefixLength": 144
+      "requiredTextPrefixLength": 146
     },
     {
       "id": "R004",
