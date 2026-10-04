@@ -1,6 +1,6 @@
 # 原片检查工具
 
-从原片建立逐分账本时使用；ChatCut、Pr与本地流程共用，不改变[判读](adjudication.md)和[覆盖](coverage-and-exceptions.md)规则。优先复用可用的媒体查看能力；以下终端工具帮助agent取得证据，不自动识别得分，也不要求用户逐帧标注。
+用于阶段1精剪及后续补查，证据存入内部log；ChatCut、Pr与本地流程共用，不改变[判读](adjudication.md)和[覆盖](coverage-and-exceptions.md)规则。优先复用可用的媒体查看能力；以下终端工具帮助agent取得证据，不自动识别得分，也不要求用户逐帧标注。
 
 ## 按问题取证
 

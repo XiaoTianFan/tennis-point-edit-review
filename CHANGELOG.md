@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026.10.05 — skill 2026.10.05-v23.1
+
+- Makes stage 1 deliver the complete point-cut timeline, with an internal ledger and no scoring; stage 2 owns point adjudication, scoring and basic graphics.
+- Allows repeated review/recalculation rounds and includes problem games when self-checks cannot reconcile the supplied final score.
+- Combines panels and speed overlays into stage 6, using data prepared in stage 5; aligns all workflow references with seven stages. Runtime code and templates are unchanged.
+
 ## 2026.10.04 — skill 2026.10.04-v23
 
 - Reorganizes the entry around stage-scoped work, required references, concrete deliverables and completion checks at any starting point; explicit continuous execution keeps the same checks.

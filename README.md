@@ -23,11 +23,14 @@ illustration. No match footage, player identities or measured serve speeds are i
 The workflow resumes from the current stage and defaults to one stage per turn,
 with inspected deliverables and a brief report of results and the next step.
 An explicit request enables continuous execution; required references and checks
-still apply. The agent does the detailed checking, including serve identification;
-the user sees only remaining material uncertainties. Main-cut point locators,
-scoreboards and short serve labels are built before statistics.
+still apply. Stage 1 delivers the complete point-cut timeline and keeps its ledger
+as an internal log. Stage 2 performs point adjudication, scoring and basic graphics.
+Stages 3–4 repeat review and recalculation as needed. Stage 5 prepares all statistics,
+speeds and timing; stage 6 builds panels and speed overlays together; stage 7 verifies
+the result. Review covers unresolved points or problem games that still disagree
+with the supplied final score after the agent's own checks.
 
-Current skill revision: **2026.10.04-v23**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, optional 3D fitting, quality checks and fallbacks.
+Current skill revision: **2026.10.05-v23.1**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, optional 3D fitting, quality checks and fallbacks.
 
 ChatCut, **Premiere Pro** and a standalone pipeline are primary editing choices.
 The [environment contract](skills/tennis-point-edit-review/references/editing-environments.md)

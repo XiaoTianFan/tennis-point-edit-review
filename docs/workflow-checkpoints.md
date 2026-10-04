@@ -1,7 +1,7 @@
 # Stage-based workflow maintenance
 
-Revision v23 addresses observed failures to finish agent-owned analysis, deliver
-interactive review, and distinguish main-cut labels from review information.
+Revisions v23–v23.1 clarify agent-owned work, concrete stage delivery, necessary
+interactive review, and the distinction between main-cut and review labels.
 This is repository maintenance context, not additional match instructions.
 
 The skill entry now groups each stage's work, required reading and completion
@@ -11,6 +11,11 @@ stage, and inapplicable stages do not require empty deliverables or approvals.
 Existing project notes hold the small progress record; no new state schema or
 workflow engine is introduced.
 
+The seven stages deliver: cut timeline → adjudication/scoring/basic graphics →
+review ⇄ recalculation → statistics/speed data → panels and speed overlays →
+final QA. Stage 1 keeps the ledger internal and does not advance scores; stages
+3–4 may repeat; stage 5 supplies all data for the combined graphics stage 6.
+
 ## Scenario review
 
 These are documentation walk-throughs, not a live-editor or model reliability
@@ -19,10 +24,12 @@ expected behavior to that agent.
 
 | Starting request or condition | Expected behavior |
 |---|---|
-| Raw footage, no execution preference | Briefly explain the remaining workflow; begin evidence/ledger work and deliver the first stage's actual results with the next step. |
-| Already cut points and a known final score | Reuse cuts; map stable points, add visible locators, inspect actual serves and outcomes. Build scoring and short serve labels in stage 2; final score constrains but does not fabricate outcomes. |
+| Raw footage, no execution preference | Stage 1 cuts every point from serve to dead ball with required reactions and places it on a playable timeline. Keep the ledger internal; scoring starts in stage 2. |
+| Already cut points and a known final score | Check cuts and internal mappings, then reuse the timeline for agent-owned point adjudication, scoring and basic graphics in stage 2. |
 | A few clipped endings or uncertain serves | Inspect source gaps and continuous context; adopt clear decisions. Only unresolved material questions and necessary related points enter review. |
 | Review is necessary | Deliver matching review sequence and interactive HTML, or the standalone review workspace. Every selected review row stays visible; unrelated points are not added by default. |
+| Scoring still disagrees with the supplied final game/set score after source checks | Include each problem game's points individually, with necessary adjacent evidence. Preserve known answers; repeat stages 3–4 as needed without fabricating a matching score. |
+| Statistics and speed data are ready | Stage 6 renders both five-page panels and per-serve speed overlays from stage 5's shared data and timing; neither requires its own stage or fixed rendering order. |
 | A long rally, before speed estimation | Serve label starts before service and exits no later than three seconds after the confirmed post-contact display start, or at an earlier boundary. It does not fill the rally. |
 | Resume with reviewed answers or completed statistics | Read current state and the affected stage references; preserve IDs, answers and completed work. Recompute dependencies or build the remaining panels/labels as appropriate. |
 | “Do everything continuously; ask only when necessary” | Continue across stages with progress reports, required reading and self-checks; genuine unanswered questions block only dependent conclusions. |
