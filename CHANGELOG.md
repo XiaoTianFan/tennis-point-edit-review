@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026.10.04 — skill 2026.10.04-v21
+
+- Fixes Windows FCP7 file URIs and Premiere stereo grouping using live 23.5 import/export evidence; rejects incompatible mono/stereo channel-slot layouts.
+- Qualifies synthetic cuts and a 54.1-second real-media fixture with five statistics pages, native opacity/audio automation, PCM audio and save/reopen.
+- Adds fresh-machine bootstrap, native Windows save paths, SDR compositing, encoder-preset discovery and modal/unknown-result recovery guidance for terminal agents.
+- Distinguishes Pr-authored titles without exposed legacy text controls from AE-authored MOGRTs; custom native graphics remain blocked by the local AE licensing/language issue. Newer UXP and full-match transfer are still pending.
+- Preserves all seven canonical JSX sources and the original media/ChatCut project; no account synchronization or publication.
+
 ## 2026.10.04 — skill 2026.10.04-v20
 
 - Makes ChatCut, Premiere Pro and standalone editing explicit primary choices, independently selecting the graphics layer.

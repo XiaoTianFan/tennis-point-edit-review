@@ -93,15 +93,17 @@ project and ignored local output directory.
 The candidate was installed locally for testing with telemetry/update checks
 disabled. Its broad installer defaults were narrowed: no client configuration
 was changed and only the installed CEP runtime's debug setting was enabled,
-with previous state recorded. No successful connection or host mutation has
-yet been established. Windows Computer Use was stopped by a physical Escape
-before live bridge setup; app control stopped at that point.
+with previous state recorded. The earlier turn stopped when Computer Use was
+stopped by Escape. In the new turn the permitted runtime became available and
+was used to activate the panel and inspect/dismiss test-error dialogs.
 
-The owner subsequently authorized resuming development setup, but the runtime
-continued returning the stopped-by-Escape state. No further UI method was used
-to circumvent it. The owner also clarified that the final skill must operate
-through terminal/files, without assuming Computer Use, and must distinguish
-old and new Premiere releases. Both constraints are now part of the package.
+Premiere 23.5.0 build 56 then connected. All timeline import, inspection,
+automation, export, save and reopen operations used terminal requests. The
+first activation needs an open project: Extensions is disabled on the empty
+Home screen. A fresh agent can ask the user to create/open a blank scratch
+project and activate the panel once; subsequent terminal launch uses that
+machine's Premiere executable and the saved project path. No screenshot/click
+capability is required by the distributed skill.
 
 ## Test sequence and acceptance
 
@@ -148,17 +150,13 @@ Repository upgrades, account Skill synchronization, agent installation and GitHu
 publication are distinct operations. This task prepares and commits repository
 changes; account publication is not implied by a local package upgrade.
 
-## Implemented and checked in this pass
+## Implemented and checked
 
 - Explicit editor selection and independent graphics selection, including
   legacy CEP and newer UXP setup, prerequisites and version gates.
-- A terminal-only, single-request stdio MCP client. It successfully initialized
-  the actual 1.2.8 server and retrieved the XML-import schema. This proves client
-  transport/catalog access, not a connected Premiere host. A subsequent read-only
-  check with `launchIfNeeded:false` returned `premiere_not_running`; the client
-  recorded the complete tool error and exited unsuccessfully, without retries or
-  app launch. The upstream error mentions launch failure even in this no-launch
-  mode; it is not evidence that launching was attempted.
+- A terminal-only, single-request stdio MCP client, exercised against the actual
+  1.2.8 server and the installed 23.5.0.56 CEP host. Results retain full requests,
+  responses and errors; no automatic mutation retries.
 - A bounded FCP7 generator for same-rate CFR cuts, linked mono/stereo audio and
   full-canvas stills. It rejects unsupported effects/rates and retains pending
   host operations explicitly. Exact frame/tick and structural tests passed.
@@ -170,22 +168,60 @@ changes; account publication is not implied by a local package upgrade.
 - Two real source excerpts normalized to 30 fps: 309 + 114 = 423 frames. Packet
   inspection of the source's first 70 seconds found both 1/60-second and
   11/600-second frame durations, confirming variable cadence in that window.
-  Their XML and source-offset mapping are ready for host import; original media
-  was not changed. Twelve real-data graphics were rendered into ignored local
-  test output, including five saved statistics pages.
+  Their XML and source-offset mapping were imported; original media was not
+  changed. Twelve real-data graphics were rendered into ignored local test
+  output, including five saved statistics pages.
 - A provisional authoring-script generator for five native graphics. JavaScript
-  syntax and field mappings are checked; **AE execution, binary MOGRT export and
-  Premiere compatibility are unverified**. Rendered statistics and explanation
-  overlays retain their canonical implementation.
+  syntax and field mappings are checked. AE's supported `-r` script entry was
+  attempted, but a subscription/language installation error prevented execution.
+  **No custom binary MOGRT was produced or qualified.** Rendered statistics and
+  explanation overlays retain their canonical implementation.
 
 The live ChatCut project changed while this investigation was running. A saved
 serve-overlay data file also differed from the earlier live speed instance.
 The test pack records this instead of silently choosing old data as current.
-Resume real comparison from an explicit frozen reference snapshot. No ChatCut
-timeline, review answers or source media was edited.
+The real test freezes the prepared two-point schedule and saved panel data with
+hashes; the speed label uses the earlier sampled live value and retains the
+disagreement. This is a transfer fixture, not an assertion of current project
+authority. A frame at the same two-second timestamp was also visually compared
+with the user-provided rendered reference: footage state, layout and displayed
+values match, with expected text-rendering differences. No ChatCut timeline,
+review answers or source media was edited.
 
-**Still pending:** bridge activation in Premiere, synthetic host import/readback,
-native MOGRT editing and duration, real composition comparison, audio listening,
-save/reopen, export and full-match transfer. Newer UXP is documented from Adobe
-APIs, not run on this older installed host. Do not label the integration fully
-qualified until these gates have actual evidence.
+## v21 live evidence and fixes
+
+| Check | Observed result |
+|---|---|
+| Windows media paths | Pr 23.5 misread `file:///C:/...` and opened Link Media. Matching Pr's exported `file://localhost/C%3a/...` resolved it; Chinese, spaces, `#` and `%` imported online. UNC/macOS remain untested in a host. |
+| Exact synthetic cuts | 90 exported frames; source in/out and timeline boundaries matched integer ticks, including XML export/reimport. All 90 decoded frames matched source cuts plus the alpha overlay: maximum whole-frame mean absolute RGB error 1.34/255. |
+| Stereo | Two ordinary mono tracks collapsed both tones to the center. Premiere's exploded Stereo XML grouping fixed it; 440 Hz left and 880 Hz right remained separated in the actual export. |
+| Real fixture | 423 footage frames plus 5 × 240 statistics frames = 1,623 frames / 54.1 seconds at 30 fps. All media online, no base-track gaps, matched score/serve/speed boundary samples. |
+| Native automation on rendered stats | Five opacity envelopes read back at 0/100/100/0; two source-time audio fades retained the measured 0 dB raw level. These are native Premiere properties on raster graphics, not editable native text. |
+| SDR composition | Initial linear-color composition failed the PNG comparison at translucent fades. Setting the scratch sequence's `compositeLinearColor=false` reduced the maximum mean error across 40 statistics boundary/plateau samples to 1.60/255. This is a tested SDR choice, not an HDR default. |
+| Audio | Exported PCM matched both source interiors with zero sample lag, unity gain and effectively perfect correlation; the statistics tail was silent. AAC output showed a 1,024-sample / 21.33 ms delay relative to PCM. No subjective listening claim. |
+| Save/reopen | A slash-joined candidate Save As produced a file but later Save failed. `saveAs(new File(destination).fsName)` fixed the Windows path. Save, project close, terminal reopen and effect readback passed. Full Premiere process exit and terminal restart also restored the panel automatically. |
+| Pr-authored MOGRT | The installed Basic Title imported, but returned no MGT component/text parameter through this legacy DOM. Import success does not establish terminal text editability. |
+| AE-authored MOGRT | Both custom authoring and an installed AE-authored template were blocked by the local AE subscription/language error. No licensing settings were changed. |
+
+The 1.2.8 bridge may report a missing bridge while a modal blocks the host, or
+after closing the last project unloads CEP. An `export_frame` call also returned
+an error before its PNG appeared. Inspect outcomes before retrying; record
+partial mutation and independently validate output files. A terminal agent asks
+the user to resolve a concrete blocking dialog when necessary. It must not
+invent click capability or silently switch editors.
+
+The skill now documents blank-project bootstrap, panel configuration, native
+filesystem paths, stereo slot mapping, source-time keyframes, compositing,
+factory encoder preset discovery, save/reopen and these failure modes. Adobe's
+[legacy sample](https://github.com/Adobe-CEP/Samples/blob/master/PProPanel/jsx/PPRO/Premiere.jsx)
+and [UXP changelog](https://developer.adobe.com/premiere-pro/uxp/changelog/) remain
+the primary API references; newer-host claims do not inherit 23.5 test results.
+
+**Remaining gates:** resolve AE's installation/licensing issue; produce and
+qualify all five custom MOGRT types (Unicode fields, edit/readback, trimming,
+save/reopen and typography); test the hybrid real excerpt, corrected/later and
+continuous-review cases; listen across cuts; then perform full-match transfer.
+Newer UXP requires its own installed host and verified terminal bridge. The
+current rendered test fixture is useful evidence, not completion of the selected
+hybrid workflow. Private media and detailed JSON evidence stay in ignored local
+output; nothing was synchronized to the account Skill or published.

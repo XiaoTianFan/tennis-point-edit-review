@@ -23,7 +23,7 @@ illustration. No match footage, player identities or measured serve speeds are i
 The workflow begins with a short introduction unless the user opts out. The agent
 does the detailed checking; the user sees only remaining material uncertainties.
 
-Current skill revision: **2026.10.04-v20**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, optional 3D fitting, quality checks and fallbacks.
+Current skill revision: **2026.10.04-v21**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, optional 3D fitting, quality checks and fallbacks.
 
 ChatCut, **Premiere Pro** and a standalone pipeline are primary editing choices.
 The [environment contract](skills/tennis-point-edit-review/references/editing-environments.md)
@@ -32,8 +32,10 @@ legacy CEP/ExtendScript and newer UXP routes, with a terminal-only interaction
 contract and fresh-machine setup guidance. The agent does not need Computer Use.
 The default Premiere graphics plan is hybrid: native editable scores/labels and
 rendered canonical statistics. See the [investigation and test plan](docs/premiere-investigation.md).
-Live Premiere/AE qualification remains pending; offline helper tests are not a
-claim that every host version or native template has been verified.
+Premiere 23.5 has passed live XML, stereo/PCM audio, rendered-overlay, export and
+save/reopen checks, including a real two-point excerpt and five statistics pages.
+Native MOGRT qualification is blocked by the local AE installation/licensing issue;
+newer UXP hosts and full-match transfer remain unverified.
 
 ## Preview
 

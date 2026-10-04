@@ -54,6 +54,17 @@ class ExchangeChecks(unittest.TestCase):
         self.assertTrue(all(l.text in ids for l in root.findall('.//linkclipref')))
         self.assertEqual(len(root.findall('.//file/pathurl')), 2)
         self.assertEqual(report['clips'][0]['pointId'], 'P001')
+        tracks = root.findall('./sequence/media/audio/track')
+        self.assertEqual([t.attrib['currentExplodedTrackIndex'] for t in tracks], ['0', '1'])
+        self.assertTrue(all(t.attrib['totalExplodedTrackCount'] == '2' for t in tracks))
+        self.assertTrue(all(c.attrib['premiereChannelType'] == 'stereo' for c in audio))
+        self.assertEqual([t.findtext('outputchannelindex') for t in tracks], ['1', '2'])
+
+    def test_conflicting_audio_layout_rejected(self):
+        p = fixture()
+        mono = copy.deepcopy(p['assets'][0]); mono.update(id='mono', audioChannels=1)
+        p['assets'].append(mono); p['clips'][1]['assetId'] = 'mono'
+        with self.assertRaises(ValueError): validate(p)
 
     def test_exact_ntsc_ticks_and_rate(self):
         self.assertEqual(frame_ticks(30000, '30000/1001'), str(1001 * 254016000000))
@@ -64,7 +75,7 @@ class ExchangeChecks(unittest.TestCase):
         with self.assertRaises(ValueError): frame_ticks(1, '29.97')
 
     def test_paths_unicode_reserved_and_unc(self):
-        self.assertEqual(file_uri('C:\\素材\\甲 #1%.mov'), 'file:///C:/%E7%B4%A0%E6%9D%90/%E7%94%B2%20%231%25.mov')
+        self.assertEqual(file_uri('C:\\素材\\甲 #1%.mov'), 'file://localhost/C%3a/%E7%B4%A0%E6%9D%90/%E7%94%B2%20%231%25.mov')
         self.assertEqual(file_uri('\\\\server\\share\\a b.mov'), 'file://server/share/a%20b.mov')
         for value in ('relative.mov', 'https://example.com/a.mov', '/media/../a.mov', 'C:\\a\\..\\b.mov'):
             with self.assertRaises(ValueError): file_uri(value)

@@ -44,6 +44,10 @@ def file_uri(value):
     if win.is_absolute():
         if '..' in win.parts:
             raise ValueError('Resolve parent segments in media paths first')
+        if not win.drive.startswith('\\\\'):
+            # Match Premiere's own FCP7 export. Pr 23.5 treats file:///C:/...
+            # as a UNC-like path and opens a blocking Link Media dialog.
+            return 'file://localhost/' + quote(win.as_posix(), safe='/').replace('%3A', '%3a', 1)
         return win.as_uri()
     posix = PurePosixPath(value)
     if not posix.is_absolute() or '..' in posix.parts or '://' in value:
@@ -101,7 +105,7 @@ def validate(plan, check_files=False):
             if a.get('audioChannels', 0):
                 integer(a['sampleRate'], 'sampleRate', 1)
         assets[a['id']] = a
-    seen, spans, audio_spans = set(), {}, {}
+    seen, spans, audio_spans, audio_layouts = set(), {}, {}, {}
     allowed = {'id', 'assetId', 'track', 'startFrame', 'durationFrames',
                'sourceInFrame', 'audio', 'audioTrack', 'pointId', 'reviewId',
                'name', 'sourceMapping'}
@@ -131,6 +135,11 @@ def validate(plan, check_files=False):
                 raise ValueError('Requested audio is absent')
             atrack = integer(c.get('audioTrack', 1), 'audioTrack', 1)
             for channel in range(a['audioChannels']):
+                layout = (a['audioChannels'], channel)
+                slot = atrack + channel
+                if slot in audio_layouts and audio_layouts[slot] != layout:
+                    raise ValueError('Conflicting audio channel layouts; normalize or use separate audio tracks')
+                audio_layouts[slot] = layout
                 audio_spans.setdefault(atrack + channel, []).append((start, start + duration))
         spans.setdefault(track, []).append((start, start + duration))
     if 1 not in spans:
@@ -177,13 +186,28 @@ def build(plan, check_files=False):
     audio = sub(media, 'audio'); sub(audio, 'numOutputChannels', 2)
     char = sub(sub(audio, 'format'), 'samplecharacteristics')
     sub(char, 'depth', 16); sub(char, 'samplerate', 48000)
+    outputs = sub(audio, 'outputs')
+    for channel in (1, 2):
+        group = sub(outputs, 'group'); sub(group, 'index', channel)
+        sub(group, 'numchannels', 1); sub(group, 'downmix', 0)
+        sub(sub(group, 'channel'), 'index', channel)
     vtracks, atracks = {}, {}
     for n in range(1, max(c['track'] for c in plan['clips']) + 1):
         vtracks[n] = sub(video, 'track')
     max_audio = max((c.get('audioTrack', 1) + assets[c['assetId']]['audioChannels'] - 1
                      for c in plan['clips'] if c.get('audio')), default=0)
+    audio_layouts = {}
+    for c in plan['clips']:
+        if c.get('audio'):
+            channels = assets[c['assetId']]['audioChannels']
+            for channel in range(channels):
+                audio_layouts[c.get('audioTrack', 1) + channel] = (channels, channel)
     for n in range(1, max_audio + 1):
-        atracks[n] = sub(audio, 'track')
+        channels, channel = audio_layouts.get(n, (1, 0))
+        atracks[n] = sub(audio, 'track', currentExplodedTrackIndex=channel,
+                        totalExplodedTrackCount=channels,
+                        premiereTrackType='Stereo' if channels == 2 else 'Mono',
+                        PannerCurrentValue='0.5', PannerName='Balance')
     file_ids = {key: 'file-' + str(i + 1) for i, key in enumerate(assets)}
     emitted = set()
     counts = {}
@@ -218,6 +242,8 @@ def build(plan, check_files=False):
             indexed.append((kind, track, channel, cid, counts[(kind, track)]))
         for kind, track, channel, cid, _ in indexed:
             node = sub((vtracks if kind == 'video' else atracks)[track], 'clipitem', id=cid)
+            if kind == 'audio':
+                node.set('premiereChannelType', 'stereo' if a['audioChannels'] == 2 else 'mono')
             sub(node, 'name', c.get('name', c['id']))
             sub(node, 'enabled', 'TRUE'); sub(node, 'duration', a.get('durationFrames', duration))
             xml_rate(node, fps)
@@ -235,6 +261,9 @@ def build(plan, check_files=False):
         mapping.append({**c, 'timelineStartTicks': frame_ticks(c['startFrame'], fps),
                         'timelineEndTicks': frame_ticks(c['startFrame'] + duration, fps),
                         'sourceInTicks': frame_ticks(source_in, fps)})
+    for n, track in atracks.items():
+        sub(track, 'enabled', 'TRUE'); sub(track, 'locked', 'FALSE')
+        sub(track, 'outputchannelindex', audio_layouts.get(n, (1, 0))[1] + 1)
     ET.indent(root)
     xml = '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE xmeml>\n' + ET.tostring(root, encoding='unicode') + '\n'
     report = {'schema': 'tennis-premiere-exchange/v1', 'revision': plan['revision'],
