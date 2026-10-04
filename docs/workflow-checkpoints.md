@@ -1,6 +1,6 @@
 # Stage-based workflow maintenance
 
-Revisions v23–v23.5 clarify agent-owned work, concrete stage delivery, necessary
+Revisions v23–v23.6 clarify agent-owned work, concrete stage delivery, necessary
 interactive review, visual adjudication and the distinction between main-cut and review labels.
 This is repository maintenance context, not additional match instructions.
 
@@ -16,6 +16,11 @@ review ⇄ recalculation → statistics/speed data → panels and speed overlays
 final QA. Stage 1 keeps the ledger internal and does not advance scores; stages
 3–4 may repeat; stage 5 supplies all data for the combined graphics stage 6.
 
+v23.6 replaces negative-only caveats with the agent's next action and the relevant
+stage/reference. Repeated dead-ball, review-visibility and default instructions
+now point to their detailed rules. Evidence distinctions and completion gates
+remain; no detection tool or runtime behavior is added.
+
 ## Scenario review
 
 These are documentation walk-throughs, not a live-editor or model reliability
@@ -25,6 +30,9 @@ expected behavior to that agent.
 | Starting request or condition | Expected behavior |
 |---|---|
 | Raw footage, no execution preference | Stage 1 cuts every point from serve to dead ball with required reactions and places it on a playable timeline. Keep the ledger internal; scoring starts in stage 2. |
+| Stage 1 needs serve order or point grouping to cut correctly | Make those event judgments now, save their evidence and reuse/check them in stage 2. Stage boundaries govern delivery, not permission to reason about needed events. |
+| Players have stopped, but the ending event is unclear | Trace the same ball backward to the first ending event; locate it from source frames before setting the cut. Stage 2 completes cause/winner adjudication; only gaps remaining after source checks enter review. |
+| Suitable source frames already exist | Reuse frames with adequate source/time identity, clarity and density; crop/rearrange them as needed. Extract more only for missing context or detail. |
 | Choosing an analysis method | Use agent visual inspection of source context to identify events. Extraction/crops support viewing; detection/tracking only helps investigate a specific uncertainty. Do not build or rely on whole-match automatic boundary detection. Existing calculation and rendering helpers retain their roles. |
 | A match-specific helper seems useful | Keep necessary temporary scripts in the task workspace. Match execution does not authorize skill changes; adding a tool to the skill requires an explicit user request and demonstrated utility. |
 | Already cut points and a known final score | Check cuts and internal mappings, then reuse the timeline for agent-owned point adjudication, scoring and basic graphics in stage 2. |
@@ -62,4 +70,6 @@ synthetic browser check covered two timeline points with one review row and with
 no review rows: both points remained navigable and correctly counted, and the
 selected review answer survived reload without adding a row for the clear point.
 The browser reported only the existing favicon request returning HTTP 403.
-Fresh-agent compliance on a real match has not been tested in this revision.
+For v23.6, all 167 Python tests, 42 workflow contracts, package checks and 35
+Markdown section links passed. Executable helpers and all seven JSX templates
+remain unchanged. Fresh-agent compliance on a real match has not been tested.

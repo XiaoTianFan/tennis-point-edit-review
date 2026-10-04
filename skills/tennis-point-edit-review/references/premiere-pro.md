@@ -87,7 +87,7 @@ FCP7 XMEML可一次构建轨道、原声和保留范围，再经MCP `import_fcp_
 - asset含id、绝对path、kind=video/image、width/height。video另含fps、durationFrames、timing=cfr、timingEvidence；有音频须给audioChannels=1/2和sampleRate。生成器要求媒体与序列同fps和全画幅；VFR/混合fps先显式标准化或改用已验证的host直接剪辑，不能猜测通过。
 - clip含稳定id、assetId、1起算track、startFrame、durationFrames、sourceInFrame（默认0）、audio、可选audioTrack/P/R/name/sourceMapping。基础轨道须连续覆盖；上层透明图形间隙正常。原声拆为关联声道并保存与画面一致的区间。
 - 不支持的变速、效果、缩放、混音参数直接报错。需要的MOGRT、透明度、淡出等放`postImport`，每项给operation/target与参数；报告原样列为待执行。不得把pending项目当已渲染。
-- 输出XML和相邻`.report.json`，保留帧/tick/逻辑ID映射与哈希。输出不能覆盖旧版本。此生成器通过离线结构检查不等于已通过目标Pr版本导入。
+- 输出XML和相邻`.report.json`，保留帧/tick/逻辑ID映射与哈希，另存新版本；随后按下节完成目标Pr导入与读回验证。
 
 Windows本地盘的XMEML URI使用`file://localhost/C%3a/media/clip.mov`形式；路径中的中文、空格、`#`和`%`也需百分号编码。23.5可能把`file:///C:/...`误读为网络路径并弹出Link Media。导入后核对所有媒体在线，UNC/macOS路径也须在目标host验证。
 
