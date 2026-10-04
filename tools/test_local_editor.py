@@ -49,6 +49,34 @@ class ModelTest(unittest.TestCase):
         self.p['clips'][0]['outFrame'] = 10
         with self.assertRaises(ValueError): validate(self.p)
 
+    def test_review_subset_does_not_require_clear_points_to_be_reviewed(self):
+        self.p['review']['rows'] = self.p['review']['rows'][1:]
+        project = validate(self.p)
+        write(Path(self.temp.name) / 'subset/project.json', project)
+        store = Store(Path(self.temp.name) / 'subset')
+        changed = store.apply(0, dict(type='trim', id='first', inFrame=11, outFrame=40))
+        self.assertEqual([c['pointId'] for c in layout(changed)], ['P001', 'P002'])
+        self.assertEqual(review_payload(changed)['totalRows'], 1)
+        self.assertEqual(review_payload(changed)['rows'][0]['pointId'], 'P002')
+        self.assertEqual(project['review']['rows'], self.p['review']['rows'])
+        # An unlisted point cannot acquire a fabricated human-review answer.
+        changed['answers']['P001'] = dict(scoringPlayerId='A', reviewConfirmed=True)
+        with self.assertRaisesRegex(ValueError, 'Unknown answer point'):
+            validate(changed)
+
+    def test_main_cut_without_review_keeps_point_locators(self):
+        self.p['review']['rows'] = []
+        project = validate(self.p)
+        write(Path(self.temp.name) / 'main-only/project.json', project)
+        restored = Store(Path(self.temp.name) / 'main-only').get()
+        self.assertEqual(restored['clips'], project['clips'])
+        self.assertEqual(review_payload(restored)['rows'], [])
+        self.assertEqual([c['pointId'] for c in layout(restored)], ['P001', 'P002'])
+        for invalid in ('', '   ', 1, []):
+            restored['clips'][0]['pointId'] = invalid
+            with self.assertRaisesRegex(ValueError, 'Invalid clip point ID'):
+                validate(restored)
+
     def test_conflict_and_undo_redo_preserve_answers(self):
         first = self.store.apply(0, dict(type='review', pointId='P001', answer=dict(scoringPlayerId='B', deadBallType='net', reviewConfirmed=True)))
         with self.assertRaises(Conflict): self.store.apply(0, dict(type='reorder', ids=['second', 'first']))
@@ -163,7 +191,9 @@ class MediaTest(unittest.TestCase):
                 p['assets'][0] = {'id':'src', **meta}
                 p['clips'] = [dict(id='first',assetId='src',pointId='P001',inSeconds='.4',outSeconds='1.4'),
                               dict(id='hold',assetId='src',kind='hold',inSeconds='1.4',durationSeconds='.3')]
+                p['review']['rows'] = []
                 project = initialize(p, Path(tmp)/'project')
+                self.assertEqual(review_payload(project)['rows'], [])
                 self.assertEqual((project['width'],project['height'],project['fps']),(320,240,source_rate))
                 self.assertEqual(project['clips'][0]['inFrame'],round(Fraction(2,5)*Fraction(source_rate)))
                 project['needsRebuild'] = ['presentation-order','score-and-statistics']

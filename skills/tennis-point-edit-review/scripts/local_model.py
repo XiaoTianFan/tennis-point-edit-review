@@ -104,8 +104,10 @@ def validate(project, check_files=False):
                 raise ValueError('Hold frame outside asset')
         elif not clip['inFrame'] < integer(clip['outFrame'], 'outFrame', 1) <= assets[clip['assetId']]['frames']:
             raise ValueError('Clip outside source or empty')
-        if clip.get('pointId') is not None and clip['pointId'] not in pids:
-            raise ValueError('Unknown clip point')
+        # Timeline points include clear points outside the human-review subset.
+        point_id = clip.get('pointId')
+        if point_id is not None and (not isinstance(point_id, str) or not point_id.strip()):
+            raise ValueError('Invalid clip point ID')
     for overlay in keyed(project.get('overlays', []), 'overlay').values():
         if overlay['clipId'] not in clips or overlay['component'] not in COMPONENTS:
             raise ValueError('Unknown overlay target/component')

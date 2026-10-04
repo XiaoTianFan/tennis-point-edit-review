@@ -39,7 +39,7 @@ function notice(key, values = {}) {
   if (key) noticeTimer = setTimeout(() => { noticeState = null; renderNotice(); }, key === 'exportComplete' ? 30000 : 10000);
 }
 function saveState(key) { $('save-state').dataset.i18n = key; $('save-state').textContent = t(key); }
-function projectStatus() { $('project-status').textContent = t('projectStatus', {count: project.review.rows.length, revision: project.revision}); }
+function projectStatus() { $('project-status').textContent = t('projectStatus', {count: new Set(project.clips.map(c => c.pointId).filter(Boolean)).size, revision: project.revision}); }
 function handoffText() {
   if (handoffValues) $('handoff-text').value = t('handoffText', {...handoffValues, mode: t(handoffValues.mode)}) + '\n\n' + JSON.stringify(contextData.review, null, 2);
 }
@@ -93,7 +93,7 @@ const player = new Player(url, (frame, clip, mode, linked) => {
   }
   timeline.highlight(selectedClip, selectedOverlay);
   const row = linked && project.review.rows.find((r) => r.pointId === clip.pointId);
-  $("viewer-context").textContent = row ? t("viewerMeta", {review: row.reviewId, point: row.pointId, game: row.gameNumber ?? "?", server: project.players.find((p) => p.id === row.serverId)?.name ?? row.serverId, serve: clip.serveNumber ?? row.serveNumber ?? "?"}) : mode === "source" ? t("sourceOutside") : clip.label ?? t("statistics");
+  $("viewer-context").textContent = row ? t("viewerMeta", {review: row.reviewId, point: row.pointId, game: row.gameNumber ?? "?", server: project.players.find((p) => p.id === row.serverId)?.name ?? row.serverId, serve: clip.serveNumber ?? row.serveNumber ?? "?"}) : linked && clip.pointId ? clip.pointId : mode === "source" ? t("sourceOutside") : clip.label ?? t("statistics");
 }, notice);
 function setProject(p) {
   project = p;

@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026.10.04 — skill 2026.10.04-v23
+
+- Reorganizes the entry around stage-scoped work, required references, concrete deliverables and completion checks at any starting point; explicit continuous execution keeps the same checks.
+- Separates clips, stable point IDs, consecutive display numbers and the necessary human-review subset; unchecked work remains the agent's responsibility.
+- Moves main-cut locators, scoreboards and serve labels before statistics, and makes the post-contact three-second limit apply even before speed labels exist.
+- Allows local timeline points outside the human-review subset, including projects with no review rows; keeps answer validation scoped to published review records.
+- Preserves scoring/review protocols, adaptive evidence tools, speed models and all seven canonical JSX templates. See [maintenance review scenarios](docs/workflow-checkpoints.md).
+
 ## 2026.10.04 — skill 2026.10.04-v22.4
 
 - Adds portable contact sheets, original-frame links and full-PTS media preflight; optional Premiere verification preserves offline plan generation.

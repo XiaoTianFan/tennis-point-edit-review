@@ -20,10 +20,14 @@ illustration. No match footage, player identities or measured serve speeds are i
 - Estimates launch speed for every included serve, then adds post-contact speed labels.
 - Reuses the navy/lime scoreboard, review labels, notes and statistics templates.
 
-The workflow begins with a short introduction unless the user opts out. The agent
-does the detailed checking; the user sees only remaining material uncertainties.
+The workflow resumes from the current stage and defaults to one stage per turn,
+with inspected deliverables and a brief report of results and the next step.
+An explicit request enables continuous execution; required references and checks
+still apply. The agent does the detailed checking, including serve identification;
+the user sees only remaining material uncertainties. Main-cut point locators,
+scoreboards and short serve labels are built before statistics.
 
-Current skill revision: **2026.10.04-v22.4**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, optional 3D fitting, quality checks and fallbacks.
+Current skill revision: **2026.10.04-v23**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, optional 3D fitting, quality checks and fallbacks.
 
 ChatCut, **Premiere Pro** and a standalone pipeline are primary editing choices.
 The [environment contract](skills/tennis-point-edit-review/references/editing-environments.md)
