@@ -48,8 +48,12 @@ python tools/validate.py
 npm run check:adapters
 ```
 
-工作流与编辑器指南在 `references/`，正式模板在 `examples/`，计算与取证工具在 `scripts/`。当前版本 **2026.10.04-v21.3**；估速方法详见[中英文说明](docs/serve-speed-explained.md)。
+工作流与编辑器指南在 `references/`，正式模板在 `examples/`，计算与取证工具在 `scripts/`。当前版本 **2026.10.04-v22**；估速方法详见[中英文说明](docs/serve-speed-explained.md)。
 
 账户保存版本没有可以直接交给 Git 的目录地址。建议以本仓库作可版本管理的维护源。也支持先修改账户版本，再由 agent 完整取回、差异比较、合并、验证和提交；不会自动同步，更不会自动公开到 GitHub。详见[双向同步流程](docs/synchronization.md)。
 
 MIT许可证；参见[发布步骤](docs/publishing.md)与[贡献说明](CONTRIBUTING.md)。
+
+## 本地编辑与复核
+
+未使用ChatCut或Pr时，复用技能内的[Courtside工作台](skills/tennis-point-edit-review/references/local-editor.md)：成片/原片播放、单帧与逐分跳转、剪口/顺序/图层时序编辑、左侧逐分审核、可追溯JSON回填及FFmpeg导出。agent只需终端，用户在本机浏览器操作。

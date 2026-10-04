@@ -23,7 +23,7 @@ illustration. No match footage, player identities or measured serve speeds are i
 The workflow begins with a short introduction unless the user opts out. The agent
 does the detailed checking; the user sees only remaining material uncertainties.
 
-Current skill revision: **2026.10.04-v21.3**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, optional 3D fitting, quality checks and fallbacks.
+Current skill revision: **2026.10.04-v22**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, optional 3D fitting, quality checks and fallbacks.
 
 ChatCut, **Premiere Pro** and a standalone pipeline are primary editing choices.
 The [environment contract](skills/tennis-point-edit-review/references/editing-environments.md)
@@ -37,6 +37,11 @@ covers editable native graphics and rendered overlays. Default hybrid graphics
 combine native editable scores/labels where qualified with rendered statistics.
 Available graphics controls depend on the host version and template; the agent
 checks these before building the timeline.
+
+The standalone [Courtside workbench](skills/tennis-point-edit-review/references/local-editor.md)
+ships inside the skill: a local timeline, source/edited playback, decoded frame stepping,
+clip trimming/reordering, overlay timing, point review, revisioned JSON handoff and FFmpeg export.
+Agents operate it entirely through the bundled CLI; users review in a browser.
 
 ## Preview
 

@@ -9,7 +9,8 @@
     "demo:build": "npm run demo:data && node demo/build.cjs",
     "demo:capture": "npm run demo:build && node demo/capture.cjs",
     "check": "python tools/validate.py",
-    "check:adapters": "node --test tools/premiere-adapters.test.cjs"
+    "check:adapters": "node --test tools/premiere-adapters.test.cjs",
+    "check:local": "python -m unittest tools.test_local_editor && node --test tools/local-editor.test.cjs"
   },
   "devDependencies": {
     "@playwright/cli": "0.1.22",

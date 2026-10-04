@@ -204,6 +204,11 @@
       "id": "R042",
       "path": "references/statistics.md",
       "text": "默认按总览与关键分、发球与第三拍、接发、回合与击球结果、击球位置与上网排列；使用[诊断汇总器](../scripts/diagnostic_stats.py)及更新后的[统计口径](statistics.md)。新增观察由代理承担，不生成逐字段用户审核任务。省略接发深度分布、三个位置的赢分率、重复反向指标；失误方向仅下网/出界。正反手必须回看实际动作，不能复制旧描述或随换边机械互换。"
+    },
+    {
+      "id": "LOCAL001",
+      "path": "references/local-editor.md",
+      "text": "重排只改变呈现，不能自动重排比赛事实。"
     }
   ],
   "files": [
@@ -232,7 +237,7 @@
     },
     {
       "path": "examples/review-template.html",
-      "sha256": "76aa44fc5928e4e4c083a2e75bbc15c48239e0e1c81adda5f1f9b0ea279fb7c8"
+      "sha256": "63050890a71dde7a790b6ff2b5f607fece273b069a97c0f1e16400eba7e56dbd"
     },
     {
       "path": "examples/scoreboard.jsx",
@@ -386,6 +391,39 @@
     },
     {
       "path": "scripts/check_error_review.py"
+    },
+    {
+      "path": "scripts/local_editor.py"
+    },
+    {
+      "path": "scripts/local_model.py"
+    },
+    {
+      "path": "scripts/local_media.py"
+    },
+    {
+      "path": "scripts/local_web/index.html"
+    },
+    {
+      "path": "scripts/local_web/style.css"
+    },
+    {
+      "path": "scripts/local_web/model.js"
+    },
+    {
+      "path": "scripts/local_web/app.js"
+    },
+    {
+      "path": "scripts/local_web/player.js"
+    },
+    {
+      "path": "scripts/local_web/timeline.js"
+    },
+    {
+      "path": "scripts/local_web/review.js"
+    },
+    {
+      "path": "references/local-editor.md"
     }
   ]
 }

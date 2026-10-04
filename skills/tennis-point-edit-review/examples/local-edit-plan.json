@@ -1,0 +1,84 @@
+{
+  "title": "Synthetic point review",
+  "fps": "30",
+  "width": 1920,
+  "height": 1080,
+  "players": [
+    {
+      "id": "A",
+      "name": "Player A"
+    },
+    {
+      "id": "B",
+      "name": "Player B"
+    }
+  ],
+  "assets": [
+    {
+      "id": "source",
+      "metadata": "source-proxy.media.json"
+    }
+  ],
+  "clips": [
+    {
+      "id": "point-1",
+      "pointId": "P001",
+      "serveId": "P001-S1",
+      "serveNumber": 1,
+      "assetId": "source",
+      "inFrame": 0,
+      "outFrame": 90
+    }
+  ],
+  "review": {
+    "source": "SYNTHETIC_SOURCE",
+    "ledgerRevision": "sample-v1",
+    "rows": [
+      {
+        "reviewId": "R001",
+        "pointId": "P001",
+        "serverId": "A",
+        "gameNumber": 1,
+        "setNumber": 1,
+        "serveNumber": 1,
+        "mainStartSeconds": 0,
+        "reviewStartSeconds": 0,
+        "sourceRangesSeconds": [
+          [
+            0,
+            3
+          ]
+        ],
+        "reason": "Synthetic example: replace with current evidence and clip boundaries.",
+        "initial": {}
+      }
+    ]
+  },
+  "overlays": [
+    {
+      "id": "review-id-1",
+      "clipId": "point-1",
+      "component": "reviewId",
+      "anchor": "clip",
+      "startFrame": 0,
+      "endFrame": 90,
+      "props": {
+        "reviewId": "R001",
+        "pointId": "P001"
+      }
+    },
+    {
+      "id": "review-label-1",
+      "clipId": "point-1",
+      "component": "reviewLabel",
+      "anchor": "clip",
+      "startFrame": 0,
+      "endFrame": 90,
+      "props": {
+        "phaseLabel": "第1局",
+        "serverName": "Player A",
+        "serveLabel": "一发"
+      }
+    }
+  ]
+}
