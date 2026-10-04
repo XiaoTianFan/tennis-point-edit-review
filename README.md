@@ -20,8 +20,10 @@ illustration. No match footage, player identities or measured serve speeds are i
 - Estimates launch speed for every included serve, then adds post-contact speed labels.
 - Reuses the navy/lime scoreboard, review labels, notes and statistics templates.
 
-The workflow resumes from the current stage and defaults to one stage per turn,
+The workflow resumes from the current stage and defaults to stage checkpoints,
 with inspected deliverables, the current/next stage, and a question asking whether to proceed.
+When stage 2 needs human review, continue through stage 3 and deliver its verified
+review timeline and HTML together before waiting for review answers.
 An explicit request enables continuous execution; required references and checks
 still apply. Stage 1 delivers the complete point-cut timeline and keeps its ledger
 as an internal log. Stage 2 performs point adjudication, scoring and basic graphics.
@@ -30,7 +32,7 @@ speeds and timing; stage 6 builds panels and speed overlays together; stage 7 ve
 the result. Review covers unresolved points or problem games that still disagree
 with the supplied final score after the agent's own checks.
 
-Current skill revision: **2026.10.05-v23.7**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, optional 3D fitting, quality checks and fallbacks.
+Current skill revision: **2026.10.05-v23.8**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, optional 3D fitting, quality checks and fallbacks.
 
 ChatCut, **Premiere Pro** and a standalone pipeline are primary editing choices.
 The [environment contract](skills/tennis-point-edit-review/references/editing-environments.md)

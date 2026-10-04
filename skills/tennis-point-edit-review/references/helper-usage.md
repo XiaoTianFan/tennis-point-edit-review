@@ -16,8 +16,9 @@
 - `local_editor.py`：本地工作台的`doctor/media/init/serve/context/update/render`接口，连接片段/图形时间线与逐分审核；部署、计划及回填见[本地工作台](local-editor.md)。
 
 ## 数据与命令
+按需选用下列工具；输入示例均为虚构占位数据。业务判读及复核状态见各专题，本页保留调用契约。
 原片概览、可配置CV及PTS检查见[原片检查工具](source-inspection.md)；agent查看原帧、完成判读后登记已审范围。`evidence_audit.display_order`另生成当前有效分的连续显示号码，保留稳定P/R。
-- 构建网页：python scripts/review_io.py build review-data.json review.html。输入形状见 examples/review-data.json；只填当前待审分，行序匹配复核时间线。每行提供 reviewId、pointId、gameNumber（必要时 setNumber）、serverId 和 serveNumber；记录含一发与二发的连续证据时可用 serveNumbers=[1,2] 表达。R/P 映射与时间线共用，局次和发球方逐行常显。局次为正整数，未知值留 null；发次不明也留 null，不借显示默认值猜填。输出为可独立使用的交互列表，不需要嵌入或附带视频，不增加视频转码/导出步骤；录像在对应复核时间线查看。
+- 构建网页：python scripts/review_io.py build review-data.json review.html。输入形状见[最小样例](../examples/review-data.json)，使用[离线模板](../examples/review-template.html)；按[复核协议](ledger-and-review.md#独立复核时间线与-html)仅填当前待审分，行序匹配复核时间线。每行含 reviewId、pointId、gameNumber、serverId、serveNumber，必要时 setNumber；同一记录含两次发球证据时可用 serveNumbers=[1,2]。局次须为正整数，未知局次/发次留 null；显示边界和无视频交付见[HTML 复核列表](presentation-and-qa.md#html-复核列表)。
 - 合并用户结果：python scripts/review_io.py merge ledger.json exported-review.txt ledger-next.json。输出新文件；输入账本需 source、ledgerRevision、players、points。旧结构先显式适配，绝不靠行号猜测。
 - 核对计分：python scripts/score_audit.py score-input.json。输入含config和points。内部仅A/B为两位选手的逻辑键，映射到用户ID；初始points为原始赢分计数，不是字符串15/30/40。
 - 汇总：python scripts/stats_aggregate.py annotated-input.json。含scope、audit（计分核对结果）、points（逐分技术标注）。技术字段参见函数顶部读取，statsIncluded必须显式true；不把缺失当0。
@@ -25,7 +26,7 @@
 - 旧几何均速诊断：python scripts/serve_speed.py speed-input.json。每个样本含 pointId、serveNumber、validServe、let、contactCourtMetres、bounceCourtMetres、contactTimeSeconds、bounceTimeSeconds、timeToleranceSeconds、distanceToleranceMetres；此输出不能直接标为初速。
 - 初速模型：阶段5先按[估速取证](serve-speed-audit.md)核实事件与标定，再从 scripts/launch_speed.py 导入 reconstruct(distance,duration,height,end_height,drag,lift)，输入观测或注明假设的米、秒及物理系数，以参数扰动检验敏感性。
 - 全盘速度：aggregate_serves(records)，每发含 setNumber、serveId、serverId、serveNumber、launchSpeedKphEstimate、method，必要时 included=false；同组补估必须 method=model_imputed 且有 imputationBasis。函数逐盘、逐人汇总全部纳入发球，拒绝重复和缺数，最高值只取中心估值。stats_aggregate 输入可另带 serveEstimates 以输出 launchSpeedsBySet。原 fastestMeasuredValidServe/firstServeMeanKph/secondServeMeanKph 为旧飞行均速诊断字段，不能拿去绘制初速行。
-- 自检：python scripts/check_helpers.py；python scripts/check_launch_speed.py。
+- 自检：python scripts/check_helpers.py（[规则边界检查](../scripts/check_helpers.py)）；python scripts/check_launch_speed.py。
 
 ## config 示例
 限时：mode=timed，advantage=false，nextServer=A，initialPoints={A:0,B:0}，initialGames={A:0,B:0}。
@@ -41,12 +42,10 @@ stats输入每分须有：pointId、statsIncluded、winner、server、serveNumbe
 ## 重用前检查
 agent先按[判读细则](adjudication.md)完成阶段2判球，再用脚本核算；扩展赛制须用边界样例验证。
 
-
 ## 人工无法归属的交换字段
 review_io 支持 status=unresolved 与 winnerUndetermined=true，表示用户已看过仍不确定；导出另有 inferenceRequired。回填清除旧的采用胜者并保留历史；requiresScoreInference=true时，agent按[逆推协议](ledger-and-review.md#人工无法归属与后续逆推)继续核算。人工已复核与已解决的数量分开；pending/partial、空双误与不计分语义保持兼容。
 
-
-HTML 的状态字段仅驱动标记、数量和导出，不能驱动隐藏、移除或重排记录。搜索只高亮定位，完整列表始终可见。
+状态与行可见性遵循[常驻列表协议](ledger-and-review.md#常驻列表要求)，回填不改变已发布映射。
 
 ## 覆盖、谱系与模板工具
 - 原片覆盖：python scripts/evidence_audit.py coverage.json。输入scopes=[{source,startUs,endUs}]、intervals=[{source,startUs,endUs,kind,reviewed,retained,reason,pointId?}]。参考examples/coverage-data.json；声明检查范围，不推测缺失画面。
@@ -60,38 +59,20 @@ HTML 的状态字段仅驱动标记、数量和导出，不能驱动隐藏、移
 
 恢复记录使用zlib+Base64编码的UTF-8及逐文件SHA-256；用随包提供的恢复脚本核对。
 
-
 ## 逐发球速时段
 python scripts/serve_overlay.py input.json plan.json。输入fps（支持整数、十进制或30000/1001等有理数）、records。每条包含setNumber、pointId、唯一serveId、serveNumber=1/2、eventType=serve/let、contactVerified=true、confirmedPostContactUs（已从原帧证实出球的较晚边界）、launchSpeedKphEstimate、method、statsIncluded；补估还须imputationBasis。clip包含当前startFrame、durationFrames、sourceInUs、playbackRate，另可给pointEndFrame、nextServeStartFrame作为退出上限。时间戳为整数微秒、帧为整数。
 输出球速开始/结束帧、持续帧数、约/补估标识、四舍五入的中心值及单位，以及labelStartFrame、labelEndFrame、labelStates；labelEndFrame与球速endFrame相同。可给doubleFaultConfirmedUs表示独立核实的二发失误较晚边界，脚本在其后一帧切换“二发 · 双误”，不重启计时；超出显示窗则outcomeAfterOverlayWindow=true，不重新显示。仅生成计划，不调用编辑器。向后取整保证没有出球前预显，3秒上限按成片fps计算，变速仅支持恒定倍速；非线性变速需先逐段映射。必须输入实际保留片段，缺证据或已裁掉触拍的片段会报错以提醒agent自行处理。不同擦网/重发不得共用serveId或挪用下一发球速，statsIncluded独立保留，不改变统计分母。回归检查：python scripts/check_serve_overlay.py。
 
 ## 接发标注与汇总
 从scripts/serve_return_stats.py导入aggregate_returns(points, require_complete=True)，输入已选择同一盘/全场范围的有效分，statsIncluded=true，沿用server、winner、serveNumber与ending。每分新增serveReturn={reviewed:true,serveIn:true/false,returnOutcome:"in"/"error"/"ace"/"not_applicable",returnWinner:true/false,evidence:{sourceTimes:[...],note:"..."}}。只有双误用not_applicable；其他特殊原因另选明确范围，不猜填。evidence为当前agent源片复核记录，不要求用户填写。
-输出serveDirectRate、returnIn、returnFirstIn、returnSecondIn、returnWinners及覆盖。默认缺证据即报错；stats_aggregate为兼容旧账本使用require_complete=false，有缺失时五个新指标为null并列出缺失分，模板装配仍拒绝最终渲染，促使agent先补核。每个比率保存分子、分母；源事实不互换成最终胜者。回归检查：python scripts/check_serve_return.py。
+输出serveDirectRate、returnIn、returnFirstIn、returnSecondIn、returnWinners及覆盖，定义与分母见[统计口径](statistics.md#发球直得与有效接发的逐分证据)；标注与补核由agent完成，不新增用户表单。默认缺证据即报错；stats_aggregate为兼容旧账本使用require_complete=false，有缺失时五个新指标为null并列出缺失分，模板装配仍拒绝最终渲染，促使agent先补核。每个比率保存分子、分母；源事实不互换成最终胜者。回归检查：python scripts/check_serve_return.py。
 
 ## 五页诊断统计
 向stats_aggregate.aggregate提供shotEvents即可同时调用diagnostic_stats.aggregate_diagnostics。每条有效触拍含pointId、shotIndex、hitter、countsAsShot及evidence；终结拍另含hand（FH/BH/other/null）、terminalOutcome与errorDirection（net/out/null）。发球尝试另存，不把一发失误或let拼进有效回合。build_stats_pages(metrics,speedSummary,diagnostics)生成39行及副文本；speedSummary是已选盘/全场的A/B汇总映射，跨盘先汇总原始逐发记录。执行python -m unittest discover -p "check_*.py"和python package_check.py。
 
-
-
 失误终结拍在shotEvents的真实最后一拍加入terminalErrorMotion=moving/stationary/unknown及motionEvidence={sourceTimes:[...],sheet:...,note:...}；已判标签必须有连续画面依据。diagnostic_stats输出ueMotionCounts（moving/stationary/unknown）、ueMoving与ueStationary次数；仅UE进入集合。旧errorMotionCounts/errorMoving/errorStationary仅保留作兼容诊断，不再用于默认主面板。按error-classification.md完成来球压力独立判读，调用error_review.review_coverage核查每个实际失误已有依据；不能只看最后姿态或直接复用旧UE/FE。受迫性未判用OTHER+terminalError=true，保留所有错误方向分母。stat_comparison.direction/compare负责39行比较语义与原始分数比较；build_stats_pages保存comparisonValues、comparison、highlight。请运行check_error_motion.py、check_stat_comparison.py及现有回归，核对高/低/中性/并列/缺失。
 
-## 工具与材料导航
-
-- [离线复核页](../examples/review-template.html) + [构建/回填工具](../scripts/review_io.py)：仅交互列表，无需附带视频；两位得分方、独立“人工无法确定”列、七种死球类型、双误、额外多打、备注、离线草稿、复制全部结果。
-- [独立计分核对器](../scripts/score_audit.py)：参数化有/无占先、短盘、抢七/十、限时赛；只读数据并返回计分和矛盾，不更改编辑器。
-- [统计汇总器](../scripts/stats_aggregate.py)：逐分标注、计分校验与初速逐盘汇总共同驱动五页39行比较指标，回合分布与正反手拆分嵌入原行；详细输入见[辅助材料用法](helper-usage.md)。
-- [逐帧证据助手](../scripts/frame_evidence.py)：短窗原帧、帧差与球色候选；agent按[判读细则](adjudication.md)查看原图，在阶段1确定剪口、阶段2完成判分。
-- [初速模型与逐盘汇总](../scripts/launch_speed.py)：有约束的重力/二次阻力反解，模型补估必须注明依据；最高值取中心估值，二发进球率单列。
-- [逐发球速时段助手](../scripts/serve_overlay.py)：将已核实出球映射到当前主剪，生成发球前标签、判定后双误状态及大小标签共同退出的最多3秒计划；agent按[图层回填](serve-speed-overlay.md)实施并验收。
-- [球速计算助手](../scripts/serve_speed.py)：按已确认端点、时间误差及场地标定输出飞行均速诊断；离拍初速按[初速模型](serve-speed-model.md)计算。
-- [视觉模板说明](visual-templates.md)；examples 下保存正式计分板、主剪/复核发球标签、稳定复核编号、临时说明及五页统计模板；[模板装配工具](../scripts/template_pack.py) 输出源代码、属性和比例。
-- [最小样例](../examples/review-data.json) 与 [规则边界检查](../scripts/check_helpers.py)。所有示例均为虚构占位数据，不继承原比赛。
 取证、计算和数据交换后，agent通过当前编辑环境的公开接口完成剪辑、素材管理与导出，并按[画面验收](presentation-and-qa.md#验证与交付)自检。
-
-## 接发数据完整性边界
-
-接发统计由 [接发汇总助手](../scripts/serve_return_stats.py) 消费agent逐分视觉标注；模板在证据未齐时拒绝把缺失绘成0。用户不需额外填写接发技术字段，定义与分母见 [统计口径](statistics.md)。
 
 ## 估速取证工具
 

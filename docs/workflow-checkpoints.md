@@ -1,6 +1,6 @@
 # Stage-based workflow maintenance
 
-Revisions v23–v23.7 clarify agent-owned work, concrete stage delivery, necessary
+Revisions v23–v23.8 clarify agent-owned work, concrete stage delivery, necessary
 interactive review, visual adjudication and the distinction between main-cut and review labels.
 This is repository maintenance context, not additional match instructions.
 
@@ -17,10 +17,36 @@ review ⇄ recalculation → statistics/speed data → panels and speed overlays
 final QA. Stage 1 keeps the ledger internal and does not advance scores; stages
 3–4 may repeat; stage 5 supplies all data for the combined graphics stage 6.
 
-v23.6 replaces negative-only caveats with the agent's next action and the relevant
-stage/reference. Repeated dead-ball, review-visibility and default instructions
-now point to their detailed rules. Evidence distinctions and completion gates
-remain; no detection tool or runtime behavior is added.
+## Documentation ownership
+
+Keep the seven-stage contract and essential execution reminders in `SKILL.md`.
+Route required reading to sections when only part of a reference applies.
+Detailed rules have the following owners; other documents use a short action
+or verification reminder and a link, rather than another full explanation.
+
+| Topic | Detailed owner |
+|---|---|
+| First reply and minimal questions | `onboarding.md` |
+| Match inputs, defaults and scoring rules | `inputs-and-rules.md` |
+| Resume records, interruptions and correction dependencies | `workflow.md` |
+| Review subset, stable identities, states, merging and answer protection | `ledger-and-review.md` |
+| Cuts, visual placement, display and interaction QA | `presentation-and-qa.md` |
+| Metrics, denominators, aggregation and coverage | `statistics.md` |
+| Speed method selection / evidence APIs / overlay timing | `serve-speed-model.md` / `serve-speed-audit.md` / `serve-speed-overlay.md` |
+| Tool entry points and input/output contracts | `helper-usage.md` |
+| Default component properties and layout | `examples/ui-manifest.json` and `visual-templates.md` |
+
+Do not remove a rule just because its old summary was repetitive: move any unique
+clause to its owner first. Keep technical compatibility boundaries, review-state
+semantics and all seven canonical JSX templates. A local section link must resolve;
+useful cross-references may be reciprocal, but whole-file self-links add no route.
+
+The 42 workflow contract IDs remain stable. A relocated rule may have multiple
+`checks`, each naming its current file and a required clause; all must pass.
+This preserves obligations without requiring the removed summary paragraph to
+survive verbatim. Existing single-text rules remain supported. These checks guard
+text presence, not semantic equivalence or model compliance; review the complete
+diff and the scenarios below when reorganizing instructions.
 
 ## Scenario review
 
@@ -76,3 +102,9 @@ For v23.6, all 167 Python tests, 42 workflow contracts, package checks and 35
 Markdown section links passed. Executable helpers and all seven JSX templates
 remain unchanged. v23.7 also passed all 167 Python tests and package/contract
 checks. Fresh-agent compliance on a real match has not been tested.
+
+For v23.8, all 170 Python tests (138 runtime and 32 repository), the 42
+workflow contracts, local section links and archive checks passed. The 89-file
+package retains the same runtime helpers, review UI and seven JSX templates;
+instruction text is approximately 6.7% shorter. Account readback and fresh-agent
+behavior are separate verification steps.
