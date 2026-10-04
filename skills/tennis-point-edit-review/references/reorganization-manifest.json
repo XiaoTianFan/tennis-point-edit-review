@@ -30,12 +30,12 @@
       "id": "R003",
       "sourceLine": 13,
       "target": "SKILL.md",
-      "requiredTextSha256": "a86c5bcc7cad45d3e8708c5b52292bb36d1741f220baa230b04719c7b0bb204c",
+      "requiredTextSha256": "07de8342ff53b60456ba514ef5a4f2b3bb52c891a668e299de65542462a19299",
       "status": "relocated_or_equivalent",
-      "requiredTextPrefixLength": 144,
+      "requiredTextPrefixLength": 146,
       "priorRequiredTextSha256": "4136b86d887a8b0ed6284e3c4d6d5ff32a8486604e0ed2d2c096ec74c4422aa6",
       "priorRequiredTextPrefixLength": 146,
-      "amendment": "v21: update revision for host-tested Windows XML/stereo fixes and qualification guidance; preserve routing and visual priority.",
+      "amendment": "v21.1: revision-only update on this rule; preserve its complete routing and visual priority text. Minimal-input guidance is a separate added paragraph.",
       "amendmentHistory": [
         {
           "version": "2026.10.04-v19",
@@ -45,6 +45,11 @@
         {
           "version": "2026.10.04-v20",
           "requiredTextSha256": "ed1c6e4e611922a6206efcf8602cfa348fbf7f5fe0f6f806aef377b7bbc3c057",
+          "requiredTextPrefixLength": 144
+        },
+        {
+          "version": "2026.10.04-v21",
+          "requiredTextSha256": "a86c5bcc7cad45d3e8708c5b52292bb36d1741f220baa230b04719c7b0bb204c",
           "requiredTextPrefixLength": 144
         }
       ]

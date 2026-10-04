@@ -23,21 +23,21 @@ illustration. No match footage, player identities or measured serve speeds are i
 The workflow begins with a short introduction unless the user opts out. The agent
 does the detailed checking; the user sees only remaining material uncertainties.
 
-Current skill revision: **2026.10.04-v21**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, optional 3D fitting, quality checks and fallbacks.
+Current skill revision: **2026.10.04-v21.1**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, optional 3D fitting, quality checks and fallbacks.
 
 ChatCut, **Premiere Pro** and a standalone pipeline are primary editing choices.
 The [environment contract](skills/tennis-point-edit-review/references/editing-environments.md)
 selects an editor separately from its graphics implementation. Premiere has explicit
 legacy CEP/ExtendScript and newer UXP routes, with a terminal-only interaction
 contract and fresh-machine setup guidance. The agent does not need Computer Use.
-The default Premiere graphics plan is hybrid: native editable scores/labels and
-rendered canonical statistics. See the [investigation and test plan](docs/premiere-investigation.md).
-Premiere 23.5 has passed live XML, stereo/PCM audio, rendered-overlay, export and
-save/reopen checks, including a real two-point excerpt and five statistics pages.
-Native MOGRT qualification is blocked by the local AE installation/licensing issue;
-newer UXP hosts and full-match transfer remain unverified. The next independent
-run follows the [fresh-agent test protocol](docs/premiere-fresh-agent-test.md),
-using rendered graphics with native editable text explicitly pending.
+The [Premiere guide](skills/tennis-point-edit-review/references/premiere-pro.md)
+contains setup and execution instructions; the
+[graphics contract](skills/tennis-point-edit-review/references/graphics-adapters.md)
+covers editable native graphics and rendered overlays. Default hybrid graphics
+combine native editable scores/labels where qualified with rendered statistics.
+The [validation record](skills/tennis-point-edit-review/references/validation.md)
+separates the verified Premiere 23.5 rendered route from pending native MOGRT,
+newer UXP and full-match qualification.
 
 ## Preview
 
@@ -67,11 +67,14 @@ workflow Skill, then select it from **My Skills**. A generic skill installation
 does not install ChatCut's editing capabilities: actual editing needs a connected
 video editor, media access and visual inspection.
 
-Example request:
+Minimal request, including for a fresh-agent test:
 
-> Use the tennis point-edit-review skill on this singles match. Player A wears
-> white and is right-handed; Player B wears blue and is left-handed. It is a
-> four-game, no-ad set. Produce the point edit, necessary review list and statistics.
+> Use the skill at `<skill-folder>/SKILL.md` to edit `<source-video>` in Premiere Pro.
+
+The editor choice is optional. The agent reads the workflow and setup guidance
+from the complete skill package, inspects the media and available tools, and
+asks only for necessary unresolved information or a required manual setup step.
+No research report, handoff prompt or previous project is required.
 
 ## Repository layout
 

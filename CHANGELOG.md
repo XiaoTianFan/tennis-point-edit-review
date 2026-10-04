@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026.10.04 — skill 2026.10.04-v21.1
+
+- Clarifies that a new user supplies only the skill location, raw video and optional editor choice; setup and workflow instructions come from the portable package.
+- Removes duplicate Premiere research/test handoffs and points both READMEs to the canonical package guides. Historical qualification remains in the validation record; this cleanup does not claim a fresh full-match test.
+- Preserves adapters, all seven JSX templates, graphics choices and tennis review semantics.
+
 ## 2026.10.04 — skill 2026.10.04-v21
 
 - Fixes Windows FCP7 file URIs and Premiere stereo grouping using live 23.5 import/export evidence; rejects incompatible mono/stereo channel-slot layouts.

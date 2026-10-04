@@ -3,6 +3,8 @@
 This repository distributes one user-owned tennis editing skill. The editable
 package is skills/tennis-point-edit-review/. README, docs, demo and tools are
 repository maintenance files, not extra instructions to inject into a match.
+Fresh-use tests start with the skill location, source video and optional editor
+choice. Keep required execution guidance in the package, not separate handoffs.
 
 - Read the skill entry and relevant references before changing workflow semantics.
 - Preserve adopted boundaries and review-state semantics. Do not silently drop

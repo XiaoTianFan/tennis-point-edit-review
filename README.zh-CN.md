@@ -14,7 +14,7 @@
 
 保留死球落点及对手必要反应；主剪和复核都逐分剪辑。复核 HTML 默认不带视频，所有行常驻；人工无法归属与尚未审核分开。UE/FE先根据来球压力判断，再独立统计UE内移动/站定次数，不把次数解释成该动作的失误概率。
 
-ChatCut、**Premiere Pro**、本地独立流水线均为一级候选；编辑层和图形层分别选择。Pr明确区分旧版CEP/ExtendScript与新版UXP，提供新机器配置和终端调用指南，正常执行不依赖Computer Use或鼠标点击。默认采用原生可编辑信息图形与正式模板渲染统计的混合方案。见[调研与测试计划](docs/premiere-investigation.md)：Pr 23.5已通过XML、立体声/PCM、渲染覆盖层、导出及保存重开实测，包含真实两分与五页统计；native MOGRT受本机AE安装/授权问题阻断，新版UXP与整场迁移仍待验。
+ChatCut、**Premiere Pro**、本地独立流水线均为一级候选；编辑层和图形层分别选择。[Pr分支](skills/tennis-point-edit-review/references/premiere-pro.md)明确区分旧版CEP/ExtendScript与新版UXP，包含新机器配置和终端执行指南，正常执行不依赖Computer Use或鼠标点击。[图形契约](skills/tennis-point-edit-review/references/graphics-adapters.md)说明原生可编辑图形与渲染覆盖层的选择；默认在能力已验证的前提下混用原生信息图形与渲染统计。[验证记录](skills/tennis-point-edit-review/references/validation.md)区分Pr 23.5已实测的渲染通路和仍待验的native MOGRT、新版UXP及整场执行。
 
 ![发球与第三拍统计](docs/images/stats-serve.png)
 
@@ -32,6 +32,12 @@ npx skills add . --skill tennis-point-edit-review
 
 在 ChatCut 中，让已连接的 agent 把该目录保存或更新为账户中的同名 Skill，再从 My Skills 选择使用。
 
+日常使用或全新agent测试只需给出：
+
+> 请使用 `<技能目录>/SKILL.md`，用 Premiere Pro 剪辑 `<原视频路径>`。
+
+编辑器也可不指定。工作流、环境探测和配置方法由agent从完整技能包中读取；仅对真正无法自行核实的信息或必需的人工激活动作提问。无需提供调研报告、额外交接提示词或旧工程。
+
 ## 维护和验证
 
 ```sh
@@ -42,7 +48,7 @@ python tools/validate.py
 npm run check:adapters
 ```
 
-维护细则与发球物理模型在 `references/`，正式模板在 `examples/`。当前版本 **2026.10.04-v21** 保留全部正式模板、迁移对照、事件取证及估速工具，新增显式多编辑环境与Pr适配；详见[中英文球速方法说明](docs/serve-speed-explained.md)。具体比赛的姓名、视频和路径不作为固定要求。
+维护细则与发球物理模型在 `references/`，正式模板在 `examples/`。当前版本 **2026.10.04-v21.1** 保留全部正式模板、迁移对照、事件取证及估速工具，以及显式多编辑环境与Pr适配；详见[中英文球速方法说明](docs/serve-speed-explained.md)。具体比赛的姓名、视频和路径不作为固定要求。
 
 账户保存版本没有可以直接交给 Git 的目录地址。建议以本仓库作可版本管理的维护源。也支持先修改账户版本，再由 agent 完整取回、差异比较、合并、验证和提交；不会自动同步，更不会自动公开到 GitHub。详见[双向同步流程](docs/synchronization.md)。
 
