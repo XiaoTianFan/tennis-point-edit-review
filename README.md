@@ -35,7 +35,9 @@ rendered canonical statistics. See the [investigation and test plan](docs/premie
 Premiere 23.5 has passed live XML, stereo/PCM audio, rendered-overlay, export and
 save/reopen checks, including a real two-point excerpt and five statistics pages.
 Native MOGRT qualification is blocked by the local AE installation/licensing issue;
-newer UXP hosts and full-match transfer remain unverified.
+newer UXP hosts and full-match transfer remain unverified. The next independent
+run follows the [fresh-agent test protocol](docs/premiere-fresh-agent-test.md),
+using rendered graphics with native editable text explicitly pending.
 
 ## Preview
 

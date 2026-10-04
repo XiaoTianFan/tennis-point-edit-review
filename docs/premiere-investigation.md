@@ -225,3 +225,22 @@ Newer UXP requires its own installed host and verified terminal bridge. The
 current rendered test fixture is useful evidence, not completion of the selected
 hybrid workflow. Private media and detailed JSON evidence stay in ignored local
 output; nothing was synchronized to the account Skill or published.
+
+## Next run: independent execution from the raw recording
+
+The owner subsequently authorized rendered graphics for the next full test,
+with native editable text explicitly pending, and requested removal of the
+disposable test projects. The next agent must create its own project and check
+or perform setup from the actual reset state. Earlier logs remain historical
+evidence, not match-analysis inputs. This changes the next test's graphics
+gate; it does not claim completion of the preferred hybrid route.
+
+The [fresh-agent acceptance protocol](premiere-fresh-agent-test.md) separates
+fresh loading/setup, full independent analysis, reference comparison, actual
+host rendering and owner review. The filled prompt and cleanup inventory are
+private local artifacts. The disposable projects, generated test media and
+test-only bridge were subsequently removed; the recorded added CEP debug value
+was restored to absence. Original media stayed unchanged and text evidence was
+retained separately. The next run therefore installs its bridge afresh.
+Neither a fresh agent on an already provisioned machine nor removal of a test
+bridge proves an entirely clean OS installation.
