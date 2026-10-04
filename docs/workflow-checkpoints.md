@@ -1,7 +1,7 @@
 # Stage-based workflow maintenance
 
-Revisions v23–v23.4 clarify agent-owned work, concrete stage delivery, necessary
-interactive review, and the distinction between main-cut and review labels.
+Revisions v23–v23.5 clarify agent-owned work, concrete stage delivery, necessary
+interactive review, visual adjudication and the distinction between main-cut and review labels.
 This is repository maintenance context, not additional match instructions.
 
 The skill entry now groups each stage's work, required reading and completion
@@ -25,6 +25,8 @@ expected behavior to that agent.
 | Starting request or condition | Expected behavior |
 |---|---|
 | Raw footage, no execution preference | Stage 1 cuts every point from serve to dead ball with required reactions and places it on a playable timeline. Keep the ledger internal; scoring starts in stage 2. |
+| Choosing an analysis method | Use agent visual inspection of source context to identify events. Extraction/crops support viewing; detection/tracking only helps investigate a specific uncertainty. Do not build or rely on whole-match automatic boundary detection. Existing calculation and rendering helpers retain their roles. |
+| A match-specific helper seems useful | Keep necessary temporary scripts in the task workspace. Match execution does not authorize skill changes; adding a tool to the skill requires an explicit user request and demonstrated utility. |
 | Already cut points and a known final score | Check cuts and internal mappings, then reuse the timeline for agent-owned point adjudication, scoring and basic graphics in stage 2. |
 | A few clipped endings or uncertain serves | Inspect source gaps and continuous context; adopt clear decisions. Only unresolved material questions and necessary related points enter review. |
 | Review is necessary | Schedule stage 3 and proactively build, verify and deliver its review sequence and interactive HTML, or the standalone review workspace. A questions list without the required interactive file is incomplete; waiting for answers does not block building it. Every selected row stays visible; unrelated points are not added by default. |
