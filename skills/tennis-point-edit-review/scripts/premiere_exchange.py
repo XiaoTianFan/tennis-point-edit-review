@@ -166,8 +166,26 @@ def validate(plan, check_files=False):
     return assets
 
 
-def build(plan, check_files=False):
+def check_media(assets):
+    """Optional full-PTS preflight; offline plan validation needs no ffprobe."""
+    from media_probe import probe
+    reports = {}
+    for asset in assets.values():
+        if asset['kind'] != 'video':
+            continue
+        report = probe(asset['path'])
+        timing, video = report['timing'], report['video']
+        if timing['classification'] != 'cfr' or str(rate(asset['fps'])) not in timing['fittedRates']:
+            raise ValueError('Unverified CFR timing for ' + asset['id'] + '; inspect original PTS or normalize explicitly')
+        if timing['frameCount'] != asset['durationFrames'] or (video['width'],video['height']) != (asset['width'],asset['height']):
+            raise ValueError('Media dimensions/frame count disagree with plan: ' + asset['id'])
+        reports[asset['id']] = report
+    return reports
+
+
+def build(plan, check_files=False, probe_media=False):
     assets = validate(plan, check_files)
+    timing_reports = check_media(assets) if probe_media else None
     seq = plan['sequence']
     fps = seq['fps']
     root = ET.Element('xmeml', version='5')
@@ -271,6 +289,8 @@ def build(plan, check_files=False):
               'assets': list(assets.values()),
               'clips': mapping, 'pendingHostOperations': plan.get('postImport', []),
               'qualification': 'generated_only; import, readback, rendered frames and audio still required'}
+    if timing_reports is not None:
+        report['mediaTimingChecks'] = timing_reports
     return xml, report
 
 
@@ -278,9 +298,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('plan'); parser.add_argument('output')
     parser.add_argument('--check-files', action='store_true')
+    parser.add_argument('--probe-media', action='store_true', help='Use ffprobe to verify all video PTS, dimensions and frame counts')
     args = parser.parse_args()
     plan = json.loads(Path(args.plan).read_text(encoding='utf-8-sig'))
-    xml, report = build(plan, args.check_files)
+    xml, report = build(plan, args.check_files or args.probe_media, args.probe_media)
     output = Path(args.output)
     report_path = output.with_suffix('.report.json')
     if output.exists() or report_path.exists():

@@ -9,6 +9,8 @@ scripts/evidence_audit.py检查区间缺口、重叠、未审范围、删除理�
 保留pointId，不为了恢复连续编号而重编号。独立sourceOrder/sourceStartUs控制时间顺序；后补编号可能早于较小P号。审核R顺序按新版本源片顺序生成并冻结，不在填写时重排。
 合并候选时保留被撤销候选和指向存续分的谱系，不能同时计两分；拆分时保留旧候选、输出分、版本和证据原因。一个旧候选的胜者不能自动复制给拆出的所有新分。agent先按源范围与已确认事实迁移；只有真正无法消解且影响结果的矛盾才针对证据询问用户。不要直接把旧版审核JSON导入新分结构。
 
+主剪显示另用`displayNumber`：从当前版本、当前覆盖范围内实际计分的分按源片顺序连续生成1…N；一分的多个保留片段共用号码。删除/合并/拆分后重建显示映射和依赖标签，末号与该范围有效分数一致，不能用最大的P号当总数；多打/重打等不计分片段不占号。`pointId`及已发布复核R/P保持稳定，保存`ledgerRevision + pointId → displayNumber`映射。`scripts/evidence_audit.py`的`display_order(point_ids, revision)`接收已核实的有序有效分ID，每分仅列一次；它不自行判断计分资格。
+
 ## 未按规则完局但现场判局
 分开记录真实逐分赢家、未完局小分、rulesWinner=null、rulesComplete=false和明确采用的recordedWinner。只在用户明确采用现场归属或已有本场授权时，以 exceptionType=onsite_award_before_rule_completion、exceptionConfirmed=true 和具体 exceptionNote 接续后续局分；缺少授权或理由则报告冲突，不静默补分。
 本例外放在该局最后一个真实有效分上，保持原始赢分数；计分器记录局归属、清零下一局小分并换发球，不插入虚构获胜分。普通局才适用；抢七/抢十提前结束需要另行明确规则，不套用此例外。

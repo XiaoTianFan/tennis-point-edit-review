@@ -6379,6 +6379,156 @@
     ],
     "legacyFlightSpeedFields": "fastestMeasuredValidServe,firstServeMeanKph,secondServeMeanKph: geometric sample diagnostics only"
   },
+  "displayOrder": {
+    "ledgerRevision": "synthetic-demo",
+    "count": 36,
+    "points": [
+      {
+        "pointId": "DEMO001",
+        "displayNumber": 1
+      },
+      {
+        "pointId": "DEMO002",
+        "displayNumber": 2
+      },
+      {
+        "pointId": "DEMO003",
+        "displayNumber": 3
+      },
+      {
+        "pointId": "DEMO004",
+        "displayNumber": 4
+      },
+      {
+        "pointId": "DEMO005",
+        "displayNumber": 5
+      },
+      {
+        "pointId": "DEMO006",
+        "displayNumber": 6
+      },
+      {
+        "pointId": "DEMO007",
+        "displayNumber": 7
+      },
+      {
+        "pointId": "DEMO008",
+        "displayNumber": 8
+      },
+      {
+        "pointId": "DEMO009",
+        "displayNumber": 9
+      },
+      {
+        "pointId": "DEMO010",
+        "displayNumber": 10
+      },
+      {
+        "pointId": "DEMO011",
+        "displayNumber": 11
+      },
+      {
+        "pointId": "DEMO012",
+        "displayNumber": 12
+      },
+      {
+        "pointId": "DEMO013",
+        "displayNumber": 13
+      },
+      {
+        "pointId": "DEMO014",
+        "displayNumber": 14
+      },
+      {
+        "pointId": "DEMO015",
+        "displayNumber": 15
+      },
+      {
+        "pointId": "DEMO016",
+        "displayNumber": 16
+      },
+      {
+        "pointId": "DEMO017",
+        "displayNumber": 17
+      },
+      {
+        "pointId": "DEMO018",
+        "displayNumber": 18
+      },
+      {
+        "pointId": "DEMO019",
+        "displayNumber": 19
+      },
+      {
+        "pointId": "DEMO020",
+        "displayNumber": 20
+      },
+      {
+        "pointId": "DEMO021",
+        "displayNumber": 21
+      },
+      {
+        "pointId": "DEMO022",
+        "displayNumber": 22
+      },
+      {
+        "pointId": "DEMO023",
+        "displayNumber": 23
+      },
+      {
+        "pointId": "DEMO024",
+        "displayNumber": 24
+      },
+      {
+        "pointId": "DEMO025",
+        "displayNumber": 25
+      },
+      {
+        "pointId": "DEMO026",
+        "displayNumber": 26
+      },
+      {
+        "pointId": "DEMO027",
+        "displayNumber": 27
+      },
+      {
+        "pointId": "DEMO028",
+        "displayNumber": 28
+      },
+      {
+        "pointId": "DEMO029",
+        "displayNumber": 29
+      },
+      {
+        "pointId": "DEMO030",
+        "displayNumber": 30
+      },
+      {
+        "pointId": "DEMO031",
+        "displayNumber": 31
+      },
+      {
+        "pointId": "DEMO032",
+        "displayNumber": 32
+      },
+      {
+        "pointId": "DEMO033",
+        "displayNumber": 33
+      },
+      {
+        "pointId": "DEMO034",
+        "displayNumber": 34
+      },
+      {
+        "pointId": "DEMO035",
+        "displayNumber": 35
+      },
+      {
+        "pointId": "DEMO036",
+        "displayNumber": 36
+      }
+    ]
+  },
   "previewScore": {
     "pointId": "DEMO034",
     "server": "B",

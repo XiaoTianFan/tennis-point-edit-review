@@ -16,6 +16,7 @@
 - `local_editor.py`：本地工作台的`doctor/media/init/serve/context/update/render`接口，连接片段/图形时间线与逐分审核；部署、计划及回填见[本地工作台](local-editor.md)。
 
 ## 数据与命令
+原片概览、可配置CV及PTS检查的命令和输出见[原片检查工具](source-inspection.md)；可跨编辑器复用，输出不自动标为已审。`evidence_audit.display_order`另生成当前有效分的连续显示号码，保留稳定P/R。
 - 构建网页：python scripts/review_io.py build review-data.json review.html。输入形状见 examples/review-data.json；只填当前待审分，行序匹配复核时间线。每行提供 reviewId、pointId、gameNumber（必要时 setNumber）、serverId 和 serveNumber；记录含一发与二发的连续证据时可用 serveNumbers=[1,2] 表达。R/P 映射与时间线共用，局次和发球方逐行常显。局次为正整数，未知值留 null；发次不明也留 null，不借显示默认值猜填。输出为可独立使用的交互列表，不需要嵌入或附带视频，不增加视频转码/导出步骤；录像在对应复核时间线查看。
 - 合并用户结果：python scripts/review_io.py merge ledger.json exported-review.txt ledger-next.json。输出新文件；输入账本需 source、ledgerRevision、players、points。旧结构先显式适配，绝不靠行号猜测。
 - 核对计分：python scripts/score_audit.py score-input.json。输入含config和points。内部仅A/B为两位选手的逻辑键，映射到用户ID；初始points为原始赢分计数，不是字符串15/30/40。

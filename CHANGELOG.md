@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — adaptive source inspection
+## 2026.10.04 — skill 2026.10.04-v22.4
 
 - Adds portable contact sheets, original-frame links and full-PTS media preflight; optional Premiere verification preserves offline plan generation.
 - Exposes CV settings and filter diagnostics while keeping raw visual inspection available without detection.
@@ -11,7 +11,6 @@
 - Inherits source dimensions, rational frame rate and audio settings for local projects; adapts the preview, overlays and evidence pixel thresholds.
 - Adds export resolution, frame rate, filename and destination controls with a system folder picker.
 - Allows direct export with advisory graphics warnings and preserves timeline evidence during output conversion.
-
 
 ## 2026.10.04 — skill 2026.10.04-v22.2
 

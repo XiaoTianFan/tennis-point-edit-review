@@ -333,11 +333,11 @@
     },
     {
       "path": "scripts/evidence_audit.py",
-      "sha256": "f0fe8608b055c272ee6d2fcde16c86ecd775bcb71692ac4c60c35caf17e1fbc0"
+      "sha256": "658569d229f636d33948b214628f81949da07dc4ddeda32100b0438fa2cc6282"
     },
     {
       "path": "scripts/frame_evidence.py",
-      "sha256": "6d88bff2f6bd8bf4b67855c307d0b0c67134fcb68c23776ac6a4cce7d9d13de2"
+      "sha256": "0c83c1ff0fefc4669e02e630e86bd0ad4b3b0f0a0dba6e3e2f4ab663841e5f61"
     },
     {
       "path": "scripts/launch_speed.py"
@@ -433,6 +433,18 @@
     },
     {
       "path": "scripts/local_picker.py"
+    },
+    {
+      "path": "scripts/media_probe.py"
+    },
+    {
+      "path": "scripts/source_inspect.py"
+    },
+    {
+      "path": "scripts/check_inspection.py"
+    },
+    {
+      "path": "references/source-inspection.md"
     }
   ]
 }

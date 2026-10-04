@@ -6,6 +6,18 @@ from pathlib import Path
 KINDS = {'rally','serve_fault','serve_let','aborted_toss','shadow_swing','retrieval','waiting','changeover','source_gap','unclassified'}
 PLAY = {'rally','serve_fault','serve_let'}
 
+def display_order(point_ids, revision):
+    """Caller supplies the final counted points in source order, once per point.
+
+    A clip/serve list is not a point list. Stable IDs and review IDs are untouched.
+    """
+    if not isinstance(revision,str) or not revision.strip(): raise ValueError('Ledger revision required')
+    if not isinstance(point_ids,list) or any(not isinstance(p,str) or not p.strip() for p in point_ids):
+        raise ValueError('Explicit ordered stable point IDs required')
+    if len(set(point_ids))!=len(point_ids): raise ValueError('One entry per point, not per retained fragment')
+    return {'ledgerRevision':revision,'count':len(point_ids),
+            'points':[{'pointId':p,'displayNumber':i+1} for i,p in enumerate(point_ids)]}
+
 def audit_coverage(data):
     scopes = {r['source']:r for r in data['scopes']}
     if len(scopes) != len(data['scopes']): raise ValueError('Duplicate source scope')
@@ -58,6 +70,7 @@ if __name__=='__main__':
     d=json.loads(Path(args.input).read_text(encoding='utf-8-sig'))
     out={'coverage':audit_coverage(d)}
     if 'points' in d:out['lineage']=audit_lineage(d['points'],d.get('lineage',[]))
+    if 'displayPointIds' in d:out['displayOrder']=display_order(d['displayPointIds'],d['ledgerRevision'])
     print(json.dumps(out,ensure_ascii=False,indent=2))
 
 

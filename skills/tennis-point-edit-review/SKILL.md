@@ -9,7 +9,7 @@ description: 网球单打逐分精剪、计分与低负担复核，也可接续C
 
 ## 当前规范与调用边界
 
-包版本 **2026.10.04-v22.3**。网球剪辑任务即使用户未手动点选本技能，也应按任务类型检索并加载；未另指定UI技能/模板/风格时，直接复用本包正式模板，禁止随机重设计。优先级为用户当前明确要求、项目已确认风格、本包默认。
+包版本 **2026.10.04-v22.4**。网球剪辑任务即使用户未手动点选本技能，也应按任务类型检索并加载；未另指定UI技能/模板/风格时，直接复用本包正式模板，禁止随机重设计。优先级为用户当前明确要求、项目已确认风格、本包默认。
 
 用户提供原视频或已逐分剪好的ChatCut/Pr工程，可指定编辑器。agent探测可用环境、完成所需配置，按下列阶段推进；只询问无法从素材核实的关键比赛信息或必需的人工激活动作。
 
@@ -45,7 +45,7 @@ Pr任务先核实自身操作能力：无Computer Use时请用户预先启动Pr�
 
 | 阶段 | 工作与产物 | 必读 |
 |---|---|---|
-| 1 原片与逐分账本 | 识别双方、真实触拍及源片覆盖；稳定分编号，发球作为分内事件 | [判读](references/adjudication.md)、[账本](references/ledger-and-review.md)、[覆盖](references/coverage-and-exceptions.md) |
+| 1 原片与逐分账本 | 识别双方、真实触拍及源片覆盖；稳定分编号，发球作为分内事件 | [判读](references/adjudication.md)、[原片检查工具](references/source-inspection.md)、[账本](references/ledger-and-review.md)、[覆盖](references/coverage-and-exceptions.md) |
 | 2 计分链与逐分精剪 | 分开画面球果、采用判罚、规则与现场记录；剪口保留完整死球证据 | [规则](references/inputs-and-rules.md)、[异常](references/coverage-and-exceptions.md)、[剪辑与显示](references/presentation-and-qa.md) |
 | 3 必要复核 | 先自行回查；将剩余真疑点逐分剪入独立复核时间线，同步交互列表 | [复核协议](references/ledger-and-review.md)、[复核布局](references/presentation-and-qa.md) |
 | 4 回填与再核算 | 按稳定分编号合并，保护已确认事实；有变化即重算后续计分与依赖 | [回填与逆推](references/ledger-and-review.md)、[依赖与检查点](references/workflow.md) |

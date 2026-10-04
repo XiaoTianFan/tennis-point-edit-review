@@ -6,6 +6,7 @@ sys.path.insert(0,str(ROOT/'skills/tennis-point-edit-review/scripts'))
 from score_audit import audit
 from stats_aggregate import aggregate
 from template_pack import build_stats_pages
+from evidence_audit import display_order
 def other(p):return 'B' if p=='A' else 'A'
 def build():
     points=[];shots=[];serves=[]
@@ -58,6 +59,7 @@ def build():
     out=dict(synthetic=True,warning='Fictional data only. No real observation or speed measurement.',
              players={'A':'Player A','B':'Player B'},points=points,shotEvents=shots,
              serveEstimates=serves,panels=panels,summary=result,
+             displayOrder=display_order([p['pointId'] for p in points], 'synthetic-demo'),
              previewScore=next(s for s in checked['states'] if s['pointId']=='DEMO034'))
     target=ROOT/'demo/mock-data.json'
     target.write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8',newline='')

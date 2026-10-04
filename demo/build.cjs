@@ -34,7 +34,7 @@ function artboard(id,title,markup) {
 // A selected in-match instant consistent with the six-game mock score chain.
 const score=data.previewScore;
 let boards=artboard('scoreboard','Scoreboard, post-contact serve speed and optional note',
-  component('scoreboard',{nameA:'Player A',nameB:'Player B',gamesA:String(score.before.games.A),gamesB:String(score.before.games.B),pointsA:score.before.display.A,pointsB:score.before.display.B,server:score.server,rule:'NO-AD · '+score.pointId})+
+  component('scoreboard',{nameA:'Player A',nameB:'Player B',gamesA:String(score.before.games.A),gamesB:String(score.before.games.B),pointsA:score.before.display.A,pointsB:score.before.display.B,server:score.server,rule:'NO-AD · Point '+data.displayOrder.points.find(p=>p.pointId===score.pointId).displayNumber})+
   component('serveLabel',{label:'一发'})+
   component('serveSpeed',{speed:String(data.serveEstimates.find(s=>s.pointId==='DEMO034').launchSpeedKphEstimate)})+
   component('explanation',{title:'演示说明',detail:'虚构选手与数据；本图展示计分板、发球标签及可选补充说明。'}));

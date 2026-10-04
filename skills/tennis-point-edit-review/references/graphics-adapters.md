@@ -27,7 +27,7 @@ PNG画布透明不等于`transparentBackground=true`。保持默认深蓝面板�
 
 MOGRT是实际模板文件，不是React JSX换后缀。模板可以由Pr创作并导出，也可以由AE创作并暴露Essential Graphics属性。旧版Pr应使用与其兼容版本创作的模板；不能默认新版AE输出可在旧版Pr打开。使用[Adobe官方创作说明](https://helpx.adobe.com/after-effects/desktop/motion-graphics/work-with-motion-graphics-templates/creating-motion-graphics-templates.html)。AE用于模板制作，不应默认每位终端agent用户都安装AE。
 
-每个native适配记录：模板ID/版本/哈希、最低实际验证host、画幅、字体、逻辑组件、暴露属性名/类型/默认值及持续帧数策略。计分板至少映射姓名、局分、小分、发球方及顶部赛制/P号；标签映射文字/估值标识/单位；复核模板映射稳定R/P、阶段、局次、发球方、发次。采用相同颜色、字阶、位置、紧凑尺寸和状态切换语义；native字形栅格化可能与Chromium不同，不承诺逐像素一致。
+每个native适配记录：模板ID/版本/哈希、最低实际验证host、画幅、字体、逻辑组件、暴露属性名/类型/默认值及持续帧数策略。计分板至少映射姓名、局分、小分、发球方及顶部赛制/连续显示序号；标签映射文字/估值标识/单位；复核模板映射稳定R/P、阶段、局次、发球方、发次。采用相同颜色、字阶、位置、紧凑尺寸和状态切换语义；native字形栅格化可能与Chromium不同，不承诺逐像素一致。
 
 包内提供创作脚本生成器，不附带已生成的`.mogrt`。`node scripts/make_mogrt.cjs new-output-directory PostScriptFontName`生成`build-native.jsx`与`native-manifest.json`，覆盖scoreboard、serveLabel、serveSpeed、reviewId、reviewLabel五种。在空AE工作区中运行创作脚本，成功时输出`.aep`、`.mogrt`和生成日志；Windows可使用AE的`-r`入口或由用户运行脚本，不能把Adobe脚本交给Node。生成器保护已打开的AE工程；字体用实际PostScript名称。生成后须在目标Pr验证属性、尺寸与画面，再用于成片。
 

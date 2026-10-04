@@ -95,6 +95,8 @@ Windows本地盘的XMEML URI使用`file://localhost/C%3a/media/clip.mov`形式�
 
 VFR须检查实际PTS/packet间隔；名义与平均fps不同是线索，不是完整诊断。标准化保留原始证据时间、转码窗口偏移、采样率/色彩/方向及映射误差。估速仍使用原片证据，不能拿重复/丢弃后的CFR帧提升测量精度。长片只需测试时优先标准化短窗；完整转码前考虑磁盘和时间。
 
+需核实视频的CFR声明时加`--probe-media`：使用ffprobe检查全部PTS、尺寸和帧数，报告随交换清单保存；不足或不符即报错。原`--check-files`不承担媒体分析，离线生成仍可用。取证命令及报告范围见[原片检查工具](source-inspection.md)。
+
 导入后记录新序列ID并读回宽高、fps/timebase、总帧数、各剪口source in/out、音频声道/同步、媒体在线状态和图层占用。不要把上层图形空档当基础视频黑洞。MOGRT、统计透明度、定格背景、音频淡出按[图形契约](graphics-adapters.md)完成并逐项销账。避免基础流程依赖QE DOM；必须用时单独实测实际clip匹配，不能用QE索引等同常规DOM索引。
 
 ## 新旧版本都需通过的host验证
