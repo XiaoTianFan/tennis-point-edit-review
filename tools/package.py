@@ -1,10 +1,12 @@
 """Offline package transport. No service login, network calls, commits or pushes."""
-import argparse,hashlib,json,re,sys
+import argparse,base64,hashlib,importlib.util,json,re,sys,zlib
 from pathlib import Path,PurePosixPath
 ROOT=Path(__file__).resolve().parents[1]
 SKILL=ROOT/'skills/tennis-point-edit-review'
 ARCHIVE='references/canonical-package.json'
 STATE=ROOT/'.skill-sync/baseline.json'
+_spec=importlib.util.spec_from_file_location('tennis_archive',SKILL/'scripts/restore_package.py')
+_archive=importlib.util.module_from_spec(_spec);_spec.loader.exec_module(_archive)
 def sha(text):
     return hashlib.sha256(text.encode('utf-8')).hexdigest()
 def safe_name(name):
@@ -26,7 +28,9 @@ def read_package(root=SKILL):
 def with_archive(files):
     files={k:v.replace('\r\n','\n') for k,v in files.items() if k!=ARCHIVE}
     version=json.loads(files['references/package-version.json'])['version']
-    archive={'version':version,'files':{k:{'text':v,'sha256':sha(v)} for k,v in sorted(files.items())}}
+    archive={'schema':'tennis-recovery/v2','version':version,'files':{
+        k:{'encoding':'zlib+base64','data':base64.b64encode(zlib.compress(v.encode('utf-8'),9)).decode('ascii'),'sha256':sha(v)}
+        for k,v in sorted(files.items())}}
     files[ARCHIVE]=json.dumps(archive,ensure_ascii=True,separators=(',',':'))+'\n'
     if sum(len(v.encode()) for v in files.values())>=1000000:raise ValueError('Package exceeds 1 MB')
     return files
@@ -34,9 +38,9 @@ def load_snapshot(path):
     data=json.loads(Path(path).read_text(encoding='utf-8-sig'))
     recovered=[]
     if 'packageFiles' in data:data=data['packageFiles']
-    elif isinstance(data.get('files'),dict) and all(isinstance(v,dict) and 'text' in v for v in data['files'].values()):
+    elif isinstance(data.get('files'),dict) and all(isinstance(v,dict) and ('text' in v or v.get('encoding')=='zlib+base64') for v in data['files'].values()):
         data={ARCHIVE:json.dumps(data,ensure_ascii=True,separators=(',',':'))+'\n',
-              **{k:v['text'] for k,v in data['files'].items()}}
+              **{k:_archive.archive_text(v) for k,v in data['files'].items()}}
     if not isinstance(data,dict) or not all(isinstance(v,str) for v in data.values()):
         raise ValueError('Expected a complete packageFiles mapping or recovery archive')
     data={safe_name(k):v.replace('\r\n','\n') for k,v in data.items()}
@@ -46,11 +50,11 @@ def load_snapshot(path):
         arc=json.loads(data[ARCHIVE])
         for name,entry in arc['files'].items():
             safe_name(name)
-            if sha(entry['text'])!=entry['sha256']:raise ValueError('Invalid archive checksum: '+name)
+            text=_archive.archive_text(entry)
             if name not in data:raise ValueError('Incomplete export: '+name)
-            if data[name]!=entry['text']:
-                if '\ufffd' in data[name] and '\ufffd' not in entry['text']:
-                    data[name]=entry['text'];recovered.append(name)
+            if data[name]!=text:
+                if '\ufffd' in data[name] and '\ufffd' not in text:
+                    data[name]=text;recovered.append(name)
                 else:raise ValueError('Export and archive disagree: '+name)
     if any('\ufffd' in v for v in data.values()):raise ValueError('Unrecovered damaged Unicode')
     return with_archive(data),recovered

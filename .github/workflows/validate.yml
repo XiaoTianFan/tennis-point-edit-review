@@ -19,4 +19,5 @@ jobs:
       - run: python -m pip install -r requirements-dev.txt
       - run: npm ci
       - run: npm run demo:build
+      - run: npm run check:adapters
       - run: python tools/validate.py

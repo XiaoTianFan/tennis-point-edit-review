@@ -67,6 +67,11 @@ recovery archive. It rejects unsafe paths, symlinks, missing entry files and
 incomplete snapshots relative to their embedded archive.
 
 This package includes an ASCII-safe recovery archive with per-file SHA-256 hashes.
+Since v20, recovery records compress UTF-8 text with zlib and Base64 under
+`tennis-recovery/v2`, retaining the existing 1 MB package cap. Readable package
+files are unchanged. The current sync/recovery helpers accept both legacy text
+records and compressed records, validate hashes and bound decompression. Use the
+current helper when reading a v20 archive; older decoders cannot read its records.
 If retrieved text contains damaged Unicode but the archive validates, the helper
 recovers that text and reports which files were recovered. It never treats
 corrupted display text as an intentional edit or guesses missing content.

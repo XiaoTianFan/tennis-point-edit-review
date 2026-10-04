@@ -1,6 +1,6 @@
 {
   "schema": "tennis-ui-template/v1",
-  "version": "2026.10.04-v19",
+  "version": "2026.10.04-v20",
   "referenceCanvas": {
     "width": 1920,
     "height": 1080,
@@ -552,6 +552,6 @@
       "sha256": "d7b3648ecdd953dd37ed6a414efd30fa78e53b91607e3188ba24504b4828053c"
     }
   },
-  "metricCount": 33,
+  "metricCount": 39,
   "statsPages": "examples/stats-pages.json"
 }

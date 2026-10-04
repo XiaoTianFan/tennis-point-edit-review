@@ -1,8 +1,17 @@
 # 辅助材料用法与边界
 
-脚本不连接编辑器、不编辑时间线，也不携带原项目绝对路径或素材ID。路径通过参数传入。Python基础脚本用标准库；逐帧和单应映射需要OpenCV及NumPy。浏览器复核页离线运行，无外部库。
+判读、计分、统计与复核脚本不连接编辑器、不编辑时间线，也不携带原项目绝对路径或素材ID。路径通过参数传入。Python基础脚本用标准库；逐帧和单应映射需要OpenCV及NumPy。浏览器复核页离线运行，无外部库。v20另提供可选编辑/图形适配器，职责与依赖见下节；其中终端MCP客户端会执行请求中的host操作，不能当成只读计算器。
 
-这些辅助脚本不是完整剪辑器；缺少编辑器时，由agent按[跨环境执行与能力补齐](../SKILL.md#跨环境执行与能力补齐)另建执行层，不能把辅助脚本的职责边界误读为必须使用ChatCut。
+这些辅助脚本不是完整剪辑器；先按[环境分流](editing-environments.md)在ChatCut、Premiere与本地流水线中选择，不能把辅助脚本的职责边界误读为必须使用ChatCut。
+
+## 可选编辑与图形适配器
+
+- `premiere_exchange.py`：标准库生成FCP7 XML和源帧/tick映射，只生成文件，不操作Pr；支持范围、CFR前提及未完成host操作见[Premiere分支](premiere-pro.md)。
+- `premiere_mcp.cjs`：Node内置模块实现单请求stdio客户端，无需agent原生MCP集成或Computer Use；按显式请求执行配置的桥，超时不重试；结果与host验收分别记录。
+- `render_overlays.cjs`：用React/esbuild/Playwright渲染包内七个canonical JSX为全画幅RGBA PNG与属性/哈希清单；不连接编辑器。依赖与统计淡变见[图形适配](graphics-adapters.md)。
+- `make_mogrt.cjs`：生成五种简洁native图形的AE创作脚本及映射清单；生成脚本不等于已得到MOGRT，AE执行与目标Pr版本属性/画面测试必须另证实。统计/长说明使用canonical渲染适配。
+
+不把上述适配器的有界支持范围扩成整个技能的限制；现有已验证host能力可处理更多格式，但要保留相同时间映射与验收证据。
 
 ## 数据与命令
 - 构建网页：python scripts/review_io.py build review-data.json review.html。输入形状见 examples/review-data.json；只填当前待审分，行序匹配复核时间线。每行提供 reviewId、pointId、gameNumber（必要时 setNumber）、serverId 和 serveNumber；记录含一发与二发的连续证据时可用 serveNumbers=[1,2] 表达。R/P 映射与时间线共用，局次和发球方逐行常显。局次为正整数，未知值留 null；发次不明也留 null，不借显示默认值猜填。输出为可独立使用的交互列表，不需要嵌入或附带视频，不增加视频转码/导出步骤；录像在对应复核时间线查看。
@@ -45,6 +54,8 @@ HTML 的状态字段仅驱动标记、数量和导出，不能驱动隐藏、移
 - 包检查：python scripts/check_canonical.py；python scripts/package_check.py；原check_helpers.py和check_launch_speed.py仍需通过。浏览器检查模板的正常/长文案与11行统计，运行记录写入validation.md，不伪称已跨录像验证。
 
 文字完整性：scripts/restore_package.py 默认核对ASCII安全文本备份；--repair仅恢复当前本地技能副本，不写回保存的技能。再运行package_check.py。模板校验对换行格式归一化，兼容Windows与其他平台。
+
+v20恢复记录为zlib+Base64编码的UTF-8，逐文件SHA-256保持；当前工具兼容旧text记录与新压缩记录。只压缩冗余恢复副本，可读技能文件不变；新归档不能交给旧恢复脚本处理。
 
 
 ## 逐发球速时段

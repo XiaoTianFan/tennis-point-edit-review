@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026.10.04 — skill 2026.10.04-v20
+
+- Makes ChatCut, Premiere Pro and standalone editing explicit primary choices, independently selecting the graphics layer.
+- Documents legacy CEP/ExtendScript and newer UXP routes, fresh-machine setup, and a terminal-only runtime contract without Computer Use.
+- Adds bounded FCP7 XMEML generation, a stdio MCP client usable from any terminal agent, canonical RGBA overlay rendering, and provisional AE authoring scripts for five native graphic types.
+- Preserves the seven canonical JSX files, scoring/review semantics and source-time evidence; rejects unsupported timing/effects instead of silently losing them.
+- Adds offline regressions and staged synthetic/real-media qualification. Native AE/MOGRT and live Premiere import/export remain pending host testing; no account Skill or GitHub publication is implied.
+- Compresses only the redundant ASCII-safe recovery records, preserving all readable files, hashes, legacy import compatibility and the existing 1 MB package cap.
+
 ## 2026.10.04 — skill 2026.10.04-v19
 
 - Gates speed reconstruction on reviewed contact/first-impact brackets and ball identity; separates pre-net flight from the collision and subsequent bounce.

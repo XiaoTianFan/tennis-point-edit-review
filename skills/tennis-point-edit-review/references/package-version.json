@@ -1,8 +1,8 @@
 {
-  "version": "2026.10.04-v19",
+  "version": "2026.10.04-v20",
   "metricCount": 39,
   "componentCount": 7,
   "pageCount": 5,
   "metricCountDefinition": "39 primary comparison rows; embedded hand splits and rally frequencies are not extra rows.",
-  "description": "网球单打逐分精剪、计分与低负担复核；默认首次简短引导、分阶段细则、事件驱动统计、全量逐发初速、深蓝青柠正式模板与可追溯验收。"
+  "description": "网球单打逐分精剪、计分与复核；ChatCut、Premiere旧版CEP/新版UXP、本地流水线并列，终端交互与混合图形，保留事件证据、统计及估速边界。"
 }

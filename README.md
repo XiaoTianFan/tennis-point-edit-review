@@ -23,7 +23,17 @@ illustration. No match footage, player identities or measured serve speeds are i
 The workflow begins with a short introduction unless the user opts out. The agent
 does the detailed checking; the user sees only remaining material uncertainties.
 
-Current skill revision: **2026.10.04-v19**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, optional 3D fitting, quality checks and fallbacks.
+Current skill revision: **2026.10.04-v20**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, optional 3D fitting, quality checks and fallbacks.
+
+ChatCut, **Premiere Pro** and a standalone pipeline are primary editing choices.
+The [environment contract](skills/tennis-point-edit-review/references/editing-environments.md)
+selects an editor separately from its graphics implementation. Premiere has explicit
+legacy CEP/ExtendScript and newer UXP routes, with a terminal-only interaction
+contract and fresh-machine setup guidance. The agent does not need Computer Use.
+The default Premiere graphics plan is hybrid: native editable scores/labels and
+rendered canonical statistics. See the [investigation and test plan](docs/premiere-investigation.md).
+Live Premiere/AE qualification remains pending; offline helper tests are not a
+claim that every host version or native template has been verified.
 
 ## Preview
 
@@ -67,6 +77,7 @@ skills/tennis-point-edit-review/  Complete portable skill package
   references/                   Rules, definitions, validation and history
   examples/                     Seven canonical JSX components and review HTML
   scripts/                      Evidence, scoring, aggregation and checks
+                                Optional Premiere interchange, terminal MCP and graphics adapters
 demo/                           Reproducible fictional data and screenshot renderer
 docs/                           Gallery, publishing and synchronization guides
 tools/                          Validation, packaging and conflict-aware snapshot sync
@@ -74,7 +85,7 @@ tools/                          Validation, packaging and conflict-aware snapsho
 ```
 
 The package retains the adopted v18 rules and historical preservation map.
-Repository release `0.1.0` and skill revision `2026.10.03-v18.1` are separate labels.
+Repository release `0.1.0` and the current skill revision are separate labels.
 
 ## Reproduce the demonstrations
 
@@ -86,6 +97,7 @@ npm ci
 npm run demo:build
 npm run demo:capture
 python tools/validate.py
+npm run check:adapters
 ```
 
 The renderer compiles the **actual JSX templates**, with a fixed preview frame.

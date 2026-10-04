@@ -8,7 +8,8 @@
     "demo:data": "python demo/build_mock.py",
     "demo:build": "npm run demo:data && node demo/build.cjs",
     "demo:capture": "npm run demo:build && node demo/capture.cjs",
-    "check": "python tools/validate.py"
+    "check": "python tools/validate.py",
+    "check:adapters": "node --test tools/premiere-adapters.test.cjs"
   },
   "devDependencies": {
     "@playwright/cli": "0.1.22",

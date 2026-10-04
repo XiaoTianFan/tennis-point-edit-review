@@ -6,9 +6,17 @@
       "id": "R001",
       "sourceLine": 8,
       "target": "references/helper-usage.md",
-      "requiredTextSha256": "ac6572bfa476f1c36678198f67040b0a243e1b370c7acef49314e70731d478c3",
+      "requiredTextSha256": "03f818ca24a85dd3fbb0ad68746bfdfbf66926904a6ef29d8650f9fcdd814ada",
       "status": "relocated_or_equivalent",
-      "requiredTextPrefixLength": 126
+      "requiredTextPrefixLength": 166,
+      "amendmentHistory": [
+        {
+          "version": "2026.10.04-v19",
+          "requiredTextSha256": "ac6572bfa476f1c36678198f67040b0a243e1b370c7acef49314e70731d478c3",
+          "requiredTextPrefixLength": 126
+        }
+      ],
+      "amendment": "v20: preserve calculation helpers as editor-independent; separately disclose the optional terminal MCP client and graphics adapters."
     },
     {
       "id": "R002",
@@ -22,12 +30,19 @@
       "id": "R003",
       "sourceLine": 13,
       "target": "SKILL.md",
-      "requiredTextSha256": "1e56da2d5a5717dd2fc684f3f7fdc28d71beea47e06636c30c52164c6ff76c39",
+      "requiredTextSha256": "ed1c6e4e611922a6206efcf8602cfa348fbf7f5fe0f6f806aef377b7bbc3c057",
       "status": "relocated_or_equivalent",
       "requiredTextPrefixLength": 144,
       "priorRequiredTextSha256": "4136b86d887a8b0ed6284e3c4d6d5ff32a8486604e0ed2d2c096ec74c4422aa6",
       "priorRequiredTextPrefixLength": 146,
-      "amendment": "v19: update the package revision while preserving the adopted task-routing and visual-template priority rule."
+      "amendment": "v20: update revision while preserving adopted task routing and visual priority.",
+      "amendmentHistory": [
+        {
+          "version": "2026.10.04-v19",
+          "requiredTextSha256": "1e56da2d5a5717dd2fc684f3f7fdc28d71beea47e06636c30c52164c6ff76c39",
+          "requiredTextPrefixLength": 144
+        }
+      ]
     },
     {
       "id": "R004",
@@ -541,7 +556,8 @@
     {
       "path": "scripts/restore_package.py",
       "originalSha256": "677073c8f84557bcc115d79925af0d90a9a807a6f9fa0f0e2a3feec258e88105",
-      "status": "unchanged"
+      "status": "updated_or_relocated",
+      "amendment": "v20: read bounded compressed ASCII recovery records as well as legacy text; preserve exact text hashes and local-only explicit repair semantics."
     },
     {
       "path": "scripts/review_io.py",

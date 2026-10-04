@@ -48,7 +48,8 @@ and [privacy policy](https://github.com/hetpatel-11/Adobe_Premiere_Pro_MCP/blob/
 
 MCP and XML are complementary: a single XML import can build the cut structure,
 then host calls can install MOGRT instances, read back timing and export. Direct
-UI import is also a valid route for an agent without MCP. XML generation alone
+UI import can be a manual setup/test step, but the delivered agent workflow uses
+a terminal-accessible host bridge. XML generation alone
 does not prove Premiere imported or rendered it correctly.
 
 ## Corrections to the earlier assessment
@@ -96,6 +97,12 @@ with previous state recorded. No successful connection or host mutation has
 yet been established. Windows Computer Use was stopped by a physical Escape
 before live bridge setup; app control stopped at that point.
 
+The owner subsequently authorized resuming development setup, but the runtime
+continued returning the stopped-by-Escape state. No further UI method was used
+to circumvent it. The owner also clarified that the final skill must operate
+through terminal/files, without assuming Computer Use, and must distinguish
+old and new Premiere releases. Both constraints are now part of the package.
+
 ## Test sequence and acceptance
 
 1. **Portable helpers:** rational rates/ticks, half-open cut boundaries, linked
@@ -140,3 +147,45 @@ canonical templates. Do not hard-code this test's players, media paths or IDs.
 Repository upgrades, account Skill synchronization, agent installation and GitHub
 publication are distinct operations. This task prepares and commits repository
 changes; account publication is not implied by a local package upgrade.
+
+## Implemented and checked in this pass
+
+- Explicit editor selection and independent graphics selection, including
+  legacy CEP and newer UXP setup, prerequisites and version gates.
+- A terminal-only, single-request stdio MCP client. It successfully initialized
+  the actual 1.2.8 server and retrieved the XML-import schema. This proves client
+  transport/catalog access, not a connected Premiere host. A subsequent read-only
+  check with `launchIfNeeded:false` returned `premiere_not_running`; the client
+  recorded the complete tool error and exited unsuccessfully, without retries or
+  app launch. The upstream error mentions launch failure even in this no-launch
+  mode; it is not evidence that launching was attempted.
+- A bounded FCP7 generator for same-rate CFR cuts, linked mono/stereo audio and
+  full-canvas stills. It rejects unsupported effects/rates and retains pending
+  host operations explicitly. Exact frame/tick and structural tests passed.
+- Canonical RGBA rendering: 18 synthetic PNGs across seven components, all five
+  statistics pages and seven fade-boundary samples. Measured alpha was zero at
+  both fade endpoints, 255 on the plateau, and zero outside graphic bounds.
+  The 11-row statistics page and speed label were visually inspected. A speed
+  text line-box overflow warning was inspected: visible text was not cropped.
+- Two real source excerpts normalized to 30 fps: 309 + 114 = 423 frames. Packet
+  inspection of the source's first 70 seconds found both 1/60-second and
+  11/600-second frame durations, confirming variable cadence in that window.
+  Their XML and source-offset mapping are ready for host import; original media
+  was not changed. Twelve real-data graphics were rendered into ignored local
+  test output, including five saved statistics pages.
+- A provisional authoring-script generator for five native graphics. JavaScript
+  syntax and field mappings are checked; **AE execution, binary MOGRT export and
+  Premiere compatibility are unverified**. Rendered statistics and explanation
+  overlays retain their canonical implementation.
+
+The live ChatCut project changed while this investigation was running. A saved
+serve-overlay data file also differed from the earlier live speed instance.
+The test pack records this instead of silently choosing old data as current.
+Resume real comparison from an explicit frozen reference snapshot. No ChatCut
+timeline, review answers or source media was edited.
+
+**Still pending:** bridge activation in Premiere, synthetic host import/readback,
+native MOGRT editing and duration, real composition comparison, audio listening,
+save/reopen, export and full-match transfer. Newer UXP is documented from Adobe
+APIs, not run on this older installed host. Do not label the integration fully
+qualified until these gates have actual evidence.
