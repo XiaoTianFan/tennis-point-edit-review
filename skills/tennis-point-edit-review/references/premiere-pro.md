@@ -22,7 +22,7 @@
 2. 选择并说明具体桥及版本。可选社区候选为[npm `adobe-premiere-pro-mcp`](https://github.com/hetpatel-11/Adobe_Premiere_Pro_MCP)；1.2.8使用CEP，其UXP包为experimental，不能当正式UXP默认。记录下载来源、版本/完整性摘要。检查安装脚本副作用，不凭相同可执行文件名确认包身份。
 3. 把Node包安装在稳定的本地工具目录，保留依赖锁与版本，按当前任务授权范围安装桥。该候选的Windows安装脚本默认还会改多个CEP debug注册表版本、Claude和VS Code配置；terminal-only使用不需要这些client配置。可使用`-SkipBuild -SkipCopilotConfig -SkipClaudeDesktopConfig -SkipAdobeDebugMode`分离动作，仅为实际runtime按Adobe开发设置要求处理debug，并保存原值。macOS按其安装文档核对对应偏好；不要照搬Windows路径。
 4. 该候选默认有匿名遥测；明确配置`PREMIERE_MCP_TELEMETRY=0`/`DO_NOT_TRACK=1`及面板配置`telemetry:false`。可设置`PREMIERE_MCP_UPDATE_CHECK=0`，由维护流程显式检查更新。保留用户既有配置，仅改选定桥需要的字段，不覆盖其他MCP、权限或账户配置。不要把token写入技能或Git。
-5. CEP需当前用户扩展目录中的面板、所需开发设置，以及Pr加载面板。**首次用户动作**：启动Pr，先创建或打开一个空白scratch工程，再打开Window → Extensions → MCP Bridge (CEP)，确认面板与服务端使用同一个命令目录并启动桥。23.5的Home页未打开工程时Extensions不可用。保存这个空工程及其本机路径，作为后续终端启动入口。已支持自动启动的面板仍须实测下次Pr启动后能否恢复。terminal agent没有通路时只给出这一明确配置动作，不要求它点击菜单，也不把安装文件存在说成已连通。
+5. CEP需当前用户扩展目录中的面板、所需开发设置，以及Pr加载面板。**首次激活**（无Computer Use时请用户操作）：启动Pr，先创建或打开一个空白scratch工程，再打开Window → Extensions → MCP Bridge (CEP)，确认面板与服务端使用同一个命令目录并启动桥。23.5的Home页未打开工程时Extensions不可用。保存这个空工程及其本机路径，作为后续终端启动入口。已支持自动启动的面板仍须实测下次Pr启动后能否恢复。terminal agent没有通路时只给出这一明确配置动作，不要求它点击菜单，也不把安装文件存在说成已连通。
 6. UXP需与host兼容、已安装/启用的插件及其被授予的文件/本地通信访问。开发测试可由开发者通过UXP Developer Tool加载；正式用户应按插件分发方式安装/激活，不假定UDT、developer mode或未受限filesystem已开启。使用插件实际公开的命令协议并记录权限。没有已验证UXP终端桥时可在host仍支持的情况下明确选择CEP；不能伪称当前CEP候选已成为UXP。
 7. 终端只读检查连通，返回host版本、当前工程、序列、timebase和能力；未通过即说明具体缺口。安装/启动失败时先完成独立数据准备，不反复发送编辑命令。认证、缺少授权或阻塞对话框需要用户处理；不绕过。
 8. 在新scratch工程中做最小导入/读回/渲染/保存重开测试。交付记录安装目录、桥版本、启动方式、配置文件位置、恢复原设置办法、可用导出预设，以及实测的host/能力组合。不要安装完成后静默关闭用户需要的桥；若测试后清理，按记录恢复而不是删除其他扩展。
