@@ -10,11 +10,13 @@ import secrets
 import threading
 import time
 import webbrowser
+import sys
+from fractions import Fraction
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
 from local_model import SCHEMA, Store, Conflict, context, read, write, validate
-from local_media import prepare_media, frame_image, render_graphics, export_video, probe
+from local_media import prepare_media, frame_image, render_graphics, export_video, export_settings, probe, source_settings
 
 WEB = Path(__file__).resolve().parent / 'local_web'
 
@@ -34,16 +36,41 @@ def initialize(plan, directory, base=None):
         video = next(s for s in info['streams'] if s['codec_type'] == 'video')
         if asset.get('timing') != 'cfr-proxy' or video['r_frame_rate'] != video['avg_frame_rate']:
             raise ValueError('Prepare a CFR asset with the media command first')
-        from fractions import Fraction
+        settings = source_settings(info)
+        for key in ('fps', 'width', 'height', 'audio'):
+            p.setdefault(key, settings[key])
+        asset.update(width=settings['width'], height=settings['height'], audio=settings['audio'], fps=settings['fps'])
         if Fraction(video['avg_frame_rate']) != Fraction(str(p['fps'])):
             raise ValueError('Asset fps must match timeline fps')
         asset['frames'] = int(video['nb_frames'])
         asset['hasAudio'] = any(s['codec_type'] == 'audio' for s in info['streams'])
+    # Seconds-based plans are portable across source rates; explicit frame plans stay unchanged.
+    for item in p['clips'] + p['overlays']:
+        for prefix in ('in', 'out', 'duration', 'start', 'end'):
+            key = prefix + 'Seconds'
+            frame_key = prefix + ('Frames' if prefix == 'duration' else 'Frame')
+            if key in item:
+                if frame_key in item:
+                    raise ValueError('Specify seconds or frames, not both: ' + key)
+                item[frame_key] = round(Fraction(str(item.pop(key))) * Fraction(str(p['fps'])))
     validate(p, check_files=True)
     directory.mkdir(parents=True)
     render_graphics(p, directory)
     write(directory / 'project.json', p)
     return p
+
+def pick_directory(initial):
+    # A hidden server's startup window state must not hide its native chooser.
+    launch = {}
+    if sys.platform == 'win32':
+        startup = subprocess.STARTUPINFO()
+        startup.dwFlags = subprocess.STARTF_USESHOWWINDOW
+        startup.wShowWindow = 1  # SW_SHOWNORMAL
+        launch = dict(startupinfo=startup, creationflags=subprocess.CREATE_NO_WINDOW)
+    result = subprocess.run([sys.executable, str(WEB.parent / 'local_picker.py'), str(initial)], capture_output=True, text=True, encoding='utf-8', **launch)
+    if result.returncode:
+        raise ValueError('Native folder picker unavailable; enter the folder path instead')
+    return json.loads(result.stdout)['directory']
 
 def make_server(directory, port=0):
     store = Store(directory)
@@ -52,6 +79,7 @@ def make_server(directory, port=0):
     job = {'state': 'idle'}
     job_lock = threading.Lock()
     frame_lock = threading.Lock()
+    picker_lock = threading.Lock()
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *args):
@@ -143,6 +171,8 @@ def make_server(directory, port=0):
                     self.reply({**context(p), 'projectPath': str(store.path)})
                 elif route == '/api/job':
                     self.reply(job.copy())
+                elif route == '/api/export-settings':
+                    self.reply({**export_settings(p), 'directory': str(store.directory / 'exports')})
                 elif route == '/api/export':
                     if job.get('state') != 'complete':
                         raise ValueError('No completed export')
@@ -190,12 +220,26 @@ def make_server(directory, port=0):
                         write(store.directory / 'agent-context.json', value)
                         write(store.directory / 'review.json', value['review'])
                     self.reply(value)
+                elif route == '/api/pick-directory':
+                    if not picker_lock.acquire(blocking=False):
+                        raise Conflict('Folder picker already open')
+                    try:
+                        initial = Path(data.get('directory') or store.directory)
+                        self.reply({'directory': pick_directory(initial if initial.is_dir() else store.directory)})
+                    finally:
+                        picker_lock.release()
                 elif route == '/api/render':
                     p = store.get()
                     if data['revision'] != p['revision']:
                         raise Conflict('Reload before exporting video')
-                    if p.get('needsRebuild'):
-                        raise ValueError('Send the changes to your agent to refresh graphics before exporting')
+                    options = export_settings(p, data.get('options'))
+                    destination = Path(data.get('directory') or store.directory / 'exports').expanduser()
+                    if not destination.is_absolute():
+                        raise ValueError('Use an absolute destination folder path')
+                    destination.mkdir(parents=True, exist_ok=True)
+                    target = destination.resolve() / options['filename']
+                    if target.exists():
+                        raise ValueError('Output file already exists; choose another filename')
                     with job_lock:
                         if job.get('state') == 'running':
                             raise Conflict('Export already running')
@@ -203,7 +247,7 @@ def make_server(directory, port=0):
                         job.update(state='running', revision=p['revision'], completedClips=0, totalClips=len(p['clips']))
                     def export():
                         try:
-                            export_video(p, store.directory / 'exports' / f'r{p["revision"]}-{time.time_ns()}', lambda v: job.update(v))
+                            export_video(p, store.directory / 'exports' / f'r{p["revision"]}-{time.time_ns()}', lambda v: job.update(v), options, target)
                         except Exception as e:
                             job.update(state='failed', error=str(e))
                     threading.Thread(target=export, daemon=True).start()
@@ -225,14 +269,15 @@ def main():
     sub = parser.add_subparsers(dest='command', required=True)
     sub.add_parser('doctor', help='Check terminal dependencies without starting a browser')
     media = sub.add_parser('media', help='Create a browser-compatible CFR source proxy')
-    media.add_argument('source'); media.add_argument('output'); media.add_argument('--fps', default='30')
-    media.add_argument('--width', type=int, default=1280); media.add_argument('--start', type=float, default=0)
+    media.add_argument('source'); media.add_argument('output'); media.add_argument('--fps')
+    media.add_argument('--width', type=int); media.add_argument('--start', type=float, default=0)
     media.add_argument('--duration', type=float)
     init = sub.add_parser('init'); init.add_argument('plan'); init.add_argument('directory')
     serve = sub.add_parser('serve'); serve.add_argument('directory'); serve.add_argument('--port', type=int, default=0); serve.add_argument('--open', action='store_true')
     inspect = sub.add_parser('context'); inspect.add_argument('directory'); inspect.add_argument('--output')
     update = sub.add_parser('update'); update.add_argument('directory'); update.add_argument('plan'); update.add_argument('--expected-revision', type=int, required=True)
     render = sub.add_parser('render'); render.add_argument('directory'); render.add_argument('output')
+    render.add_argument('--fps'); render.add_argument('--width', type=int); render.add_argument('--height', type=int); render.add_argument('--filename', default='edited.mp4')
     args = parser.parse_args()
     if args.command == 'doctor':
         result = {'python': __import__('sys').version.split()[0],
@@ -277,7 +322,8 @@ def main():
         render_graphics(updated, store.directory)
         result = store.commit(updated, args.expected_revision, {'type': 'agent-reconciliation'})
     else:
-        result = export_video(Store(args.directory).get(), args.output)
+        options = {k: getattr(args, k) for k in ('fps', 'width', 'height', 'filename') if getattr(args, k) is not None}
+        result = export_video(Store(args.directory).get(), args.output, options=options)
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
 if __name__ == '__main__':

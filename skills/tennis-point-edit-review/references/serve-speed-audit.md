@@ -46,7 +46,7 @@
 
 初态为 `[x,y,z,vx,vy,vz]`；priors 为 `{index,mean,sigma}`。固定相机、时间及物理参数后拟合初态，不同时放开所有相机、深度、触拍时间、阻力、旋转参数以追求低残差。collision_lower_seconds 设置首次碰撞最早边界；其后的观测不得进入拟合。短段或深度不受约束时保留多个起点的候选，发现不同速度同样贴合像素即视为不可辨识。
 
-输出 qualityAccepted 默认 false。先用 `alternating_holdouts` 在交错帧训练、预测另半帧，再独立改变 timing、geometry、drag、lift 四族假设，每族检查正负方向与有依据的边界（variant 使用 family 和 side=low/high）。把候选、两份留出结果、扰动结果和画面检查送入 `speed_evidence.assess_partial_quality`。visual_checks 须确认 ballIdentityVerified、contactBracketVerified、preImpactSegmentVerified、cameraCalibrationReviewed、metricDepthConstraintReviewed、initialStateStabilityReviewed。只有返回 accepted 才可登记 qualityAccepted=true；小残差但贴参数边界、留出不稳或缺乏深度约束均不能通过。默认阈值是工程筛查起点，需按分辨率与帧率调整，未由雷达标定。
+输出 qualityAccepted 默认 false。先用 `alternating_holdouts` 在交错帧训练、预测另半帧，再独立改变 timing、geometry、drag、lift 四族假设，每族检查正负方向与有依据的边界（variant 使用 family 和 side=low/high）。把候选、两份留出结果、扰动结果和画面检查送入 `speed_evidence.assess_partial_quality`。visual_checks 须确认 ballIdentityVerified、contactBracketVerified、preImpactSegmentVerified、cameraCalibrationReviewed、metricDepthConstraintReviewed、initialStateStabilityReviewed。只有返回 accepted 才可登记 qualityAccepted=true；小残差但贴参数边界、留出不稳或缺乏深度约束均不能通过。`visual_checks.frameHeight`传入实际源画面高度以自动缩放像素残差阈值；时间使用原片PTS秒数，帧率改变不改变物理时长。最低观测数量是证据要求，不因低帧率自动放宽；默认阈值仍是未由雷达标定的工程筛查起点。
 
 ## 补估及复现
 

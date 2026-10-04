@@ -48,7 +48,7 @@ python tools/validate.py
 npm run check:adapters
 ```
 
-工作流与编辑器指南在 `references/`，正式模板在 `examples/`，计算与取证工具在 `scripts/`。当前版本 **2026.10.04-v22.2**；估速方法详见[中英文说明](docs/serve-speed-explained.md)。
+工作流与编辑器指南在 `references/`，正式模板在 `examples/`，计算与取证工具在 `scripts/`。当前版本 **2026.10.04-v22.3**；估速方法详见[中英文说明](docs/serve-speed-explained.md)。
 
 账户保存版本没有可以直接交给 Git 的目录地址。建议以本仓库作可版本管理的维护源。也支持先修改账户版本，再由 agent 完整取回、差异比较、合并、验证和提交；不会自动同步，更不会自动公开到 GitHub。详见[双向同步流程](docs/synchronization.md)。
 

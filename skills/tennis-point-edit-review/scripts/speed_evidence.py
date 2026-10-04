@@ -89,12 +89,14 @@ def impute_same_group(target,records):
 def assess_partial_quality(candidate,holdouts,variants,visual_checks,policy=None):
     """Acceptance screening, NOT absolute accuracy validation. Caller supplies perturbations.
 
-    Pixel thresholds are defaults for a 1080p source; scale/review for each clip.
+    Pass visual_checks.frameHeight for automatic scaling of the 1080p pixel thresholds.
     Required sensitivity families: timing, geometry, drag, lift. They cannot be
     replaced by merely rerunning identical observations with the same assumptions.
     """
-    p={'minObservations':12,'minSpanSeconds':.18,'maxRmsPixels':2.5,
-       'maxHeldOutRmsPixels':3.5,'maxHeldOutSpeedFraction':.12,'maxSensitivityWidthFraction':.35}
+    pixel_scale=finite(visual_checks.get('frameHeight',1080))/1080
+    if pixel_scale<=0:raise ValueError('Positive source frame height required')
+    p={'minObservations':12,'minSpanSeconds':.18,'maxRmsPixels':2.5*pixel_scale,
+       'maxHeldOutRmsPixels':3.5*pixel_scale,'maxHeldOutSpeedFraction':.12,'maxSensitivityWidthFraction':.35}
     p.update(policy or {});reasons=[]
     for key in ('ballIdentityVerified','contactBracketVerified','preImpactSegmentVerified','cameraCalibrationReviewed','metricDepthConstraintReviewed','initialStateStabilityReviewed'):
         if visual_checks.get(key) is not True:reasons.append('missing '+key)

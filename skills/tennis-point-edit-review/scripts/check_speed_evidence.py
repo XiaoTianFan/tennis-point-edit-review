@@ -118,6 +118,15 @@ class QualityChecks(unittest.TestCase):
         c,h,v,w=self.base();c['observationCount']=8
         self.assertFalse(assess_partial_quality(c,h,v,w)['accepted'])
         c,h,v,w=self.base();self.assertFalse(assess_partial_quality(c,h,v[:2],w)['accepted'])
+    def test_pixel_thresholds_follow_source_resolution(self):
+        c,h,v,w=self.base()
+        baseline=assess_partial_quality(c,h,v,w)
+        c['rmsPixels']*=2
+        for item in h:item['heldOutRmsPixels']*=2
+        w['frameHeight']=2160
+        scaled=assess_partial_quality(c,h,v,w)
+        self.assertEqual(scaled['accepted'],baseline['accepted'])
+        self.assertEqual(scaled['policy']['maxRmsPixels'],5)
 
 class LetOverlayChecks(unittest.TestCase):
     def record(self,**changes):

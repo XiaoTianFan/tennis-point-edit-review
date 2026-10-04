@@ -10,7 +10,7 @@
 
 ```sh
 python "<skill>/scripts/local_editor.py" doctor
-python "<skill>/scripts/local_editor.py" media "<source>" "<work>/source-proxy.mp4" --fps 30 --width 1920
+python "<skill>/scripts/local_editor.py" media "<source>" "<work>/source-proxy.mp4"
 python "<skill>/scripts/local_editor.py" init "<work>/plan.json" "<work>/edit"
 python "<skill>/scripts/local_editor.py" serve "<work>/edit" --open
 ```
@@ -21,9 +21,9 @@ python "<skill>/scripts/local_editor.py" serve "<work>/edit" --open
 
 ## 媒体与时间
 
-`media`生成浏览器可解码的H.264/AAC、SDR、16:9恒定帧率代理及`.media.json`；原片保持不变。可用`--start 秒 --duration 秒`制作有界片段。画幅等比缩放并补黑边，默认导出采用代理清晰度；正式交付前明确分辨率，不把1280宽代理说成原始4K输出。HDR先确定并验收SDR色调映射；本工具拒绝静默处理PQ/HLG。
+`media`默认继承源片显示分辨率、标称有理数帧率、音频采样率及声道数，生成浏览器可解码的H.264/AAC恒定帧率媒体与`.media.json`，不改原片。旋转及像素宽高比归一为实际显示画幅；奇数尺寸补至偶数，源参数保留在元数据。`--fps`、`--width`仅用于用户明确要求的转换，不把低清代理作为默认交付源。可用`--start 秒 --duration 秒`制作有界片段。SDR颜色标签随媒体保留，最终合成统一输出SDR Rec.709；HDR先确定并验收色调映射，本工具拒绝静默转换PQ/HLG。
 
-计划中的区间全为**代理整数帧、左闭右开**，fps可用`30000/1001`等有理数字符串。原片呈现时间=`sourceStartSeconds + frame / fps`；VFR转CFR会重复/舍弃帧，代理帧号不等于原片帧号。估速、真实触拍及死球证据保留原片PTS/整数微秒，不能从代理帧数反推为原始测量精度。
+计划可用`inSeconds/outSeconds/durationSeconds/startSeconds/endSeconds`，初始化按继承帧率一次换算并保存为**媒体整数帧、左闭右开**；同一边界不可同时提供秒和帧。已有整数帧计划保持原坐标，fps可用`30000/1001`等有理数字符串。原片呈现时间=`sourceStartSeconds + frame / fps`；VFR转CFR会重复/舍弃帧，代理帧号不等于原片帧号。估速、真实触拍及死球证据保留原片PTS/整数微秒，不能从代理帧数反推为原始测量精度。
 
 暂停、单帧前后步进使用FFmpeg解码静帧，按原尺寸叠加正式PNG；播放使用浏览器视频帧回调与当前片段边界。浏览器连续播放在内部跳剪处可能短暂停顿，不能作为音画连续性或精确输出验收；最终FFmpeg成片单独检查。Source模式显示完整代理原声与画面，不显示成片覆盖层；Edited模式按剪辑计划播放。
 
@@ -33,7 +33,7 @@ python "<skill>/scripts/local_editor.py" serve "<work>/edit" --open
 
 | 字段 | 契约 |
 |---|---|
-| `title`, `fps`, `width`, `height` | 当前时间线名称、帧率和偶数16:9画幅；当前上限4096像素 |
+| `title`, `fps`, `width`, `height` | 时间线名称；省略`fps/width/height`时由首个媒体继承，偶数画幅各边≤8192，1–240 fps；混合帧率素材先显式统一到时间线帧率 |
 | `players` | 当前两方`id/name`映射；比赛身份与双打限制遵循输入规则 |
 | `assets` | 稳定`id`加`media`生成的`metadata`路径；初始化核实实际帧率与帧数 |
 | `clips` | 按播放顺序排列；稳定`id`、`assetId`、`inFrame/outFrame`；比赛段带`pointId/serveNumber/serveId`，同分可含多个clip，不另计分 |
@@ -43,7 +43,7 @@ python "<skill>/scripts/local_editor.py" serve "<work>/edit" --open
 
 逐分说明`review.rows[].reason`由agent依据当前素材证据生成；工作台只展示工程中的说明，加载视频不会自动生成分析。
 
-覆盖层的属性与位置复用[正式清单](../examples/ui-manifest.json)和[图形适配](graphics-adapters.md)。源码模板不复制、不修改；`init/update`渲染整画幅透明PNG，浏览器和导出复用同一批图形及props。静态标签直接切换，统计页由工作台负责首尾9帧淡变，不能再叠加第二份动画。文字与分数从账本重生成，网页支持修改图层时序，不声称图片内文字可直接编辑。
+覆盖层的属性与位置复用[正式清单](../examples/ui-manifest.json)和[图形适配](graphics-adapters.md)。源码模板不复制、不修改；`init/update`渲染整画幅透明PNG，浏览器和导出复用同一批图形及props。静态标签直接切换，其他比例采用等比居中的参考布局适配，播放器画布继承实际宽高比；统计页由工作台按当前帧率负责首尾约0.3秒淡变，不能再叠加第二份动画。文字与分数从账本重生成，网页支持修改图层时序，不声称图片内文字可直接编辑。
 
 agent在阶段2建立主剪计划，必要复核在阶段3另建复核计划与工作区；按分保留充分证据，复核图形使用`reviewId/reviewLabel/explanation`及常显规则。工作台共用同一个播放器与复核协议，但主剪/复核仍各有明确用途，不能用主剪删去的一发替代审核证据。阶段5–7调用既有计分、统计、估速与`template_pack.py`生成正式props，再加入五页统计定格及逐发球速；示例计划不提供默认比赛结果。
 
@@ -64,12 +64,12 @@ python "<skill>/scripts/local_editor.py" render "<work>/edit" "<work>/new-export
 
 `context`直接读取最新持久化状态，不依赖用户先点按钮。`updated-project.json`从**当前project.json副本**修改，保留用户剪口、顺序、映射及素材路径；不能把最初plan直接覆盖回来。先按[依赖重算](workflow.md)处理`needsRebuild`，再用原计分/统计/估速工具重算受影响事实和props。`update`保留用户answers、source、ledgerRevision和R/P映射，重新渲染图形并以预期revision原子提交；成功后清除待重算项，保留历史并开始新的Undo边界。发布另一轮审核或增删分时另建有版本的新计划，显式沿用已确认事实。
 
-修剪会标记证据与时序待查，重排标记呈现顺序待查，答案变化标记计分/统计待查。重排只改变呈现，不能自动重排比赛事实。未处理这些变化前允许预览和继续审核，但禁止最终导出，避免交付旧分数。不要为消除提示而直接清空`needsRebuild`；确认没有事实影响的纯呈现修改也需检查图层与源映射后通过`update`提交。
+修剪会标记证据与时序待查，重排标记呈现顺序待查，答案变化标记计分/统计待查。重排只改变呈现，不能自动重排比赛事实。未处理这些变化仍可直接导出；界面仅提示计分板、统计或图形时序可能与用户编辑不一致，导出报告保留待查项。不要为消除提示而直接清空`needsRebuild`；确认没有事实影响的纯呈现修改也需检查图层与源映射后通过`update`提交。
 
 ## 导出与边界
 
-Export video始终可打开输出面板，查看当前分辨率、帧率、时长、编码与待复核原因；仅“开始导出”受未保存编辑、待复核项及运行中任务限制。输出沿用工程的16:9偶数尺寸（各边≤4096）和恒定帧率（1–120 fps，支持分数帧率），网页不提供独立改帧率或分辨率的选项；需要不同设置时，由agent准备相应媒体、时间线与图形后更新工程。
+Export video提供分辨率预设和自定义宽高、整数或有理数fps、文件名、目标目录及系统文件夹选择器。默认沿用当前时间线；输出变化不修改工程帧坐标或证据，整条合成后一次换帧率以避免各剪口累积舍入，输出时长误差≤半个输出帧。宽高不同比例时等比补边，图形随视频一起缩放。支持偶数尺寸各边≤8192及1–240 fps；音频沿用工程采样率与声道数。系统选择器使用Python Tk（Windows/macOS原生对话框，Windows启用逐显示器DPI感知）；缺少Tk或无桌面时可直接填路径。终端`render`同样接受`--width/--height/--fps/--filename`。不覆盖已有文件，请换名后导出。
 
-Export video与终端`render`使用同一路径：逐段精准取帧、同源PNG合成、统计淡变、剪口两帧音频淡变、定格静音，然后输出H.264/AAC MP4。每次使用新目录，保存`project-snapshot.json`与带帧数/哈希的`export.json`；不能只验证PNG、忽略最终视频。至少检查发球前后、大小标签同帧退出、分界、五页统计、定格接点、原声及起止帧；确认总帧数、时长和有效音轨。两帧音频淡变不代替人工检查剪口声音。
+Export video与终端`render`使用同一路径：逐段精准取帧、同源PNG合成、统计淡变、剪口两帧音频淡变、定格静音，然后输出H.264/AAC MP4。输出文件写入用户选定目录；每次在工程内使用新的渲染工作目录，保存`project-snapshot.json`与带帧数/哈希的`export.json`；不能只验证PNG、忽略最终视频。至少检查发球前后、大小标签同帧退出、分界、五页统计、定格接点、原声及起止帧；确认总帧数、时长和有效音轨。两帧音频淡变不代替人工检查剪口声音。
 
-当前实现为单视频主轨、顺序拼接、原速片段与静帧、七种正式覆盖层；不含多机位、任意转场、音频混音、变速曲线、HDR或非16:9布局。需要这些能力时明确扩展计划或选择用户认可的编辑环境；不要静默丢失特性。源文件、代理和workspace一并移动后需更新路径并验证；本地服务器仅服务已注册素材和图形，不提供任意文件浏览。
+当前实现为单视频主轨、顺序拼接、原速片段与静帧、七种正式覆盖层；不含多机位、任意转场、音频混音、变速曲线或HDR。需要这些能力时明确扩展计划或选择用户认可的编辑环境；不要静默丢失特性。源文件、代理和workspace一并移动后需更新路径并验证；本地服务器仅服务已注册素材和图形，不提供任意文件浏览。

@@ -62,14 +62,17 @@ def validate(project, check_files=False):
         raise ValueError('Unsupported project schema')
     integer(project.get('revision'), 'revision')
     fps = Fraction(str(project['fps']))
-    if not 1 <= fps <= 120:
-        raise ValueError('fps outside 1..120')
+    if not 1 <= fps <= 240:
+        raise ValueError('fps outside 1..240')
     for key in ('width', 'height'):
         integer(project[key], key, 2)
-        if project[key] > 4096 or project[key] % 2:
-            raise ValueError('Use even dimensions <= 4096')
-    if project['width'] * 9 != project['height'] * 16:
-        raise ValueError('Canonical local layout currently requires 16:9')
+        if project[key] > 8192 or project[key] % 2:
+            raise ValueError('Use even dimensions <= 8192')
+    if project.get('audio'):
+        integer(project['audio']['sampleRate'], 'audio sample rate', 1)
+        integer(project['audio']['channels'], 'audio channels', 1)
+        if project['audio']['sampleRate'] > 96000 or project['audio']['channels'] > 8:
+            raise ValueError('Unsupported audio configuration')
     players = keyed(project['players'], 'player')
     if len(players) != 2:
         raise ValueError('Local review currently requires two scoring sides')

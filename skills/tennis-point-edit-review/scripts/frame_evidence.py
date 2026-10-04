@@ -24,6 +24,7 @@ def evidence(source,start,end,out,roi=None,hsv_low=(18,42,80),hsv_high=(62,255,2
             diff=cv2.absdiff(gray,previous); previous=gray
             if t<start: continue
             h,w=frame.shape[:2]
+            pixel_scale=(w*h/(1920*1080))**.5
             x,y,rw,rh=roi if roi else (0,0,w,h)
             if x<0 or y<0 or rw<=0 or rh<=0 or x+rw>w or y+rh>h: raise ValueError("ROI outside source frame")
             mask=cv2.inRange(cv2.cvtColor(frame,cv2.COLOR_BGR2HSV),np.array(hsv_low),np.array(hsv_high))
@@ -33,7 +34,8 @@ def evidence(source,start,end,out,roi=None,hsv_low=(18,42,80),hsv_high=(62,255,2
             marked=frame.copy()
             for j in range(1,n):
                 bx,by,bw,bh,area=stats[j];cx,cy=centres[j]
-                if 1<=area<=190 and bw<=35 and bh<=35:
+                # Retain a small compression/quantization floor on low-resolution footage.
+                if 1<=area<=max(64,190*pixel_scale**2) and bw<=max(12,35*pixel_scale) and bh<=max(12,35*pixel_scale):
                     candidates.append([round(float(cx),2),round(float(cy),2),int(area)])
                     cv2.circle(marked,(round(cx),round(cy)),9,(0,160,255),1)
             name=f"{len(records):05d}"

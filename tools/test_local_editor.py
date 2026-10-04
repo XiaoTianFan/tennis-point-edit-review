@@ -8,13 +8,15 @@ import sys
 import tempfile
 import threading
 import unittest
+from unittest.mock import patch
+from fractions import Fraction
 from pathlib import Path
 
 SCRIPTS = Path(__file__).resolve().parents[1] / 'skills/tennis-point-edit-review/scripts'
 sys.path.insert(0, str(SCRIPTS))
 from local_model import SCHEMA, Store, Conflict, write, validate, layout, review_payload, overlay_range
-from local_editor import make_server
-from local_media import export_video, prepare_media, probe, run
+from local_editor import make_server, initialize
+from local_media import export_video, export_settings, prepare_media, probe, run, source_settings
 
 
 def sample(directory):
@@ -81,11 +83,11 @@ class ModelTest(unittest.TestCase):
             with self.assertRaises(ValueError): self.store.apply(0, operation)
             self.assertEqual(self.store.get()['revision'], 0)
 
-    def test_dirty_project_cannot_export(self):
+    def test_export_filename_and_dimensions_validation(self):
         self.p['needsRebuild'] = ['score-and-statistics']
-        with self.assertRaisesRegex(ValueError, 'reconciliation'):
-            export_video(self.p, Path(self.temp.name) / 'export')
-        self.assertFalse((Path(self.temp.name) / 'export').exists())
+        self.assertEqual(export_settings(self.p, {'filename':'Match 你好'})['filename'], 'Match 你好.mp4')
+        for opts in [{'filename':'../bad'}, {'filename':'CON.mp4'}, {'width':321}, {'fps':'0'}, {'fps':'241'}]:
+            with self.assertRaises(ValueError): export_settings(self.p, opts)
 
     def test_cli_reconciliation_preserves_answers_and_rejects_mapping_changes(self):
         current = self.store.apply(0, dict(type='review', pointId='P001', answer=dict(scoringPlayerId='B', deadBallType='net', reviewConfirmed=True)))
@@ -127,15 +129,58 @@ class ModelTest(unittest.TestCase):
         op = dict(revision=0, operation=dict(type='reorder',ids=['second','first']))
         self.assertEqual(request('POST','/api/operation',op,{'X-Session-Token':token})[0],200)
         self.assertEqual(request('POST','/api/operation',op,{'X-Session-Token':token})[0],409)
-        # Opening export settings must not weaken the server's final-render gate.
-        status, body, _ = request('POST','/api/render',{'revision':1},{'X-Session-Token':token})
-        self.assertEqual(status,400)
-        self.assertIn(b'refresh graphics',body)
-        self.assertFalse((Path(self.temp.name)/'exports').exists())
+        with patch('local_editor.export_video', return_value={'state':'complete'}) as render:
+            status, body, _ = request('POST','/api/render',{'revision':1,'options':{'filename':'用户选择.mp4','fps':'25','width':640,'height':360}},{'X-Session-Token':token})
+            self.assertEqual(status,202,body)
+            render.assert_called_once()
+            args = render.call_args.args
+            self.assertEqual(args[0]['needsRebuild'], ['presentation-order'])
+            self.assertEqual(args[3]['fps'], '25')
+            self.assertEqual(args[4].name, '用户选择.mp4')
+        with patch('local_editor.pick_directory', return_value=self.temp.name) as picker:
+            status, body, _ = request('POST','/api/pick-directory',{'directory':self.temp.name},{'X-Session-Token':token})
+            self.assertEqual(status,200)
+            self.assertEqual(json.loads(body)['directory'],self.temp.name)
+            picker.assert_called_once()
+        with patch('local_editor.pick_directory', return_value=''):
+            self.assertEqual(json.loads(request('POST','/api/pick-directory',{}, {'X-Session-Token':token})[1])['directory'],'')
+
 
 
 @unittest.skipUnless(shutil.which('ffmpeg') and shutil.which('ffprobe'), 'FFmpeg required')
 class MediaTest(unittest.TestCase):
+    def test_source_defaults_and_fps_override_preserve_evidence_and_duration(self):
+        for source_rate, output_rate in [('25','60'), ('30000/1001','24'), ('60','30000/1001')]:
+            with self.subTest(rate=source_rate), tempfile.TemporaryDirectory() as tmp:
+                p = sample(tmp)
+                raw = Path(tmp)/'raw.mp4'
+                run(['ffmpeg','-v','error','-f','lavfi','-i',f'testsrc2=size=320x240:rate={source_rate}',
+                     '-f','lavfi','-i','sine=frequency=440:sample_rate=44100','-t','3','-c:v','libx264','-c:a','aac',raw])
+                meta = prepare_media(raw,Path(tmp)/'prepared.mp4')
+                self.assertEqual((meta['width'],meta['height'],meta['fps']),(320,240,source_rate))
+                self.assertEqual(meta['audio'],dict(sampleRate=44100,channels=1))
+                for key in ('fps','width','height'): p.pop(key)
+                p['assets'][0] = {'id':'src', **meta}
+                p['clips'] = [dict(id='first',assetId='src',pointId='P001',inSeconds='.4',outSeconds='1.4'),
+                              dict(id='hold',assetId='src',kind='hold',inSeconds='1.4',durationSeconds='.3')]
+                project = initialize(p, Path(tmp)/'project')
+                self.assertEqual((project['width'],project['height'],project['fps']),(320,240,source_rate))
+                self.assertEqual(project['clips'][0]['inFrame'],round(Fraction(2,5)*Fraction(source_rate)))
+                project['needsRebuild'] = ['presentation-order','score-and-statistics']
+                before = copy.deepcopy(project)
+                result = export_video(project,Path(tmp)/'render',options=dict(width=640,height=480,fps=output_rate,filename='custom 中文.mp4'))
+                self.assertEqual(project,before)
+                self.assertEqual(result['warnings'],project['needsRebuild'])
+                video = next(x for x in result['probe']['streams'] if x['codec_type']=='video')
+                audio = next(x for x in result['probe']['streams'] if x['codec_type']=='audio')
+                self.assertEqual((video['width'],video['height'],Fraction(video['avg_frame_rate'])),(640,480,Fraction(output_rate)))
+                self.assertEqual((audio['sample_rate'],audio['channels']),('44100',1))
+                seconds = sum(c['endFrame']-c['startFrame'] for c in layout(project))/float(Fraction(source_rate))
+                self.assertLessEqual(abs(float(video['duration'])-seconds), .501/float(Fraction(output_rate))+1e-6)
+                self.assertTrue(Path(result['path']).name.startswith('custom 中文'))
+                with self.assertRaisesRegex(ValueError,'already exists'):
+                    export_video(project,Path(tmp)/'another',target=result['path'])
+
     def test_overlay_half_open_frames_and_stats_fade(self):
         with tempfile.TemporaryDirectory() as tmp:
             p = sample(tmp)
@@ -146,12 +191,13 @@ class MediaTest(unittest.TestCase):
             p['clips'] = [dict(id='clip',assetId='src',pointId='P001',inFrame=0,outFrame=30)]
             for component,start,end,visible,hidden in [('serveLabel',5,15,[5,14],[4,15]),('statsPanel',0,30,[9,20],[0,29])]:
                 p['overlays'] = [dict(id='overlay',clipId='clip',component=component,startFrame=start,endFrame=end,image=str(graphic))]
-                result = export_video(p,Path(tmp)/component)
-                pixels = subprocess.check_output(['ffmpeg','-v','error','-i',result['path'],'-vf','scale=4:4','-f','rawvideo','-pix_fmt','rgb24','-'])
-                self.assertEqual(len(pixels),30*4*4*3)
-                reds = [pixels[n*48] for n in range(30)]
-                for n in visible: self.assertGreater(reds[n],200,(component,n,reds))
-                for n in hidden: self.assertLess(reds[n],20,(component,n,reds))
+                for output_rate in (30,60):
+                    result = export_video(p,Path(tmp)/(component+str(output_rate)),options={'fps':str(output_rate)})
+                    pixels = subprocess.check_output(['ffmpeg','-v','error','-i',result['path'],'-vf','scale=4:4','-f','rawvideo','-pix_fmt','rgb24','-'])
+                    self.assertEqual(len(pixels),output_rate*4*4*3)
+                    reds = [pixels[n*48] for n in range(output_rate)]
+                    for n in visible: self.assertGreater(reds[n*output_rate//30],200,(component,n,reds))
+                    for n in hidden: self.assertLess(reds[n*output_rate//30],20,(component,n,reds))
 
     def test_real_cut_export_frame_count_audio_and_timestamps(self):
         with tempfile.TemporaryDirectory() as tmp:

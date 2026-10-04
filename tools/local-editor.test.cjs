@@ -113,4 +113,9 @@ test('export summary uses the actual project dimensions, rational fps and hold d
   assert.deepEqual(summary.reasons,['presentation-order']);
   summary.reasons.push('graphics-timing');
   assert.equal(JSON.stringify(p),before);
+  const converted=m.exportSummary(p,{width:1280,height:720,fps:'60'});
+  assert.equal(converted.frames,90);
+  assert.equal(converted.width,1280);
+  assert.ok(Math.abs(converted.seconds-summary.seconds)<=.5/60);
+  assert.equal(JSON.stringify(p),before);
 });

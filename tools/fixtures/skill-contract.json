@@ -337,7 +337,7 @@
     },
     {
       "path": "scripts/frame_evidence.py",
-      "sha256": "8ca218b410567493d74901a53bd89c0af1f7a9bb4d8b1171659ae44910bd3505"
+      "sha256": "6d88bff2f6bd8bf4b67855c307d0b0c67134fcb68c23776ac6a4cce7d9d13de2"
     },
     {
       "path": "scripts/launch_speed.py"
@@ -430,6 +430,9 @@
     },
     {
       "path": "scripts/local_web/view-state.js"
+    },
+    {
+      "path": "scripts/local_picker.py"
     }
   ]
 }

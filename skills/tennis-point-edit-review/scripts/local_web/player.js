@@ -11,11 +11,7 @@ export class Player {
     this.frame = 0;
     this.playing = false;
     this.seekGeneration = 0;
-    new ResizeObserver(([entry]) => {
-      const w = Math.min(entry.contentRect.width, entry.contentRect.height * 16 / 9);
-      $("canvas").style.width = w + "px";
-      $("canvas").style.height = w * 9 / 16 + "px";
-    }).observe($("viewer"));
+    new ResizeObserver(() => this.resize()).observe($("viewer"));
     this.video.onended = () => {
       if (this.mode === "edited" && this.frame < this.total - 1) this.seek(this.clips.find((c) => c.id === this.clip.id).endFrame, true);
       else this.pause();
@@ -42,12 +38,19 @@ export class Player {
   }
   setProject(p) {
     this.p = p;
+    this.resize();
     if (this.mode === "source" && this.asset) this.asset = p.assets.find(a => a.id === this.asset.id);
     this.fps = rate(p);
     this.clips = layout(p);
     this.total = this.clips.at(-1).endFrame;
     this.overlayIds = null;
     this.seek(this.mode === "source" ? this.frame : Math.min(this.frame, this.total - 1));
+  }
+  resize() {
+    if (!this.p) return;
+    const box = $('viewer').getBoundingClientRect(), aspect = this.p.width / this.p.height;
+    const w = Math.min(box.width, box.height * aspect);
+    $('canvas').style.width = w + 'px'; $('canvas').style.height = w / aspect + 'px';
   }
   async seek(frame, play = false) {
     if (!this.p) return;
@@ -161,7 +164,8 @@ export class Player {
       let opacity = 1;
       if (o.component === "statsPanel") {
         const [start, end] = bounds(o, c);
-        opacity = Math.max(0, Math.min(1, (local - start) / 9, (end - 1 - local) / 9));
+        const fade = Math.max(1, Math.min(Math.round(.3 * this.fps), Math.floor((end-start)/2)));
+        opacity = Math.max(0, Math.min(1, (local - start) / fade, (end - 1 - local) / fade));
       }
       $("graphics").querySelector(`[data-overlay="${o.id}"]`).style.opacity = opacity;
     }

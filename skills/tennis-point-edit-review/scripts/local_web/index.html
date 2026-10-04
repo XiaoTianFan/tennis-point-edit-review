@@ -23,18 +23,19 @@
 <dialog id="handoff-dialog"><div class="section-bar"><h2 data-i18n="handoffTitle">Review saved for your agent</h2><button id="close-handoff" aria-label="Close review handoff" data-i18n-aria-label="closeHandoff" data-i18n="close">Close</button></div><p data-i18n="handoffInfo">Your answers, clip changes and current position are saved in the project. Copy this message into your agent conversation.</p><textarea id="handoff-text" readonly aria-label="Agent handoff message" data-i18n-aria-label="handoffMessage"></textarea><div class="dialog-actions"><button id="copy-handoff" class="primary" data-i18n="copy">Copy message</button><button id="download-review" data-i18n="downloadReview">Download review JSON</button><span id="copy-status" role="status"></span></div></dialog>
 <dialog id="export-dialog" aria-labelledby="export-title">
   <div class="section-bar"><h2 id="export-title" data-i18n="exportSettings">Export video</h2><button id="close-export" data-i18n="close">Close</button></div>
-  <p data-i18n="exportDescription"></p>
+  <form id="export-form" class="export-form">
+    <label><span data-i18n="resolution"></span><select id="export-size" aria-label="Resolution preset" data-i18n-aria-label="resolution"><option value="project" data-i18n="matchTimeline"></option><option value="1280x720">720p</option><option value="1920x1080">1080p</option><option value="2560x1440">1440p</option><option value="3840x2160">4K UHD</option><option value="custom" data-i18n="custom"></option></select></label>
+    <div class="dimensions"><label><span data-i18n="width"></span><input id="export-width" type="number" min="2" max="8192" step="2" required></label><span>×</span><label><span data-i18n="height"></span><input id="export-height" type="number" min="2" max="8192" step="2" required></label></div>
+    <label><span data-i18n="frameRate"></span><input id="export-fps" list="frame-rates" required inputmode="decimal"><datalist id="frame-rates"><option value="24000/1001"></option><option value="24"></option><option value="25"></option><option value="30000/1001"></option><option value="30"></option><option value="50"></option><option value="60000/1001"></option><option value="60"></option><option value="120"></option><option value="240"></option></datalist></label>
+    <label><span data-i18n="outputFile"></span><input id="export-filename" value="edited.mp4" maxlength="180" required></label>
+    <label class="export-destination"><span data-i18n="saveDirectory"></span><span class="path-control"><input id="export-directory" required spellcheck="false"><button id="browse-export" type="button" data-i18n="browse"></button></span></label>
+  </form>
   <dl class="export-settings">
-    <div><dt data-i18n="resolution"></dt><dd id="export-resolution"></dd></div>
-    <div><dt data-i18n="frameRate"></dt><dd id="export-fps"></dd></div>
     <div><dt data-i18n="duration"></dt><dd id="export-duration"></dd></div>
     <div><dt data-i18n="videoFormat"></dt><dd>MP4 · H.264 · SDR Rec.709</dd></div>
-    <div><dt data-i18n="audioFormat"></dt><dd data-i18n="stereoAudio"></dd></div>
-    <div><dt data-i18n="outputFile"></dt><dd>edited.mp4</dd></div>
+    <div><dt data-i18n="audioFormat"></dt><dd id="export-audio"></dd></div>
   </dl>
-  <p class="export-info" data-i18n="exportProjectSettings"></p>
-  <details class="export-capabilities"><summary data-i18n="exportMore"></summary><p data-i18n="exportCapabilities"></p><p data-i18n="exportDestination"></p></details>
-  <div id="export-blocked" class="export-blocked" hidden><strong data-i18n="exportBlocked"></strong><p id="export-blocked-detail"></p><button id="export-handoff" data-i18n="handoff"></button></div>
+  <p id="export-warning" class="export-warning" data-i18n="exportWarning" hidden></p>
   <div id="export-status" class="export-status" role="status" aria-live="polite"></div>
   <div class="dialog-actions"><button id="start-export" class="primary" data-i18n="startExport"></button><a id="export-download" data-i18n="downloadVideo" download="edited.mp4" hidden></a></div>
 </dialog>

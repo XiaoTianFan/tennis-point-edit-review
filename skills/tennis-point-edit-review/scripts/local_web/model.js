@@ -41,9 +41,11 @@ export const rate = (p) => {
   return a / b;
 };
 export const length = (c) => c.kind === "hold" ? c.durationFrames : c.outFrame - c.inFrame;
-export function exportSummary(p) {
-  const frames = p.clips.reduce((sum, clip) => sum + length(clip), 0);
-  return {width:p.width, height:p.height, fps:String(p.fps), frames, seconds:frames / rate(p), reasons:[...(p.needsRebuild ?? [])]};
+export function exportSummary(p, options = {}) {
+  const seconds = p.clips.reduce((sum, clip) => sum + length(clip), 0) / rate(p);
+  const fps = String(options.fps ?? p.fps), outputRate = rate({fps});
+  const frames = Math.max(1, Math.round(seconds * outputRate));
+  return {width:options.width ?? p.width, height:options.height ?? p.height, fps, frames, seconds:frames / outputRate, reasons:[...(p.needsRebuild ?? [])]};
 }
 export function layout(p) {
   let start = 0;

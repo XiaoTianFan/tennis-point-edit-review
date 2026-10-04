@@ -18,6 +18,7 @@ const url = (path) => path + (path.includes("?") ? "&" : "?") + "token=" + encod
 let project, selectedClip, selectedOverlay, queue = Promise.resolve(), pending = 0, contextData;
 let noticeState, noticeTimer, handoffValues;
 let exportJob = {state: "idle"}, exportBusy = false, exportError = null, exportTimer;
+let exportDefaults, pickerBusy = false;
 function renderNotice() {
   const node = $('notice');
   node.hidden = !noticeState;
@@ -27,7 +28,7 @@ function renderNotice() {
   node.textContent = key instanceof Error ? errorText(key.message) : t(key, params);
   if (key === 'exportComplete') {
     const link = document.createElement('a');
-    link.href = url('/api/export'); link.download = 'edited.mp4'; link.textContent = t('downloadVideo');
+    link.href = url('/api/export'); link.download = exportJob.settings?.filename ?? 'edited.mp4'; link.textContent = t('downloadVideo');
     node.append(' · ', link);
   }
 }
@@ -256,40 +257,62 @@ $("recover-draft").onclick = () => {
   setTimeout(() => URL.revokeObjectURL(a.href), 1e3);
   notice("draftDownloaded");
 };
+function exportOptions() {
+  return {width:Number($('export-width').value), height:Number($('export-height').value), fps:$('export-fps').value.trim(), filename:$('export-filename').value.trim()};
+}
 function refreshExport() {
   if (!project) return;
-  const summary = exportSummary(project);
-  $('export-resolution').textContent = `${summary.width} × ${summary.height}`;
-  $('export-fps').textContent = `${summary.fps} fps`;
-  $('export-duration').textContent = t('durationFrames', {seconds: summary.seconds.toFixed(2), frames: summary.frames});
-  const known = ['presentation-order', 'graphics-timing', 'clip-evidence', 'score-and-statistics'];
-  const reasons = [...new Set(summary.reasons.map(reason => t('rebuild.' + (known.includes(reason) ? reason : 'unknown'))))];
-  $('export-blocked').hidden = !reasons.length;
-  $('export-blocked-detail').textContent = t('exportBlockedDetail', {reasons: reasons.join(' · ')});
+  const options = exportOptions(), outputRate = rate(options), summary = exportSummary(project, options);
+  const valid = $('export-form').checkValidity() && /^\d+(\.\d+)?(\/\d+)?$/.test(options.fps) && outputRate >= 1 && outputRate <= 240;
+  $('export-duration').textContent = valid ? t('durationFrames', {seconds: summary.seconds.toFixed(2), frames: summary.frames}) : '—';
+  const audio = exportDefaults?.audio ?? project.audio;
+  $('export-audio').textContent = audio ? t('audioSettings', {rate:audio.sampleRate/1000, channels:audio.channels}) : t('silentAudio');
+  $('export-warning').hidden = !project.needsRebuild?.length;
   const running = exportJob.state === 'running';
-  $('start-export').disabled = exportBusy || running || reasons.length > 0 || pending > 0 || drafts().length > 0 || !!exportError;
-  $('export-status').textContent = exportError ? errorText(exportError.message) : exportBusy ? t('exportChecking') : running ? t('exporting', {done:exportJob.completedClips ?? 0, total:exportJob.totalClips}) : pending ? t('exportWaiting') : drafts().length ? t('exportUnsaved') : exportJob.state === 'failed' ? errorText(exportJob.error) : exportJob.state === 'complete' ? t('exportComplete') + ' · ' + t('exportJobRevision', {revision:exportJob.revision}) : reasons.length ? '' : t('exportReady');
+  $('start-export').disabled = exportBusy || running || pickerBusy || pending > 0 || drafts().length > 0 || !valid;
+  $('browse-export').disabled = pickerBusy;
+  $('export-status').textContent = exportError ? errorText(exportError.message) : pickerBusy ? t('pickerOpen') : exportBusy ? t('exportChecking') : running ? t('exporting', {done:exportJob.completedClips ?? 0, total:exportJob.totalClips}) : pending ? t('exportWaiting') : drafts().length ? t('exportUnsaved') : exportJob.state === 'failed' ? errorText(exportJob.error) : exportJob.state === 'complete' ? t('exportComplete') + ' · ' + t('exportJobRevision', {revision:exportJob.revision}) : !valid ? t('invalidExport') : '';
   $('export-download').hidden = exportJob.state !== 'complete';
   $('export-download').href = url('/api/export');
+  $('export-download').download = exportJob.settings?.filename ?? 'edited.mp4';
 }
+$('export-form').onsubmit = e => { e.preventDefault(); if (!$('start-export').disabled) $('start-export').click(); };
+$('export-form').oninput = e => { if (['export-width','export-height'].includes(e.target.id)) $('export-size').value = 'custom'; exportError = null; refreshExport(); };
+$('export-size').onchange = () => {
+  const value = $('export-size').value;
+  if (value !== 'custom') {
+    const [w,h] = value === 'project' ? [project.width, project.height] : value.split('x').map(Number);
+    $('export-width').value = w; $('export-height').value = h;
+  }
+  refreshExport();
+};
+$('browse-export').onclick = async () => {
+  pickerBusy = true; exportError = null; refreshExport();
+  try { const result = await api('/api/pick-directory', {directory:$('export-directory').value}); if (result.directory) $('export-directory').value = result.directory; }
+  catch(e) { exportError = e; }
+  finally { pickerBusy = false; refreshExport(); }
+};
 $('export-video').onclick = async () => {
   player.pause();
   exportBusy = true; exportError = null;
   refreshExport(); $('export-dialog').showModal();
   try {
+    if (!exportDefaults) {
+      exportDefaults = await api('/api/export-settings');
+      for (const key of ['width','height','fps','filename','directory']) $('export-' + key).value = exportDefaults[key];
+    }
     exportJob = await api('/api/job');
     if (exportJob.state === 'running') { clearTimeout(exportTimer); exportTimer = setTimeout(poll, 1000); }
   } catch (e) { exportError = e; }
   finally { exportBusy = false; refreshExport(); }
 };
 $('close-export').onclick = () => $('export-dialog').close();
-$('export-handoff').onclick = () => { $('export-dialog').close(); $('handoff').click(); };
 $('start-export').onclick = async () => {
   exportBusy = true; exportError = null; refreshExport();
   try {
     await queue;
-    if (project.needsRebuild?.length || drafts().length) return;
-    exportJob = await api('/api/render', {revision: project.revision});
+    if (drafts().length) return;
+    exportJob = await api('/api/render', {revision: project.revision, options:exportOptions(), directory:$('export-directory').value.trim()});
     clearTimeout(exportTimer); exportTimer = setTimeout(poll, 500);
   } catch (e) { exportError = e; }
   finally { exportBusy = false; refreshExport(); }

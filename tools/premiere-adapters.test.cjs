@@ -56,6 +56,14 @@ test('statistics preserve the canonical fade and reject invalid frames',()=>{
   assert.equal(result.frame,9);
   assert.throws(()=>prepare({id:'bad',component:'statsPanel',props:{panelFrames:2}},mf,canvas));
 });
+test('local fit layout adapts reference graphics without changing default Premiere geometry',()=>{
+  const entry={id:'label',component:'serveLabel'}, portrait={width:1080,height:1920};
+  assert.throws(()=>prepare(entry,mf,portrait),/layout adapter/);
+  const result=prepare(entry,mf,portrait,'fit');
+  assert.match(result.html,/transform:scale\(0\.5625,0\.5625\)/);
+  const original=prepare(entry,mf,canvas), fitted=prepare(entry,mf,canvas,'fit');
+  assert.equal(original.html,fitted.html);
+});
 test('AE authoring source is parseable and honestly provisional',()=>{
   const result=build(path.join(os.tmpdir(),'synthetic-native'));
   assert.doesNotThrow(()=>new vm.Script(result.source));

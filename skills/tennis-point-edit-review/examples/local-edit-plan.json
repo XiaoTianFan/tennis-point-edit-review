@@ -1,8 +1,5 @@
 {
   "title": "Synthetic point review",
-  "fps": "30",
-  "width": 1920,
-  "height": 1080,
   "players": [
     {
       "id": "A",
@@ -26,8 +23,8 @@
       "serveId": "P001-S1",
       "serveNumber": 1,
       "assetId": "source",
-      "inFrame": 0,
-      "outFrame": 90
+      "inSeconds": 0.0,
+      "outSeconds": 3.0
     }
   ],
   "review": {
@@ -60,25 +57,25 @@
       "clipId": "point-1",
       "component": "reviewId",
       "anchor": "clip",
-      "startFrame": 0,
-      "endFrame": 90,
       "props": {
         "reviewId": "R001",
         "pointId": "P001"
-      }
+      },
+      "startSeconds": 0.0,
+      "endSeconds": 3.0
     },
     {
       "id": "review-label-1",
       "clipId": "point-1",
       "component": "reviewLabel",
       "anchor": "clip",
-      "startFrame": 0,
-      "endFrame": 90,
       "props": {
         "phaseLabel": "第1局",
         "serverName": "Player A",
         "serveLabel": "一发"
-      }
+      },
+      "startSeconds": 0.0,
+      "endSeconds": 3.0
     }
   ]
 }

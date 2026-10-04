@@ -15,7 +15,7 @@ function interpolate(v,xs,ys) {
   for(let i=1;i<xs.length;i++)if(v<=xs[i])return ys[i-1]+(ys[i]-ys[i-1])*(v-xs[i-1])/(xs[i]-xs[i-1]);
   return ys.at(-1);
 }
-function prepare(entry,manifest,canvas) {
+function prepare(entry,manifest,canvas,layout) {
   if(!/^[A-Za-z0-9_-]+$/.test(entry.id))throw new Error('Use a safe unique overlay id');
   const def=manifest.components[entry.component]; if(!def)throw new Error('Unknown component');
   const source=fs.readFileSync(path.join(root,def.codeFile),'utf8').replace(/\r\n/g,'\n');
@@ -44,14 +44,15 @@ function prepare(entry,manifest,canvas) {
   for(const key of ['left','top','width','height'])if(!Number.isFinite(placement[key])||placement[key]<0)throw new Error('Invalid placement');
   if(!placement.width||!placement.height)throw new Error('Zero-sized overlay');
   // Placement is specified in the canonical 1080p reference canvas.
-  if(canvas.width*1080!==canvas.height*1920)throw new Error('Non-16:9 needs an explicit layout adapter');
-  const scale=canvas.width/1920;
+  if(canvas.width*1080!==canvas.height*1920 && layout!=='fit')throw new Error('Non-16:9 needs an explicit layout adapter');
+  const scale=Math.min(canvas.width/1920,canvas.height/1080);
+  const offsetX=(canvas.width-1920*scale)/2,offsetY=(canvas.height-1080*scale)/2;
   const frame=entry.frame??(entry.component==='statsPanel'?9:0);
   if(!Number.isInteger(frame)||frame<0)throw new Error('Frame must be a nonnegative integer');
   const code=transformSync(source,{loader:'jsx',jsx:'transform'}).code;
   const Component=new Function('React','useCurrentFrame','interpolate',code+';return Component;')(React,()=>frame,interpolate);
   const markup=renderToStaticMarkup(React.createElement(Component,{item:{props}}));
-  const style=`position:absolute;left:${placement.left*scale}px;top:${placement.top*scale}px;width:${def.naturalSize.width}px;height:${h}px;transform-origin:top left;transform:scale(${placement.width/def.naturalSize.width*scale},${placement.height/h*scale})`;
+  const style=`position:absolute;left:${offsetX+placement.left*scale}px;top:${offsetY+placement.top*scale}px;width:${def.naturalSize.width}px;height:${h}px;transform-origin:top left;transform:scale(${placement.width/def.naturalSize.width*scale},${placement.height/h*scale})`;
   return {html:`<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:transparent;width:100%;height:100%;overflow:hidden}*{animation:none!important}</style></head><body><div id="overlay" style="${style}">${markup}</div></body></html>`,props,placement,naturalHeight:h,frame,
     sourceSha256:def.sha256,fade:entry.component==='statsPanel'?{frames:[0,9,props.panelFrames-9,props.panelFrames-1],values:[0,1,1,0]}:null};
 }
@@ -62,7 +63,7 @@ async function render(request,outDir) {
   const ids=new Set();
   const prepared=request.entries.map(entry=>{
     if(ids.has(entry.id))throw new Error('Duplicate overlay id');ids.add(entry.id);
-    return {entry,data:prepare(entry,manifest,canvas)};
+    return {entry,data:prepare(entry,manifest,canvas,request.layout)};
   });
   if(fs.existsSync(outDir))throw new Error('Use a new output directory to preserve render evidence');
   fs.mkdirSync(outDir,{recursive:true});

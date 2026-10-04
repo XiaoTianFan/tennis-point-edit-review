@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased — adaptive source inspection
+
+- Adds portable contact sheets, original-frame links and full-PTS media preflight; optional Premiere verification preserves offline plan generation.
+- Exposes CV settings and filter diagnostics while keeping raw visual inspection available without detection.
+- Separates consecutive final-cut point numbers from stable ledger/review IDs; preserves all seven canonical JSX templates.
+
+## 2026.10.04 — skill 2026.10.04-v22.3
+
+- Inherits source dimensions, rational frame rate and audio settings for local projects; adapts the preview, overlays and evidence pixel thresholds.
+- Adds export resolution, frame rate, filename and destination controls with a system folder picker.
+- Allows direct export with advisory graphics warnings and preserves timeline evidence during output conversion.
+
+
 ## 2026.10.04 — skill 2026.10.04-v22.2
 
 - Makes review choices adapt to pane width and enables point navigation from card text or background.
