@@ -424,6 +424,12 @@
     },
     {
       "path": "references/local-editor.md"
+    },
+    {
+      "path": "scripts/local_web/i18n.js"
+    },
+    {
+      "path": "scripts/local_web/view-state.js"
     }
   ]
 }

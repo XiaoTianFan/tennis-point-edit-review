@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026.10.04 — skill 2026.10.04-v22.1
+
+- Adds English/Chinese UI switching and persistent, draggable review/preview/timeline pane sizes.
+- Uses flat editor surfaces, equal review-choice buttons, centered playback controls and temporary messages inside the preview.
+- Adds Ctrl/Cmd-wheel timeline panning and pointer-anchored Alt-wheel zoom.
+
 ## 2026.10.04 — skill 2026.10.04-v22
 
 - Adds the portable Courtside local editor: source/edited playback, exact paused proxy frames, point navigation, clip trims/reordering, overlay timing and canonical graphics export.

@@ -2,13 +2,49 @@ import { $, rate, length, layout } from "./model.js";
 import { Review } from "./review.js";
 import { Timeline } from "./timeline.js";
 import { Player } from "./player.js";
+import { t, errorText, translate, getLocale, setLocale } from "./i18n.js";
+import { initPanes } from "./view-state.js";
+try { setLocale(localStorage.getItem('courtside-language') ?? (navigator.language.startsWith('zh') ? 'zh' : 'en')); } catch { setLocale('en'); }
+translate();
+document.documentElement.lang = getLocale() === 'zh' ? 'zh-CN' : 'en';
+$('language').value = getLocale();
+initPanes();
 const fragment = new URLSearchParams(location.hash.slice(1));
 const token = fragment.get("token") || sessionStorage.getItem("courtside:" + location.port) || "";
 if (token) sessionStorage.setItem("courtside:" + location.port, token);
 const url = (path) => path + (path.includes("?") ? "&" : "?") + "token=" + encodeURIComponent(token);
 let project, selectedClip, selectedOverlay, queue = Promise.resolve(), pending = 0, contextData;
-const notice = (message) => {
-  $("notice").textContent = message;
+let noticeState, noticeTimer, handoffValues;
+function renderNotice() {
+  const node = $('notice');
+  node.hidden = !noticeState;
+  if (!noticeState) { node.replaceChildren(); return; }
+  const {key, values} = noticeState;
+  const params = Object.fromEntries(Object.entries(values).map(([k,v]) => [k, v instanceof Error ? errorText(v.message) : v]));
+  node.textContent = key instanceof Error ? errorText(key.message) : t(key, params);
+  if (key === 'exportComplete') {
+    const link = document.createElement('a');
+    link.href = url('/api/export'); link.download = 'edited.mp4'; link.textContent = t('downloadVideo');
+    node.append(' · ', link);
+  }
+}
+function notice(key, values = {}) {
+  clearTimeout(noticeTimer);
+  noticeState = key ? {key, values} : null;
+  renderNotice();
+  if (key) noticeTimer = setTimeout(() => { noticeState = null; renderNotice(); }, key === 'exportComplete' ? 30000 : 10000);
+}
+function saveState(key) { $('save-state').dataset.i18n = key; $('save-state').textContent = t(key); }
+function projectStatus() { $('project-status').textContent = t('projectStatus', {count: project.review.rows.length, revision: project.revision}); }
+function handoffText() {
+  if (handoffValues) $('handoff-text').value = t('handoffText', {...handoffValues, mode: t(handoffValues.mode)}) + '\n\n' + JSON.stringify(contextData.review, null, 2);
+}
+$('language').onchange = () => {
+  setLocale($('language').value);
+  try { localStorage.setItem('courtside-language', getLocale()); } catch { /* Language still changes in this session. */ }
+  document.documentElement.lang = getLocale() === 'zh' ? 'zh-CN' : 'en';
+  translate(); renderNotice(); handoffText();
+  if (project) { review.localize(); timeline.render(); player.paint(); inspector(true); projectStatus(); }
 };
 const draftKey = () => "courtside-draft:" + (project.projectId ?? [project.review.source, project.review.ledgerRevision, project.title].join(":"));
 function drafts() {
@@ -24,7 +60,7 @@ function storeDrafts(values) {
     else localStorage.removeItem(draftKey());
     if (!values.length) $("recover-draft").hidden = true;
   } catch {
-    notice("Browser draft storage is unavailable. Keep this page open until edits are saved.");
+    notice("draftStorage");
   }
 }
 async function api(path, data) {
@@ -36,7 +72,7 @@ async function api(path, data) {
 const review = new Review((pid) => {
   const c = layout(project).find((c2) => c2.pointId === pid);
   if (c) select(c.id);
-  else notice("This point has no retained clip. Ask the agent to add its evidence.");
+  else notice("noClip");
 }, save);
 const timeline = new Timeline(url, select, (frame) => {
   if (player.mode !== "edited") player.switchMode("edited");
@@ -52,19 +88,23 @@ const player = new Player(url, (frame, clip, mode, linked) => {
   }
   timeline.highlight(selectedClip, selectedOverlay);
   const row = linked && project.review.rows.find((r) => r.pointId === clip.pointId);
-  $("viewer-context").textContent = row ? `${row.reviewId} / ${row.pointId}  ·  Game ${row.gameNumber ?? "?"}  ·  ● ${project.players.find((p) => p.id === row.serverId)?.name ?? row.serverId}  ·  Serve ${clip.serveNumber ?? row.serveNumber ?? "?"}` : mode === "source" ? "Source · outside retained points" : clip.label ?? "Statistics";
+  $("viewer-context").textContent = row ? t("viewerMeta", {review: row.reviewId, point: row.pointId, game: row.gameNumber ?? "?", server: project.players.find((p) => p.id === row.serverId)?.name ?? row.serverId, serve: clip.serveNumber ?? row.serveNumber ?? "?"}) : mode === "source" ? t("sourceOutside") : clip.label ?? t("statistics");
 }, notice);
 function setProject(p) {
   project = p;
   if (!p.overlays.some(o => o.id === selectedOverlay)) selectedOverlay = null;
   $("project-title").textContent = p.title;
-  $("project-status").textContent = `${p.review.rows.length} points · revision ${p.revision} · local project`;
-  $("save-state").textContent = "Saved";
+  projectStatus();
+  saveState(p.needsRebuild?.length ? "savedNeedsRefresh" : "saved");
+  for (const id of ['save-state', 'export-video']) {
+    if (p.needsRebuild?.length) { $(id).dataset.i18nTitle = 'rebuild'; $(id).title = t('rebuild'); }
+    else { delete $(id).dataset.i18nTitle; $(id).removeAttribute('title'); }
+  }
   review.setProject(p);
   timeline.setProject(p);
   player.setProject(p);
   inspector();
-  if (p.needsRebuild?.length) notice("Changes saved. Send to your agent to refresh the affected scores, statistics or timing.");
+  if (p.needsRebuild?.length) notice("rebuild");
   else notice("");
   $("export-video").disabled = !!p.needsRebuild?.length;
   $("undo").disabled = !p.undo?.length;
@@ -74,7 +114,7 @@ function save(operation) {
   const draftId = crypto.randomUUID();
   storeDrafts([...drafts(), { id: draftId, revision: project.revision, operation }]);
   pending++;
-  $("save-state").textContent = "Saving…";
+  saveState("saving");
   queue = queue.then(async () => {
     const result = await api("/api/operation", { revision: project.revision, operation });
     storeDrafts(drafts().filter((d) => d.id !== draftId));
@@ -85,8 +125,8 @@ function save(operation) {
   }).catch((e) => {
     pending = 0;
     $("recover-draft").hidden = !drafts().length;
-    $("save-state").textContent = "Not saved";
-    notice(e.message + " Use Recover edits to retain the unsaved changes before reconciling.");
+    saveState("notSaved");
+    notice("saveError", {error: e});
     throw e;
   });
   queue.catch(() => {
@@ -103,23 +143,23 @@ function select(id, overlayId = null) {
   inspector();
   timeline.highlight(id, overlayId);
 }
-function inspector() {
+function inspector(labelsOnly = false) {
   if (!project) return;
   const c = project.clips.find((c2) => c2.id === selectedClip) ?? project.clips[0];
   selectedClip = c.id;
   const o = project.overlays.find((o2) => o2.id === selectedOverlay);
-  $("selection-name").textContent = o ? o.label ?? o.component : c.pointId ?? c.label ?? c.id;
-  $("clip-in").value = o ? o.startFrame : c.inFrame;
-  $("clip-out").value = o ? o.endFrame : c.kind === "hold" ? c.inFrame + c.durationFrames : c.outFrame;
+  $("selection-name").textContent = o ? o.label ?? t("component." + o.component) : c.pointId ?? c.label ?? c.id;
+  if (!labelsOnly) $("clip-in").value = o ? o.startFrame : c.inFrame;
+  if (!labelsOnly) $("clip-out").value = o ? o.endFrame : c.kind === "hold" ? c.inFrame + c.durationFrames : c.outFrame;
   $("clip-in").disabled = c.kind === "hold" && !o;
-  $("apply-trim").textContent = o ? "Apply timing" : "Apply trim";
+  $("apply-trim").textContent = t(o ? "applyTiming" : "applyTrim");
   $("move-left").disabled = !!o || project.clips[0].id === c.id;
   $("move-right").disabled = !!o || project.clips.at(-1).id === c.id;
 }
 function jump(direction) {
   const clips = layout(project).filter((c) => c.pointId);
   const unique = clips.filter((c, i) => i === 0 || c.pointId !== clips[i - 1].pointId);
-  if (!unique.length) { notice("There are no point clips in this timeline."); return; }
+  if (!unique.length) { notice("noPoints"); return; }
   let index = unique.findIndex((c) => c.pointId === player.clip?.pointId);
   if (index < 0) index = direction < 0 ? unique.length : 0;
   select(unique[Math.max(0, Math.min(unique.length - 1, index + direction))].id);
@@ -136,7 +176,7 @@ $("source-position").oninput = () => player.seek(Number($("source-position").val
 $("apply-trim").onclick = () => {
   const i = Number($("clip-in").value), o = Number($("clip-out").value), c = project.clips.find((c2) => c2.id === selectedClip);
   if (!Number.isInteger(i) || !Number.isInteger(o)) {
-    notice("Use whole frame numbers.");
+    notice("wholeFrames");
     return;
   }
   save(selectedOverlay ? { type: "overlay", id: selectedOverlay, startFrame: i, endFrame: o } : c.kind === "hold" ? { type: "trim", id: c.id, durationFrames: o - i } : { type: "trim", id: c.id, inFrame: i, outFrame: o });
@@ -157,11 +197,11 @@ $("reload").onclick = async () => {
     queue = Promise.resolve();
     setProject(await api("/api/project"));
   } catch (e) {
-    notice(e.message);
+    notice(e);
   }
 };
 document.addEventListener("keydown", (e) => {
-  if (e.target.matches("input,textarea,select") || $("handoff-dialog").open) return;
+  if (e.target.matches("input,textarea,select,[role=separator]") || $("handoff-dialog").open) return;
   if (e.code === "Space") {
     e.preventDefault();
     $("play").click();
@@ -183,23 +223,22 @@ $("handoff").onclick = async () => {
     player.pause();
     await save({ type: "selection", clipId: player.clip.id, frame: player.frame, mode: player.mode });
     contextData = await api("/api/handoff", { revision: project.revision });
-    $("handoff-text").value = `Continue reviewing “${project.title}”. Read ${contextData.projectPath} and its adjacent agent-context.json and review.json (revision ${project.revision}). My current point is ${player.clip.pointId ?? player.clip.label ?? player.clip.id}, ${player.mode} frame ${player.frame}. Reconcile my saved answers and clip edits, then refresh the affected graphics.
-
-${JSON.stringify(contextData.review, null, 2)}`;
+    handoffValues = {title: project.title, path: contextData.projectPath, revision: project.revision, point: player.clip.pointId ?? player.clip.label ?? player.clip.id, mode: player.mode, frame: player.frame};
+    handoffText();
     $("handoff-dialog").showModal();
   } catch (e) {
-    notice(e.message);
+    notice(e);
   }
 };
 $("close-handoff").onclick = () => $("handoff-dialog").close();
 $("copy-handoff").onclick = async () => {
   try {
     await navigator.clipboard.writeText($("handoff-text").value);
-    $("copy-status").textContent = "Copied";
+    $("copy-status").dataset.i18n = "copied"; $("copy-status").textContent = t("copied");
   } catch {
     $("handoff-text").focus();
     $("handoff-text").select();
-    $("copy-status").textContent = "Press Ctrl+C to copy the selected text";
+    $("copy-status").dataset.i18n = "copyFallback"; $("copy-status").textContent = t("copyFallback");
   }
 };
 $("download-review").onclick = () => {
@@ -216,7 +255,7 @@ $("recover-draft").onclick = () => {
   a.download = "unsaved-edits.json";
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 1e3);
-  notice("Draft downloaded. Give it to your agent to compare with the current project; it has not been applied automatically.");
+  notice("draftDownloaded");
 };
 $("export-video").onclick = async () => {
   try {
@@ -225,28 +264,24 @@ $("export-video").onclick = async () => {
     $("export-video").disabled = true;
     poll();
   } catch (e) {
-    notice(e.message);
+    notice(e);
   }
 };
 async function poll() {
   try {
     const job = await api("/api/job");
     if (job.state === "running") {
-      notice(`Exporting ${job.completedClips ?? 0} / ${job.totalClips} clips…`);
+      notice("exporting", {done: job.completedClips ?? 0, total: job.totalClips});
       setTimeout(poll, 1e3);
     } else if (job.state === "complete") {
-      const a = document.createElement("a");
-      a.href = url("/api/export");
-      a.download = "edited.mp4";
-      a.textContent = "Download edited video";
-      $("notice").replaceChildren("Export complete · ", a);
+      notice("exportComplete");
       $("export-video").disabled = !!project.needsRebuild?.length;
     } else {
-      notice(job.error ?? "Export stopped");
+      notice(job.error ? new Error(job.error) : "exportStopped");
       $("export-video").disabled = !!project.needsRebuild?.length;
     }
   } catch (e) {
-    notice(e.message);
+    notice(e);
   }
 }
 window.addEventListener("beforeunload", (e) => {
@@ -258,13 +293,13 @@ window.addEventListener("beforeunload", (e) => {
 try {
   setProject(await api("/api/project"));
   $("recover-draft").hidden = !drafts().length;
-  if (drafts().length) notice("Unsaved edits from an earlier session are available through Recover edits.");
+  if (drafts().length) notice("draftAvailable");
   if (project.selection?.clipId) {
     select(project.selection.clipId);
     player.mode = project.selection.mode ?? "edited";
     player.seek(project.selection.frame ?? 0);
   }
 } catch (e) {
-  notice(e.message);
-  $("save-state").textContent = "Not connected";
+  notice(e);
+  saveState("notConnected");
 }

@@ -126,7 +126,7 @@ def make_server(directory, port=0):
         def do_GET(self):
             try:
                 route = unquote(urlparse(self.path).path)
-                public = {'/': 'index.html', '/app.js': 'app.js', '/model.js': 'model.js', '/review.js': 'review.js', '/timeline.js': 'timeline.js', '/player.js': 'player.js', '/style.css': 'style.css'}
+                public = {'/': 'index.html', '/app.js': 'app.js', '/model.js': 'model.js', '/review.js': 'review.js', '/timeline.js': 'timeline.js', '/player.js': 'player.js', '/style.css': 'style.css', '/i18n.js': 'i18n.js', '/view-state.js': 'view-state.js'}
                 if route in public:
                     if self.headers.get('Host') != f'127.0.0.1:{self.server.server_port}':
                         self.reply({'error': 'Invalid host'}, 403)

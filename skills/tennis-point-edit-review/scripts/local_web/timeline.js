@@ -1,3 +1,5 @@
+import { t } from "./i18n.js";
+import { zoomAt, wheelPixels } from "./view-state.js";
 import { $, el, layout, length, bounds, rate, tc } from "./model.js";
 export class Timeline {
   constructor(url, select, seek, save) {
@@ -6,10 +8,22 @@ export class Timeline {
     this.seek = seek;
     this.save = save;
     this.zoom = 1;
-    $("zoom").oninput = () => {
-      this.zoom = Number($("zoom").value);
-      this.render();
+    $('zoom').oninput = () => {
+      const scroller = $('timeline-scroll'), pointer = scroller.clientWidth / 2;
+      const next = Number($('zoom').value), scroll = (scroller.scrollLeft + pointer) * next / this.zoom - pointer;
+      this.setZoom(next, scroll);
     };
+    $('timeline-panel').addEventListener('wheel', e => {
+      if (!this.p || !(e.altKey || e.ctrlKey || e.metaKey)) return;
+      e.preventDefault();
+      const scroller = $('timeline-scroll'), delta = wheelPixels(e, scroller.clientWidth);
+      if (e.altKey) {
+        const pointer = Math.max(0, Math.min(scroller.clientWidth, e.clientX - scroller.getBoundingClientRect().left));
+        const next = zoomAt(this.zoom, delta, scroller.scrollLeft, pointer);
+        this.setZoom(next.zoom, next.scroll);
+      } else scroller.scrollLeft += delta;
+    }, {passive: false});
+    $('timeline-scroll').addEventListener('scroll', () => this.alignLabels());
     new ResizeObserver(() => {
       if (this.p) this.render();
     }).observe($("timeline-scroll"));
@@ -22,6 +36,16 @@ export class Timeline {
         this.seek(this.frame + (e.key === "ArrowLeft" ? -1 : 1));
       }
     };
+  }
+  alignLabels() {
+    document.querySelector('.track-labels').style.transform = `translateY(${-$('timeline-scroll').scrollTop}px)`;
+  }
+  setZoom(value, scroll) {
+    this.zoom = value;
+    $('zoom').value = value;
+    if (!this.p) return;
+    this.render();
+    $('timeline-scroll').scrollLeft = scroll;
   }
   setProject(p) {
     this.p = p;
@@ -54,7 +78,6 @@ export class Timeline {
     const reviewLanes = ["reviewId", "reviewLabel", "explanation"].filter(component => this.p.overlays.some(o => o.component === component));
     const reviewHeight = reviewLanes.length * 24;
     document.documentElement.style.setProperty("--review-height", reviewHeight + "px");
-    document.documentElement.style.setProperty("--timeline-height", (232 + reviewHeight) + "px");
     document.querySelector(".track-labels>div:last-child").hidden = !reviewHeight;
     $("review-track").hidden = !reviewHeight;
     this.clips = clips;
@@ -71,7 +94,7 @@ export class Timeline {
       $("ruler").append(tick);
     }
     for (const c of clips) {
-      const block = el("div", null, { class: "clip-block", "data-clip": c.id, draggable: "true", tabindex: "0", role: "button", "aria-label": `${c.pointId ?? c.label ?? c.id} clip` });
+      const block = el("div", null, { class: "clip-block", "data-clip": c.id, draggable: "true", tabindex: "0", role: "button", "aria-label": t("clipName", {name: c.pointId ?? c.label ?? c.id}) });
       block.style.left = c.startFrame * this.px + "px";
       block.style.width = length(c) * this.px + "px";
       const img = el("img", null, { src: this.url(`/api/frame?asset=${c.assetId}&frame=${c.inFrame}`), alt: "", loading: "lazy" });
@@ -98,7 +121,7 @@ export class Timeline {
         this.save({ type: "reorder", ids });
       };
       for (const side of ["start", "end"]) {
-        const handle = el("span", "", { class: "trim-handle " + side, role: "separator", "aria-label": `Trim ${side} ${c.id}` });
+        const handle = el("span", "", { class: "trim-handle " + side, role: "separator", "aria-label": t(side === "start" ? "trimStart" : "trimEnd", {id: c.id}) });
         handle.onpointerdown = (e) => this.trim(e, c, side, block);
         handle.onclick = (e) => e.stopPropagation();
         block.append(handle);
@@ -109,7 +132,7 @@ export class Timeline {
       const c = clips.find((v) => v.id === o.clipId), [a, b] = bounds(o, c);
       if (b <= a) continue;
       const track = o.component === "scoreboard" ? "score-track" : ["serveLabel", "serveSpeed"].includes(o.component) ? "serve-track" : o.component === "statsPanel" ? "stats-track" : "review-track";
-      const bar = el("button", o.label ?? o.component, { class: "overlay-block " + o.component, "data-overlay-id": o.id, title: (o.label ?? o.component) + " · drag to move, edges to resize" });
+      const bar = el("button", o.label ?? t("component." + o.component), { class: "overlay-block " + o.component, "data-overlay-id": o.id, title: t("overlayHint", {name: o.label ?? t("component." + o.component)}) });
       bar.style.left = (c.startFrame + a) * this.px + "px";
       bar.style.width = Math.max(3, (b - a) * this.px) + "px";
       if (track === "review-track") bar.style.top = (2 + reviewLanes.indexOf(o.component) * 24) + "px";
@@ -126,6 +149,8 @@ export class Timeline {
     }
     $("timeline-duration").textContent = tc(this.total, this.fps);
     this.setFrame(this.frame ?? 0);
+    this.highlight(this.selectedClip, this.selectedOverlay);
+    this.alignLabels();
   }
   trim(e, c, side, block) {
     e.stopPropagation();
@@ -193,6 +218,7 @@ export class Timeline {
     document.addEventListener("pointerup", end, { once: true });
   }
   highlight(clipId, overlayId) {
+    this.selectedClip = clipId; this.selectedOverlay = overlayId;
     for (const e of document.querySelectorAll(".clip-block")) e.classList.toggle("selected", e.dataset.clip === clipId);
     for (const e of document.querySelectorAll(".overlay-block")) e.classList.toggle("selected", e.dataset.overlayId === overlayId);
   }

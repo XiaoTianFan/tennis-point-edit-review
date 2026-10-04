@@ -1,3 +1,4 @@
+import { t } from "./i18n.js";
 import { $, rate, length, layout, bounds, tc } from "./model.js";
 export class Player {
   constructor(url, changed, error) {
@@ -19,7 +20,7 @@ export class Player {
       if (this.mode === "edited" && this.frame < this.total - 1) this.seek(this.clips.find((c) => c.id === this.clip.id).endFrame, true);
       else this.pause();
     };
-    this.video.onerror = () => this.error("Video could not be decoded. Prepare a browser-compatible proxy.");
+    this.video.onerror = () => this.error("decodeError");
     const tick = (_now, metadata) => {
       if (this.playing && (this.mode === "source" || this.clip?.kind !== "hold") && !this.video.seeking) {
         const sf = Math.round(metadata.mediaTime * this.fps);
@@ -37,7 +38,7 @@ export class Player {
       this.video.requestVideoFrameCallback(tick);
     };
     if (this.video.requestVideoFrameCallback) this.video.requestVideoFrameCallback(tick);
-    else this.error("Use a current browser with video frame callbacks.");
+    else this.error("browserError");
   }
   setProject(p) {
     this.p = p;
@@ -81,7 +82,7 @@ export class Player {
       this.frameImage.onload = () => {
         if (generation === this.seekGeneration && !this.playing) {
           this.frameImage.hidden = false;
-          $("frame-status").textContent = "Decoded frame " + sourceFrame;
+          $("frame-status").textContent = t("decodedFrame", {frame: sourceFrame});
           if (play) this.play();
         }
       };
@@ -131,7 +132,7 @@ export class Player {
       this.holdTimer = requestAnimationFrame(tick);
     } else this.video.play().catch((e) => {
       this.playing = false;
-      this.error(e.message);
+      this.error(e);
     });
     this.paint();
   }
@@ -150,12 +151,13 @@ export class Player {
       $("graphics").replaceChildren(...active.map((o) => {
         const img = document.createElement("img");
         img.src = this.url("/graphics/" + o.id);
-        img.alt = o.component;
+        img.alt = t("component." + o.component);
         img.dataset.overlay = o.id;
         return img;
       }));
     }
     for (const o of active) {
+      $("graphics").querySelector(`[data-overlay="${o.id}"]`).alt = t("component." + o.component);
       let opacity = 1;
       if (o.component === "statsPanel") {
         const [start, end] = bounds(o, c);
@@ -164,15 +166,15 @@ export class Player {
       $("graphics").querySelector(`[data-overlay="${o.id}"]`).style.opacity = opacity;
     }
     $("empty-view").hidden = true;
-    $("play").textContent = this.playing ? "Pause" : "Play";
+    $("play").textContent = t(this.playing ? "pause" : "play");
     $("edited").classList.toggle("active", this.mode === "edited");
     $("source").classList.toggle("active", this.mode === "source");
     $("timecode").textContent = tc(this.frame, this.fps) + " / " + tc(this.mode === "source" ? this.asset.frames : this.total, this.fps);
     $("source-position").max = (this.mode === "source" ? this.asset.frames : this.total) - 1;
     $("source-position").value = this.frame;
     const original = (this.asset.sourceStartSeconds ?? 0) + this.sourceFrame() / this.fps;
-    $("source-time").textContent = `Source ${original.toFixed(3)}s · ${this.p.fps} fps proxy`;
-    $("frame-status").textContent = this.playing ? "Playing" : this.frameImage.hidden ? "Decoding frame…" : "Decoded frame " + this.sourceFrame();
+    $("source-time").textContent = t("sourceTime", {seconds: original.toFixed(3), fps: this.p.fps});
+    $("frame-status").textContent = this.playing ? t("playing") : this.frameImage.hidden ? t("decoding") : t("decodedFrame", {frame: this.sourceFrame()});
     this.changed(this.frame, c, this.mode, linked);
   }
 }

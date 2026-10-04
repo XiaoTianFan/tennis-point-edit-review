@@ -115,6 +115,10 @@ class ModelTest(unittest.TestCase):
             c.request(method, path, json.dumps(body) if body is not None else None, headers or {})
             r = c.getresponse(); result = (r.status, r.read(), dict(r.getheaders())); c.close(); return result
         self.assertEqual(request('GET','/api/project')[0],403)
+        for path in ['/i18n.js', '/view-state.js']:
+            status, body, headers = request('GET', path)
+            self.assertEqual(status, 200)
+            self.assertIn(b'export ', body)
         self.assertEqual(request('GET','/api/project',headers={'X-Session-Token':token,'Origin':'https://example.org'})[0],403)
         self.assertEqual(request('GET','/../../project.json',headers={'X-Session-Token':token})[0],404)
         status, body, headers = request('GET','/media/src',headers={'X-Session-Token':token,'Range':'bytes=2-4'})
