@@ -1,6 +1,6 @@
 # Stage-based workflow maintenance
 
-Revisions v23–v23.1 clarify agent-owned work, concrete stage delivery, necessary
+Revisions v23–v23.2 clarify agent-owned work, concrete stage delivery, necessary
 interactive review, and the distinction between main-cut and review labels.
 This is repository maintenance context, not additional match instructions.
 
@@ -34,6 +34,8 @@ expected behavior to that agent.
 | Resume with reviewed answers or completed statistics | Read current state and the affected stage references; preserve IDs, answers and completed work. Recompute dependencies or build the remaining panels/labels as appropriate. |
 | “Do everything continuously; ask only when necessary” | Continue across stages with progress reports, required reading and self-checks; genuine unanswered questions block only dependent conclusions. |
 | Familiar user, “skip the introduction” or “start directly” | Omit onboarding; do not infer permission to replace default staged delivery with one full pass. |
+| Any stage completes, including a review/recalculation repeat | Name the completed and next applicable stages, report results, and ask whether to proceed. Wait unless continuous execution was explicitly requested; at final delivery, state that the workflow is complete. |
+| Reporting progress or asking for point review | Use chat and the existing interactive review HTML/sequence. Do not add mock audio, listening samples, demonstrations or separate reports unless requested; internal logs stay internal. |
 | Delete or merge points after review | Rebuild consecutive display numbers; preserve stable point IDs, published review mappings and answers. |
 
 ## Preserved contracts and validation
