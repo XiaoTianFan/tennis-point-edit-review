@@ -1,4 +1,35 @@
 export const $ = (id) => document.getElementById(id);
+/* Lucide icons: https://github.com/lucide-icons/lucide (play, pause, undo-2, redo-2)
+ * ISC License — Copyright (c) 2026 Lucide Icons and Contributors
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+export const icons = {
+  play: [['path', {d: 'M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z'}]],
+  pause: [['rect', {x:14,y:3,width:5,height:18,rx:1}], ['rect', {x:5,y:3,width:5,height:18,rx:1}]],
+  'undo-2': [['path', {d:'M9 14 4 9l5-5'}], ['path', {d:'M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11'}]],
+  'redo-2': [['path', {d:'m15 14 5-5-5-5'}], ['path', {d:'M20 9H9.5A5.5 5.5 0 0 0 4 14.5A5.5 5.5 0 0 0 9.5 20H13'}]],
+};
+export function buttonIcon(button, name) {
+  if (button.dataset.icon === name) return;
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  for (const [key, value] of Object.entries({viewBox:'0 0 24 24', width:18, height:18, fill:'none', stroke:'currentColor', 'stroke-width':2, 'stroke-linecap':'round', 'stroke-linejoin':'round', 'aria-hidden':'true', focusable:'false'})) svg.setAttribute(key,value);
+  for (const [tag, attrs] of icons[name]) {
+    const node = document.createElementNS(svg.namespaceURI, tag);
+    for (const [key, value] of Object.entries(attrs)) node.setAttribute(key,value);
+    svg.append(node);
+  }
+  button.replaceChildren(svg);
+  button.dataset.icon = name;
+}
 export function el(tag, text, attrs = {}) {
   const e = document.createElement(tag);
   if (text != null) e.textContent = text;
@@ -10,6 +41,10 @@ export const rate = (p) => {
   return a / b;
 };
 export const length = (c) => c.kind === "hold" ? c.durationFrames : c.outFrame - c.inFrame;
+export function exportSummary(p) {
+  const frames = p.clips.reduce((sum, clip) => sum + length(clip), 0);
+  return {width:p.width, height:p.height, fps:String(p.fps), frames, seconds:frames / rate(p), reasons:[...(p.needsRebuild ?? [])]};
+}
 export function layout(p) {
   let start = 0;
   return p.clips.map((c) => {

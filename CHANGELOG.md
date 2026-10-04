@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026.10.04 — skill 2026.10.04-v22.2
+
+- Makes review choices adapt to pane width and enables point navigation from card text or background.
+- Adds local Lucide play/pause and undo/redo icons, a language toggle, and removes redundant clip-move buttons.
+- Adds an always-accessible export panel with actual project settings, progress, downloads and explicit render-blocking reasons.
+
 ## 2026.10.04 — skill 2026.10.04-v22.1
 
 - Adds English/Chinese UI switching and persistent, draggable review/preview/timeline pane sizes.

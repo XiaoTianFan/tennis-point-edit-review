@@ -28,6 +28,17 @@ export class Review {
     for (const r of this.p.review.rows) {
       const card = el("article", null, { "data-point": r.pointId, class: "point-card" }), head = el("button", r.reviewId + " / " + r.pointId, { class: "point-heading", "aria-label": t("jump", {point: r.pointId}) });
       head.onclick = () => this.select(r.pointId);
+      card.tabIndex = 0;
+      card.onclick = (event) => {
+        if (event.target.closest('input,textarea,select,button,label,a,[contenteditable]')) return;
+        if (window.getSelection()?.isCollapsed === false) return;
+        this.select(r.pointId);
+      };
+      card.onkeydown = (event) => {
+        if (event.target === card && ['Enter', ' '].includes(event.key)) {
+          event.preventDefault(); event.stopPropagation(); this.select(r.pointId);
+        }
+      };
       card.append(head, el("span", "", { class: "row-status" }));
       card.append(el("div", "", { class: "point-meta" }), el("p", r.reason ?? "", { class: "point-reason" }));
       const inputs = [];
@@ -73,6 +84,7 @@ export class Review {
     for (const r of this.p.review.rows) {
       const n = this.nodes.get(r.pointId), server = this.p.players.find(p => p.id === r.serverId)?.name ?? r.serverId;
       n.card.querySelector('.point-heading').setAttribute('aria-label', t('jump', {point: r.pointId}));
+      n.card.setAttribute('aria-label', t('jump', {point: r.pointId}));
       n.card.querySelector('.point-meta').textContent = t('pointMeta', {set: r.setNumber ?? 1, game: r.gameNumber ?? '?', server, serve: (r.serveNumbers ?? [r.serveNumber ?? '?']).join(' → ')});
       n.card.querySelector('.winners legend').textContent = t('winner');
       n.card.querySelector('.causes legend').textContent = t('deadBall');

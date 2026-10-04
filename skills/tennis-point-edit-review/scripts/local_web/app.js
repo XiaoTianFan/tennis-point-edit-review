@@ -1,4 +1,4 @@
-import { $, rate, length, layout } from "./model.js";
+import { $, rate, length, layout, buttonIcon, exportSummary } from "./model.js";
 import { Review } from "./review.js";
 import { Timeline } from "./timeline.js";
 import { Player } from "./player.js";
@@ -7,7 +7,9 @@ import { initPanes } from "./view-state.js";
 try { setLocale(localStorage.getItem('courtside-language') ?? (navigator.language.startsWith('zh') ? 'zh' : 'en')); } catch { setLocale('en'); }
 translate();
 document.documentElement.lang = getLocale() === 'zh' ? 'zh-CN' : 'en';
-$('language').value = getLocale();
+function languageButton() { $('language').textContent = getLocale() === 'en' ? '中文' : 'EN'; }
+languageButton();
+buttonIcon($('undo'), 'undo-2'); buttonIcon($('redo'), 'redo-2'); buttonIcon($('play'), 'play');
 initPanes();
 const fragment = new URLSearchParams(location.hash.slice(1));
 const token = fragment.get("token") || sessionStorage.getItem("courtside:" + location.port) || "";
@@ -15,6 +17,7 @@ if (token) sessionStorage.setItem("courtside:" + location.port, token);
 const url = (path) => path + (path.includes("?") ? "&" : "?") + "token=" + encodeURIComponent(token);
 let project, selectedClip, selectedOverlay, queue = Promise.resolve(), pending = 0, contextData;
 let noticeState, noticeTimer, handoffValues;
+let exportJob = {state: "idle"}, exportBusy = false, exportError = null, exportTimer;
 function renderNotice() {
   const node = $('notice');
   node.hidden = !noticeState;
@@ -39,12 +42,13 @@ function projectStatus() { $('project-status').textContent = t('projectStatus', 
 function handoffText() {
   if (handoffValues) $('handoff-text').value = t('handoffText', {...handoffValues, mode: t(handoffValues.mode)}) + '\n\n' + JSON.stringify(contextData.review, null, 2);
 }
-$('language').onchange = () => {
-  setLocale($('language').value);
+$('language').onclick = () => {
+  setLocale(getLocale() === 'en' ? 'zh' : 'en');
+  languageButton();
   try { localStorage.setItem('courtside-language', getLocale()); } catch { /* Language still changes in this session. */ }
   document.documentElement.lang = getLocale() === 'zh' ? 'zh-CN' : 'en';
   translate(); renderNotice(); handoffText();
-  if (project) { review.localize(); timeline.render(); player.paint(); inspector(true); projectStatus(); }
+  if (project) { review.localize(); timeline.render(); player.paint(); inspector(true); projectStatus(); refreshExport(); }
 };
 const draftKey = () => "courtside-draft:" + (project.projectId ?? [project.review.source, project.review.ledgerRevision, project.title].join(":"));
 function drafts() {
@@ -96,7 +100,7 @@ function setProject(p) {
   $("project-title").textContent = p.title;
   projectStatus();
   saveState(p.needsRebuild?.length ? "savedNeedsRefresh" : "saved");
-  for (const id of ['save-state', 'export-video']) {
+  for (const id of ['save-state']) {
     if (p.needsRebuild?.length) { $(id).dataset.i18nTitle = 'rebuild'; $(id).title = t('rebuild'); }
     else { delete $(id).dataset.i18nTitle; $(id).removeAttribute('title'); }
   }
@@ -106,7 +110,8 @@ function setProject(p) {
   inspector();
   if (p.needsRebuild?.length) notice("rebuild");
   else notice("");
-  $("export-video").disabled = !!p.needsRebuild?.length;
+  $("export-video").disabled = false;
+  refreshExport();
   $("undo").disabled = !p.undo?.length;
   $("redo").disabled = !p.redo?.length;
 }
@@ -115,6 +120,7 @@ function save(operation) {
   storeDrafts([...drafts(), { id: draftId, revision: project.revision, operation }]);
   pending++;
   saveState("saving");
+  refreshExport();
   queue = queue.then(async () => {
     const result = await api("/api/operation", { revision: project.revision, operation });
     storeDrafts(drafts().filter((d) => d.id !== draftId));
@@ -126,6 +132,7 @@ function save(operation) {
     pending = 0;
     $("recover-draft").hidden = !drafts().length;
     saveState("notSaved");
+    refreshExport();
     notice("saveError", {error: e});
     throw e;
   });
@@ -142,6 +149,7 @@ function select(id, overlayId = null) {
   player.seek(c.startFrame + (overlayId ? Math.max(0, project.overlays.find((o) => o.id === overlayId).startFrame - (project.overlays.find((o) => o.id === overlayId).anchor === "source" ? c.inFrame : 0)) : 0));
   inspector();
   timeline.highlight(id, overlayId);
+  timeline.reveal(player.frame);
 }
 function inspector(labelsOnly = false) {
   if (!project) return;
@@ -153,8 +161,6 @@ function inspector(labelsOnly = false) {
   if (!labelsOnly) $("clip-out").value = o ? o.endFrame : c.kind === "hold" ? c.inFrame + c.durationFrames : c.outFrame;
   $("clip-in").disabled = c.kind === "hold" && !o;
   $("apply-trim").textContent = t(o ? "applyTiming" : "applyTrim");
-  $("move-left").disabled = !!o || project.clips[0].id === c.id;
-  $("move-right").disabled = !!o || project.clips.at(-1).id === c.id;
 }
 function jump(direction) {
   const clips = layout(project).filter((c) => c.pointId);
@@ -181,13 +187,6 @@ $("apply-trim").onclick = () => {
   }
   save(selectedOverlay ? { type: "overlay", id: selectedOverlay, startFrame: i, endFrame: o } : c.kind === "hold" ? { type: "trim", id: c.id, durationFrames: o - i } : { type: "trim", id: c.id, inFrame: i, outFrame: o });
 };
-for (const [id, d] of [["move-left", -1], ["move-right", 1]]) $(id).onclick = () => {
-  const ids = project.clips.map((c) => c.id), i = ids.indexOf(selectedClip);
-  if (i + d >= 0 && i + d < ids.length) {
-    [ids[i], ids[i + d]] = [ids[i + d], ids[i]];
-    save({ type: "reorder", ids });
-  }
-};
 $("undo").onclick = () => save({ type: "undo" });
 $("redo").onclick = () => save({ type: "redo" });
 $("reload").onclick = async () => {
@@ -201,7 +200,7 @@ $("reload").onclick = async () => {
   }
 };
 document.addEventListener("keydown", (e) => {
-  if (e.target.matches("input,textarea,select,[role=separator]") || $("handoff-dialog").open) return;
+  if (e.target.matches("input,textarea,select,[role=separator]") || $("handoff-dialog").open || $("export-dialog").open) return;
   if (e.code === "Space") {
     e.preventDefault();
     $("play").click();
@@ -257,32 +256,55 @@ $("recover-draft").onclick = () => {
   setTimeout(() => URL.revokeObjectURL(a.href), 1e3);
   notice("draftDownloaded");
 };
-$("export-video").onclick = async () => {
+function refreshExport() {
+  if (!project) return;
+  const summary = exportSummary(project);
+  $('export-resolution').textContent = `${summary.width} × ${summary.height}`;
+  $('export-fps').textContent = `${summary.fps} fps`;
+  $('export-duration').textContent = t('durationFrames', {seconds: summary.seconds.toFixed(2), frames: summary.frames});
+  const known = ['presentation-order', 'graphics-timing', 'clip-evidence', 'score-and-statistics'];
+  const reasons = [...new Set(summary.reasons.map(reason => t('rebuild.' + (known.includes(reason) ? reason : 'unknown'))))];
+  $('export-blocked').hidden = !reasons.length;
+  $('export-blocked-detail').textContent = t('exportBlockedDetail', {reasons: reasons.join(' · ')});
+  const running = exportJob.state === 'running';
+  $('start-export').disabled = exportBusy || running || reasons.length > 0 || pending > 0 || drafts().length > 0 || !!exportError;
+  $('export-status').textContent = exportError ? errorText(exportError.message) : exportBusy ? t('exportChecking') : running ? t('exporting', {done:exportJob.completedClips ?? 0, total:exportJob.totalClips}) : pending ? t('exportWaiting') : drafts().length ? t('exportUnsaved') : exportJob.state === 'failed' ? errorText(exportJob.error) : exportJob.state === 'complete' ? t('exportComplete') + ' · ' + t('exportJobRevision', {revision:exportJob.revision}) : reasons.length ? '' : t('exportReady');
+  $('export-download').hidden = exportJob.state !== 'complete';
+  $('export-download').href = url('/api/export');
+}
+$('export-video').onclick = async () => {
+  player.pause();
+  exportBusy = true; exportError = null;
+  refreshExport(); $('export-dialog').showModal();
+  try {
+    exportJob = await api('/api/job');
+    if (exportJob.state === 'running') { clearTimeout(exportTimer); exportTimer = setTimeout(poll, 1000); }
+  } catch (e) { exportError = e; }
+  finally { exportBusy = false; refreshExport(); }
+};
+$('close-export').onclick = () => $('export-dialog').close();
+$('export-handoff').onclick = () => { $('export-dialog').close(); $('handoff').click(); };
+$('start-export').onclick = async () => {
+  exportBusy = true; exportError = null; refreshExport();
   try {
     await queue;
-    await api("/api/render", { revision: project.revision });
-    $("export-video").disabled = true;
-    poll();
-  } catch (e) {
-    notice(e);
-  }
+    if (project.needsRebuild?.length || drafts().length) return;
+    exportJob = await api('/api/render', {revision: project.revision});
+    clearTimeout(exportTimer); exportTimer = setTimeout(poll, 500);
+  } catch (e) { exportError = e; }
+  finally { exportBusy = false; refreshExport(); }
 };
 async function poll() {
   try {
-    const job = await api("/api/job");
-    if (job.state === "running") {
-      notice("exporting", {done: job.completedClips ?? 0, total: job.totalClips});
-      setTimeout(poll, 1e3);
-    } else if (job.state === "complete") {
-      notice("exportComplete");
-      $("export-video").disabled = !!project.needsRebuild?.length;
-    } else {
-      notice(job.error ? new Error(job.error) : "exportStopped");
-      $("export-video").disabled = !!project.needsRebuild?.length;
-    }
-  } catch (e) {
-    notice(e);
-  }
+    exportJob = await api('/api/job');
+    exportError = null;
+    refreshExport();
+    if (exportJob.state === 'running') {
+      if (!$('export-dialog').open) notice('exporting', {done:exportJob.completedClips ?? 0, total:exportJob.totalClips});
+      clearTimeout(exportTimer); exportTimer = setTimeout(poll, 1000);
+    } else if (exportJob.state === 'complete') notice('exportComplete');
+    else notice(exportJob.error ? new Error(exportJob.error) : 'exportStopped');
+  } catch (e) { exportError = e; refreshExport(); notice(e); }
 }
 window.addEventListener("beforeunload", (e) => {
   if (pending) {

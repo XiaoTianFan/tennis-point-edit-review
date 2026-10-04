@@ -99,3 +99,18 @@ test('pane limits retain usable preview space and wheel units normalize across d
   assert.equal(wheelPixels({deltaX:0,deltaY:-1,deltaMode:2},900),-900);
   assert.equal(wheelPixels({deltaX:120,deltaY:0,deltaMode:0},900),120);
 });
+
+test('export summary uses the actual project dimensions, rational fps and hold duration', async () => {
+  const m=await model;
+  const p={width:1920,height:1080,fps:'30000/1001',needsRebuild:['presentation-order'],clips:[
+    {inFrame:50,outFrame:80},{kind:'hold',inFrame:79,durationFrames:15}
+  ]};
+  const before=JSON.stringify(p), summary=m.exportSummary(p);
+  assert.equal(summary.frames,45);
+  assert.equal(summary.fps,'30000/1001');
+  assert.equal(summary.width,1920); assert.equal(summary.height,1080);
+  assert.ok(Math.abs(summary.seconds-1.5015)<1e-9);
+  assert.deepEqual(summary.reasons,['presentation-order']);
+  summary.reasons.push('graphics-timing');
+  assert.equal(JSON.stringify(p),before);
+});

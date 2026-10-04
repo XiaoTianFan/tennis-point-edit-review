@@ -41,6 +41,8 @@ python "<skill>/scripts/local_editor.py" serve "<work>/edit" --open
 | `review` | `source/ledgerRevision/rows`沿用[复核输入](../examples/review-data.json)，稳定R/P、局/盘、发球方、疑点及证据定位；初始AI判断放`initial`，不预填人工已审 |
 | `overlays` | 稳定`id`、`clipId`、正式`component/props`、`startFrame/endFrame`；`anchor: "source"`绑定代理源帧，`"clip"`绑定片段局部帧；自动裁到片段可见范围 |
 
+逐分说明`review.rows[].reason`由agent依据当前素材证据生成；工作台只展示工程中的说明，加载视频不会自动生成分析。
+
 覆盖层的属性与位置复用[正式清单](../examples/ui-manifest.json)和[图形适配](graphics-adapters.md)。源码模板不复制、不修改；`init/update`渲染整画幅透明PNG，浏览器和导出复用同一批图形及props。静态标签直接切换，统计页由工作台负责首尾9帧淡变，不能再叠加第二份动画。文字与分数从账本重生成，网页支持修改图层时序，不声称图片内文字可直接编辑。
 
 agent在阶段2建立主剪计划，必要复核在阶段3另建复核计划与工作区；按分保留充分证据，复核图形使用`reviewId/reviewLabel/explanation`及常显规则。工作台共用同一个播放器与复核协议，但主剪/复核仍各有明确用途，不能用主剪删去的一发替代审核证据。阶段5–7调用既有计分、统计、估速与`template_pack.py`生成正式props，再加入五页统计定格及逐发球速；示例计划不提供默认比赛结果。
@@ -48,8 +50,8 @@ agent在阶段2建立主剪计划，必要复核在阶段3另建复核计划与�
 ## 用户操作与agent接续
 
 - 顶栏可切换English/中文；语言与面板尺寸保存在本浏览器，不改比赛文字、图形或答案。拖动复核/预览之间、预览/时间线之间的分隔条调整布局；分隔条也支持方向键、Shift大步调整及Home或双击复位。时间线内`Ctrl/Cmd+滚轮`横移，`Alt+滚轮`以指针位置缩放。
-- 左侧逐分列表点击R/P定位，查看得分方、人工无法确定、死球原因、双误、多打与备注。所有行保持原序常驻，搜索只高亮；答案变化不会自动跳走。与独立HTML使用相同`tennis-point-review/v1`导出及pending/partial/resolved/replay/unresolved语义。
-- 右侧切换Edited/Source，拖动播放条或时间线游标，按`Space`播放、方向键单帧、`Shift+方向键`十帧、`[`/`]`逐分跳转。按住clip两端修剪，拖动clip改变播放顺序；也可用入/出帧及左右移动按钮精确操作。图层条可拖动或缩短/延长，点击后用同一数字框修改时序。局部图层帧与源锚定帧不可混用。
+- 左侧逐分列表点击卡片文字或空白处定位该分首个保留片段；卡片聚焦后也可按Enter/空格定位。选项随面板宽度自动换行。查看得分方、人工无法确定、死球原因、双误、多打与备注；答案控件和备注框保持独立操作，不触发跳转。所有行保持原序常驻，搜索只高亮。与独立HTML使用相同`tennis-point-review/v1`导出及pending/partial/resolved/replay/unresolved语义。
+- 右侧切换Edited/Source，拖动播放条或时间线游标，按`Space`播放、方向键单帧、`Shift+方向键`十帧、`[`/`]`逐分跳转。按住clip两端修剪，拖动clip改变播放顺序；也可用入/出帧精确修剪。图层条可拖动或缩短/延长，点击后用同一数字框修改时序。局部图层帧与源锚定帧不可混用。
 - 有效更改自动写入`project.json`并增加revision；`history/`保存更改前版本，Undo/Redo最多保留40步。不要用新工程覆盖旧工程或替用户清空答案。agent同时写入或另一标签页修改时，旧revision被拒绝；重读当前上下文后处理差异，不盲目重试。未提交的操作保留在本浏览器草稿中；连接失败或版本冲突时用Recover edits下载，交agent与当前工程对比，不自动覆盖较新的状态。
 - **Send to agent**保存`agent-context.json`、`review.json`与当前片段/游标，给出可复制消息和完整JSON；用户自行粘贴到agent会话，网页不连接云端模型、不自动发送消息。单独导出的JSON也可交给现有`review_io.py merge`。
 
@@ -65,6 +67,8 @@ python "<skill>/scripts/local_editor.py" render "<work>/edit" "<work>/new-export
 修剪会标记证据与时序待查，重排标记呈现顺序待查，答案变化标记计分/统计待查。重排只改变呈现，不能自动重排比赛事实。未处理这些变化前允许预览和继续审核，但禁止最终导出，避免交付旧分数。不要为消除提示而直接清空`needsRebuild`；确认没有事实影响的纯呈现修改也需检查图层与源映射后通过`update`提交。
 
 ## 导出与边界
+
+Export video始终可打开输出面板，查看当前分辨率、帧率、时长、编码与待复核原因；仅“开始导出”受未保存编辑、待复核项及运行中任务限制。输出沿用工程的16:9偶数尺寸（各边≤4096）和恒定帧率（1–120 fps，支持分数帧率），网页不提供独立改帧率或分辨率的选项；需要不同设置时，由agent准备相应媒体、时间线与图形后更新工程。
 
 Export video与终端`render`使用同一路径：逐段精准取帧、同源PNG合成、统计淡变、剪口两帧音频淡变、定格静音，然后输出H.264/AAC MP4。每次使用新目录，保存`project-snapshot.json`与带帧数/哈希的`export.json`；不能只验证PNG、忽略最终视频。至少检查发球前后、大小标签同帧退出、分界、五页统计、定格接点、原声及起止帧；确认总帧数、时长和有效音轨。两帧音频淡变不代替人工检查剪口声音。
 

@@ -51,6 +51,10 @@ export class Timeline {
     this.p = p;
     this.render();
   }
+  reveal(frame) {
+    const scroller = $('timeline-scroll'), x = frame * this.px;
+    if (x < scroller.scrollLeft + 12 || x > scroller.scrollLeft + scroller.clientWidth - 12) scroller.scrollLeft = Math.max(0, x - 20);
+  }
   scrub(e) {
     e.preventDefault();
     const move = (event) => {

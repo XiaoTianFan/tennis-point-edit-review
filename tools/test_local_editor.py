@@ -127,6 +127,11 @@ class ModelTest(unittest.TestCase):
         op = dict(revision=0, operation=dict(type='reorder',ids=['second','first']))
         self.assertEqual(request('POST','/api/operation',op,{'X-Session-Token':token})[0],200)
         self.assertEqual(request('POST','/api/operation',op,{'X-Session-Token':token})[0],409)
+        # Opening export settings must not weaken the server's final-render gate.
+        status, body, _ = request('POST','/api/render',{'revision':1},{'X-Session-Token':token})
+        self.assertEqual(status,400)
+        self.assertIn(b'refresh graphics',body)
+        self.assertFalse((Path(self.temp.name)/'exports').exists())
 
 
 @unittest.skipUnless(shutil.which('ffmpeg') and shutil.which('ffprobe'), 'FFmpeg required')

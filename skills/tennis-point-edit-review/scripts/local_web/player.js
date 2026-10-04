@@ -1,5 +1,5 @@
 import { t } from "./i18n.js";
-import { $, rate, length, layout, bounds, tc } from "./model.js";
+import { $, rate, length, layout, bounds, tc, buttonIcon } from "./model.js";
 export class Player {
   constructor(url, changed, error) {
     this.url = url;
@@ -166,7 +166,8 @@ export class Player {
       $("graphics").querySelector(`[data-overlay="${o.id}"]`).style.opacity = opacity;
     }
     $("empty-view").hidden = true;
-    $("play").textContent = t(this.playing ? "pause" : "play");
+    buttonIcon($("play"), this.playing ? "pause" : "play");
+    $("play").setAttribute('aria-label', t(this.playing ? "pause" : "play"));
     $("edited").classList.toggle("active", this.mode === "edited");
     $("source").classList.toggle("active", this.mode === "source");
     $("timecode").textContent = tc(this.frame, this.fps) + " / " + tc(this.mode === "source" ? this.asset.frames : this.total, this.fps);
