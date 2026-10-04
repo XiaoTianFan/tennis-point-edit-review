@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026.10.04 — skill 2026.10.04-v21.3
+
+- Continues existing point-by-point ChatCut or Premiere timelines with point/game/set/match attribution, speed estimates, statistics and graphics while preserving the user's cuts.
+- Specifies that the ChatCut route requires the agent to run inside ChatCut with its editing tools.
+
 ## 2026.10.04 — skill 2026.10.04-v21.1
 
 - Supports requests containing the skill location, raw video and optional editor choice.
