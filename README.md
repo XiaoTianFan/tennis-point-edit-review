@@ -23,7 +23,7 @@ illustration. No match footage, player identities or measured serve speeds are i
 The workflow begins with a short introduction unless the user opts out. The agent
 does the detailed checking; the user sees only remaining material uncertainties.
 
-Current skill revision: **2026.10.04-v21.1**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, optional 3D fitting, quality checks and fallbacks.
+Current skill revision: **2026.10.04-v21.2**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, optional 3D fitting, quality checks and fallbacks.
 
 ChatCut, **Premiere Pro** and a standalone pipeline are primary editing choices.
 The [environment contract](skills/tennis-point-edit-review/references/editing-environments.md)
@@ -35,9 +35,8 @@ contains setup and execution instructions; the
 [graphics contract](skills/tennis-point-edit-review/references/graphics-adapters.md)
 covers editable native graphics and rendered overlays. Default hybrid graphics
 combine native editable scores/labels where qualified with rendered statistics.
-The [validation record](skills/tennis-point-edit-review/references/validation.md)
-separates the verified Premiere 23.5 rendered route from pending native MOGRT,
-newer UXP and full-match qualification.
+Available graphics controls depend on the host version and template; the agent
+checks these before building the timeline.
 
 ## Preview
 
@@ -67,21 +66,20 @@ workflow Skill, then select it from **My Skills**. A generic skill installation
 does not install ChatCut's editing capabilities: actual editing needs a connected
 video editor, media access and visual inspection.
 
-Minimal request, including for a fresh-agent test:
+Example request:
 
 > Use the skill at `<skill-folder>/SKILL.md` to edit `<source-video>` in Premiere Pro.
 
 The editor choice is optional. The agent reads the workflow and setup guidance
 from the complete skill package, inspects the media and available tools, and
 asks only for necessary unresolved information or a required manual setup step.
-No research report, handoff prompt or previous project is required.
 
 ## Repository layout
 
 ```text
 skills/tennis-point-edit-review/  Complete portable skill package
   SKILL.md                      Workflow entry and required references
-  references/                   Rules, definitions, validation and history
+  references/                   Match rules, workflow and editor setup
   examples/                     Seven canonical JSX components and review HTML
   scripts/                      Evidence, scoring, aggregation and checks
                                 Optional Premiere interchange, terminal MCP and graphics adapters
@@ -90,9 +88,6 @@ docs/                           Gallery, publishing and synchronization guides
 tools/                          Validation, packaging and conflict-aware snapshot sync
 .github/workflows/              Automated validation
 ```
-
-The package retains the adopted v18 rules and historical preservation map.
-Repository release `0.1.0` and the current skill revision are separate labels.
 
 ## Reproduce the demonstrations
 

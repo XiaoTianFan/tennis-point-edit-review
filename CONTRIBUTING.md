@@ -12,5 +12,4 @@ Keep changes small and explain the observable workflow problem they solve.
 Do not expand default user review forms simply because internal evidence has more
 fields. Do not introduce new metrics that duplicate existing indicators.
 
-Existing package history records what was checked in earlier revisions; it is not
-proof that a new recording, camera view or render target has passed visual review.
+Check the actual recording, camera view and render target when verifying an edit.

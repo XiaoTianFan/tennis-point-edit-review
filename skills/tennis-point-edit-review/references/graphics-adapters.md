@@ -29,12 +29,12 @@ MOGRT是实际模板文件，不是React JSX换后缀。模板可以由Pr创作�
 
 每个native适配记录：模板ID/版本/哈希、最低实际验证host、画幅、字体、逻辑组件、暴露属性名/类型/默认值及持续帧数策略。计分板至少映射姓名、局分、小分、发球方及顶部赛制/P号；标签映射文字/估值标识/单位；复核模板映射稳定R/P、阶段、局次、发球方、发次。采用相同颜色、字阶、位置、紧凑尺寸和状态切换语义；native字形栅格化可能与Chromium不同，不承诺逐像素一致。
 
-`node scripts/make_mogrt.cjs new-output-directory PostScriptFontName`可生成`build-native.jsx`与`native-manifest.json`，覆盖scoreboard、serveLabel、serveSpeed、reviewId、reviewLabel五种。在空AE工作区中运行该创作脚本，成功时输出`.aep`、`.mogrt`和生成日志；Windows可由开发者通过已验证的AE `-r`入口或用户运行脚本完成，不能把Adobe脚本交给Node。生成器保护已打开的AE工程；字体用实际PostScript名称。此适配是待host验证的native近似，不能替代七组件的正式JSX，也不宣称已通过AE/Pr执行。
+包内提供创作脚本生成器，不附带已生成的`.mogrt`。`node scripts/make_mogrt.cjs new-output-directory PostScriptFontName`生成`build-native.jsx`与`native-manifest.json`，覆盖scoreboard、serveLabel、serveSpeed、reviewId、reviewLabel五种。在空AE工作区中运行创作脚本，成功时输出`.aep`、`.mogrt`和生成日志；Windows可使用AE的`-r`入口或由用户运行脚本，不能把Adobe脚本交给Node。生成器保护已打开的AE工程；字体用实际PostScript名称。生成后须在目标Pr验证属性、尺寸与画面，再用于成片。
 
 这些MOGRT自然时长120秒、30fps；在序列中调整每个实例实际in/out，并读回，不按自然时长显示120秒。字段映射保存在清单；发球点用serverAOpacity/serverBOpacity（0/100），reviewLabel的serverText由serverPrefix+serverName同源装配。若需其他色彩/字体可编辑控制，必须在模板中明确暴露并补测；当前生成器只暴露文字和发球点，不能宣称所有样式参数都已可编辑。图形锚点/缩放按host实际尺寸放置并检查。
 
 不要按英文界面或固定效果索引定位参数；先枚举当前模板暴露的属性并建立映射。AE文本可能返回结构化文本值，应保留样式和Unicode；写后读回并看实际帧，不能仅靠`setValue`的返回值。未知属性结构应停止该实例写入，不猜字符串替换。新模板自然时长可能覆盖请求duration，必须读回实际终点。避免通过未经验证的QE操作维持基础工作流。
 
-**模板来源也是能力分支**：旧版CEP不能把“Pr界面可编辑”推断为“DOM可写”。本轮23.5导入Adobe随附Pr-authored Basic Title成功，但`getMGTComponent()`为空，枚举组件也没有文本属性。该实例不能走本轮终端文字回填；换成已验证暴露属性的模板或明确待验。AE-authored模板另需其渲染运行时正常；本机AE语言/订阅配置错误同时阻断创作脚本和随附AE MOGRT的导入。由用户解决Adobe安装/授权问题，不能绕过，也不能用渲染文字替代后宣称混合验收通过。AE创作工具可由模板维护者使用；分发给普通用户的是经兼容测试且具备分发权的模板，不是要求每位用户重新制作。随附Adobe模板只用来本机探测，不收入本技能包。
+**模板来源也是能力分支**：旧版CEP不能把“Pr界面可编辑”推断为“DOM可写”。若`getMGTComponent()`为空且组件没有所需文本属性，该实例不能通过终端回填文字；应选用暴露属性的兼容模板，或说明采用渲染文字的可编辑性取舍。AE-authored模板需要正常的渲染运行时；遇到安装或授权错误时，由用户处理具体环境问题。已有兼容模板可直接使用，无需每位用户重新创作；须具备模板的使用或分发权。
 
 由同一账本生成不同状态实例；不得在MOGRT表达式内另行推进比分。更改原生实例中的文字后，应把合法人工修正同步回计划；若涉及球果，仍回到证据/计分流程，不能只修图。模板变动应版本化并与七种视觉职责做对照测试；保留canonical JSX，不能以新增native变体为由删除它们。

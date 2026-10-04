@@ -22,7 +22,7 @@ HTML 默认是独立的交互列表，不附带、不嵌入视频，也不需要
 extra 保留实际球果但不计有效分，不能假装 replay。
 使用原生表格与表头，键盘可操作；本地保存以来源和账本版本隔离；无网络依赖。全部行常驻显示；复制必须包含所有行，包括未填、已复核和待逆推的行。浏览器不允许剪贴板时提供完整可选文字。
 预填AI判断不得被计为本轮用户已确认；要显式复核确认或修改后提交。
-本次七原因版是基于已验证五原因版升级，保存前做交互检查。
+保存前检查选择、互斥、草稿恢复和完整导出是否正常。
 
 ## 回填规则
 校验 schema、来源、ledgerRevision、重复 pointId 与未知ID；版本不同先做字段级对照，不自动覆盖新版本。
@@ -34,7 +34,7 @@ extra 保留实际球果但不计有效分，不能假装 replay。
 
 ## 人工无法归属与后续逆推
 “人工无法确定”只用于用户已查看但仍无法确定这一分得分方，不能由代理预填为人工结论，也不同于尚未填写的 pending/partial。选择后清空当前得分方和会隐含得分方的 ACE/双误确认，保留其他已知死球类型及备注；不强迫用户猜选双方之一。再次选定选手、ACE 或双误时退出人工无法归属状态；整分重打也退出此状态并照常不计分。
-导出新增 winnerUndetermined=true、inferenceRequired=true、status=unresolved、reviewConfirmed=true、scoringPlayerId=null、scoringPlayer=null；countsTowardScore 保持原来的计分资格，不能因为得分者未知而置为 false。若已明确为 extra，则保持不计分，inferenceRequired=false。原本未审的空行仍是 pending/partial，不能自动变成人工无法归属。
+导出包含 winnerUndetermined=true、inferenceRequired=true、status=unresolved、reviewConfirmed=true、scoringPlayerId=null、scoringPlayer=null；countsTowardScore 保持原来的计分资格，不能因为得分者未知而置为 false。若已明确为 extra，则保持不计分，inferenceRequired=false。原本未审的空行仍是 pending/partial，不能自动变成人工无法归属。
 completedRows 表示已完成本轮人工复核的行数，可以包含 unresolved；另报 unresolvedRows 和 inferenceRequiredRows，不能宣称这些分已解决。提供不同于“已解决”的待逆推状态与数量，可高亮定位；不得按状态隐藏记录，复制时仍包括所有行。沿用原本的来源/账本版本草稿键，新增字段向后兼容旧草稿。
 回填时归档原采用得分方，将 scoringPlayerId、winner、adoptedWinner 置空，保留观察证据与旧确认历史；禁止让旧的 AI 预填胜者继续参与计分或统计。已确认的旧判罚与新“无法确定”意见冲突时显式记录冲突，不静默抹掉历史。待归属分不参与需要胜者的统计，已独立核实的技术事实仍可保留。
 之后结合已知终局总分、局分、局末边界、相邻发球轮换、换边证据、已确认逐分结果及赛制，枚举并检验可能计分路径。换边和站位是边界证据，不能单独视作分胜负的硬约束；未知规则、缺分或额外事件不得凭终局假造。只有全部有效约束下该分归属唯一，才采用为“规则约束逆推”，记录所用约束与候选解，和视频确认、人工判定分开。多个解时只采用所有解共同确定的归属，其余仍未知；无解时回查漏分、重复计分、边界和输入约束，不强行配平总分。

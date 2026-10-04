@@ -1,6 +1,6 @@
 # Premiere Pro：终端agent的一级编辑分支
 
-本分支不要求Computer Use、鼠标、键盘模拟、屏幕坐标或Codex/Claude专属工具。运行中的Pr + 已配置本地桥是编辑能力；terminal agent通过MCP stdio、已验证插件的命令/响应文件或其本地API操作。桌面自动化仅可用于开发/验收，不能成为技能正常执行的隐含依赖。用户的首次host安装/激活与后续无人点击运行分别记录。
+本分支不要求Computer Use、鼠标、键盘模拟、屏幕坐标或Codex/Claude专属工具。运行中的Pr + 已配置本地桥是编辑能力；terminal agent通过MCP stdio、已验证插件的命令/响应文件或其本地API操作。用户的首次host安装/激活与后续无人点击运行分别记录。
 
 ## 版本分支
 
@@ -19,8 +19,8 @@
 ## 新机器配置：一次性建立通路
 
 1. 只读检查Pr是否已安装/授权、确切版本、OS、Node/Python/FFmpeg、媒体目录权限、可用字体与导出预设。不要自动升级Pr；不要要求改变用户主机版本才能开工。
-2. 选择并说明具体桥及版本。可选社区候选为[npm `adobe-premiere-pro-mcp`](https://github.com/hetpatel-11/Adobe_Premiere_Pro_MCP)，本轮检查版本1.2.8，支持的实际后端是CEP；其UXP包为experimental，不能当正式UXP默认。记录下载来源、版本/完整性摘要。检查安装脚本副作用，不凭相同可执行文件名确认包身份。
-3. 把Node包安装在稳定的本地工具目录，保留依赖锁与版本；调研临时目录不作为长期安装地址。遵循本次授权范围再安装桥。该候选的Windows安装脚本默认还会改多个CEP debug注册表版本、Claude和VS Code配置；terminal-only使用不需要这些client配置。可使用`-SkipBuild -SkipCopilotConfig -SkipClaudeDesktopConfig -SkipAdobeDebugMode`分离动作，仅为实际runtime按Adobe开发设置要求处理debug，并保存原值。macOS按其安装文档核对对应偏好；不要照搬Windows路径。
+2. 选择并说明具体桥及版本。可选社区候选为[npm `adobe-premiere-pro-mcp`](https://github.com/hetpatel-11/Adobe_Premiere_Pro_MCP)；1.2.8使用CEP，其UXP包为experimental，不能当正式UXP默认。记录下载来源、版本/完整性摘要。检查安装脚本副作用，不凭相同可执行文件名确认包身份。
+3. 把Node包安装在稳定的本地工具目录，保留依赖锁与版本，按当前任务授权范围安装桥。该候选的Windows安装脚本默认还会改多个CEP debug注册表版本、Claude和VS Code配置；terminal-only使用不需要这些client配置。可使用`-SkipBuild -SkipCopilotConfig -SkipClaudeDesktopConfig -SkipAdobeDebugMode`分离动作，仅为实际runtime按Adobe开发设置要求处理debug，并保存原值。macOS按其安装文档核对对应偏好；不要照搬Windows路径。
 4. 该候选默认有匿名遥测；明确配置`PREMIERE_MCP_TELEMETRY=0`/`DO_NOT_TRACK=1`及面板配置`telemetry:false`。可设置`PREMIERE_MCP_UPDATE_CHECK=0`，由维护流程显式检查更新。保留用户既有配置，仅改选定桥需要的字段，不覆盖其他MCP、权限或账户配置。不要把token写入技能或Git。
 5. CEP需当前用户扩展目录中的面板、所需开发设置，以及Pr加载面板。**首次用户动作**：启动Pr，先创建或打开一个空白scratch工程，再打开Window → Extensions → MCP Bridge (CEP)，确认面板与服务端使用同一个命令目录并启动桥。23.5的Home页未打开工程时Extensions不可用。保存这个空工程及其本机路径，作为后续终端启动入口。已支持自动启动的面板仍须实测下次Pr启动后能否恢复。terminal agent没有通路时只给出这一明确配置动作，不要求它点击菜单，也不把安装文件存在说成已连通。
 6. UXP需与host兼容、已安装/启用的插件及其被授予的文件/本地通信访问。开发测试可由开发者通过UXP Developer Tool加载；正式用户应按插件分发方式安装/激活，不假定UDT、developer mode或未受限filesystem已开启。使用插件实际公开的命令协议并记录权限。没有已验证UXP终端桥时可在host仍支持的情况下明确选择CEP；不能伪称当前CEP候选已成为UXP。
@@ -29,7 +29,7 @@
 
 ### Windows CEP候选的具体配置位置与命令
 
-以下是已检查的1.2.8包布局；升级包时重新核对，不能把这些位置当所有桥的通用协议。先备份现有扩展与配置，再安装，不能覆盖另一任务正在运行的桥。Node最低20；生产机器使用仍受支持且已验证的Node版本。
+以下命令针对1.2.8包布局；其他版本须核对实际文件位置。先备份现有扩展与配置，再安装，不能覆盖另一任务正在运行的桥。Node最低20；生产机器使用仍受支持且兼容的Node版本。
 
 ```powershell
 $premiereToolRoot = Join-Path $env:LOCALAPPDATA 'tennis-tools\premiere-mcp-1.2.8'
@@ -45,7 +45,7 @@ $premierePackageRoot = Join-Path $premiereToolRoot 'node_modules\adobe-premiere-
 
 候选面板配置在`%USERPROFILE%\.premiere-mcp-bridge\config.json`。在面板未运行时读取现有JSON、保存原件，再合并`tempDirectory`（与服务端`PREMIERE_TEMP_DIR`完全一致）、`telemetry:false`、`updateCheck:false`三个字段；不要清空其他字段。安装脚本的`-TempDir`只准备目录及可选client配置，**不会替你写入这份面板配置**。面板内Save Configuration也会写命令目录的`config.json`；两处不能互相指向旧任务目录。随后用户打开面板，确认状态是运行中；若未自动运行，再用面板Start Bridge/Test Connection完成首次配置。
 
-未签名CEP面板需要相应运行库的`PlayerDebugMode`。本轮旧版Pr 23.5配置的是`HKCU:\Software\Adobe\CSXS.11`下的字符串`PlayerDebugMode=1`；其他版本从已安装CEP运行库/Adobe兼容信息核对，不能循环开启所有CSXS版本。更改前记录键和值是否存在、原值和类型；只有明确需要开发面板且当前任务已授权安装时才写。此设置放宽该用户相应CEP运行库的扩展签名检查。恢复时原值存在则还原，原值不存在则仅移除本次新增值，不删除整个Adobe注册表分支。
+未签名CEP面板需要相应运行库的`PlayerDebugMode`。例如Pr 23.5的CSXS.11可使用`HKCU:\Software\Adobe\CSXS.11`下的字符串`PlayerDebugMode=1`；须核对已安装CEP运行库，不能循环开启所有CSXS版本。更改前记录键和值是否存在、原值和类型；只有明确需要开发面板且当前任务已授权安装时才写。此设置放宽该用户相应CEP运行库的扩展签名检查。恢复时原值存在则还原，原值不存在则仅移除新增值，不删除整个Adobe注册表分支。
 
 终端检查失败时按实际状态分流：`premiere_not_running`需要先启动Pr；`bridge_panel_not_running`需要加载面板；心跳来自错误目录时修正两端配置并重启面板。`launchIfNeeded:false`明确不尝试启动，候选返回的“could not be launched”文案不能作为已尝试启动的证据。只在用户完成设置或状态改变后再检查；不要轮询编辑命令碰运气。首次setup记录应包括上述备份、路径、版本、debug差异、面板激活步骤、终端检查原始结果及重启后恢复结果。
 
@@ -89,7 +89,7 @@ FCP7 XMEML可一次构建轨道、原声和保留范围，再经MCP `import_fcp_
 - 不支持的变速、效果、缩放、混音参数直接报错。需要的MOGRT、透明度、淡出等放`postImport`，每项给operation/target与参数；报告原样列为待执行。不得把pending项目当已渲染。
 - 输出XML和相邻`.report.json`，保留帧/tick/逻辑ID映射与哈希。输出不能覆盖旧版本。此生成器通过离线结构检查不等于已通过目标Pr版本导入。
 
-Windows本地盘的XMEML URI按Pr自己的导出形式编码，例如`file://localhost/C%3a/media/clip.mov`；路径中的中文、空格、`#`和`%`也需百分号编码。23.5把`file:///C:/...`误读为网络路径并弹出Link Media。生成器已修正并实测中文及保留字符；UNC/macOS路径目前仅结构检查，仍需当地host验证。
+Windows本地盘的XMEML URI使用`file://localhost/C%3a/media/clip.mov`形式；路径中的中文、空格、`#`和`%`也需百分号编码。23.5可能把`file:///C:/...`误读为网络路径并弹出Link Media。导入后核对所有媒体在线，UNC/macOS路径也须在目标host验证。
 
 `audioTrack`在交换计划中指1起算的XML声道槽。立体声占相邻两槽，使用Pr的exploded Stereo轨道分组；Pr导入后合并为一条stereo轨道。不要把两个普通mono轨道当作保留立体声，它们可能居中混合。相同声道槽不能混用mono/stereo布局，先标准化或分配独立槽。导入后按实际轨道/clip ID绑定音量，不直接沿用XML轨道号。
 
@@ -99,20 +99,19 @@ VFR须检查实际PTS/packet间隔；名义与平均fps不同是线索，不是�
 
 ## 新旧版本都需通过的host验证
 
-先合成短片，再真实短窗，再整场迁移。至少检查：连接；XML导入/读回/往返；CFR与原PTS映射；透明PNG；native MOGRT中文属性写入读回及持续时间；球速出球后出现/大小标签共同退出；双误改字不重启；R/P跨内部剪口连续；11行统计与5页各8秒；原声、淡出和定格；保存重开；实际导出文件可解码、时长和声音正确。
+先合成短片，再检查原片短段，最后处理整场。至少检查：连接；XML导入/读回/往返；CFR与原PTS映射；透明PNG；native MOGRT中文属性写入读回及持续时间；球速出球后出现/大小标签共同退出；双误改字不重启；R/P跨内部剪口连续；11行统计与5页各8秒；原声、淡出和定格；保存重开；实际导出文件可解码、时长和声音正确。
 
 帧检查通过桥导出的合成PNG或真实导出视频进行；不依赖桌面截图。某些`export_frame`会用未文档化接口或失败，需验证文件和像素；无法可靠导帧时先导出短视频再用FFmpeg取帧，不假称API返回成功就是画面正确。音频需实际监听/可用音频检查；只有波形或轨道存在不能证明主观接点自然。
 
-导出需具体存在的`.epr`或已验证的host导出设置；格式名不等于预设。入队job ID不等于完成。检查落盘文件、帧数、时长、音画和对应版本，再交付原生工程、素材/overlay清单及复核定位。当前实测范围见[验证记录](validation.md)；只有一个旧host可测试时，新版UXP明确标文档支持/待实机验证。
+导出需具体存在的`.epr`或已验证的host导出设置；格式名不等于预设。入队job ID不等于完成。检查落盘文件、帧数、时长、音画和对应版本，再交付原生工程、素材/overlay清单及复核定位。
 
-## CEP实测操作细节与故障恢复
+## CEP属性操作与故障恢复
 
 - 先比对`app.project.path`与预期工程的`File.fsName`，再按明确的`sequenceID`和clip ID执行；序列数组顺序会变化。下述DOM代码可作为`execute_extendscript`的`script`经终端客户端发送，不需要UI或QE。先枚举组件的`matchName`、属性名和值，再绑定当前host的属性；中文界面不要用英文显示名硬查。
-- 统计透明度定位`AE.ADBE Opacity`组件，23.5的透明度为0–100。`setTimeVarying(true)`后，对每个已计算的源时间创建`Time`，设置精确`ticks`，调用`addKey(time)`、`setValueAtKey(time,value,true)`，并用`getValueAtTime(time)`读回。序列上的start与clip源时间不是同一坐标：本轮PNG实例inPoint=0，关键帧为源帧0/9/231/239。非零inPoint需加源偏移。保持线性插值并检查实际过渡帧；不要重放未知结果的写入。
-- 音量在本轮host为`Internal Volume Stereo`组件；原始0 dB读值约0.177828，**不是1**。保留当前原声基准值，再做两帧首尾包络；不要把其他host的增益标尺当通用标准。先核实已有自动化，再写入和读回，不能无声覆盖用户关键帧。用PCM对照检查声道、增益和样本偏移，再单独检查AAC等交付编码；本轮AAC比PCM晚1024个48 kHz样本，不能据此移动源片剪口。
-- SDR透明面板须核实序列色彩与合成设置。23.5默认`getSettings().compositeLinearColor=true`与本例HTML/PNG参照的半透明效果不同；本轮在scratch序列通过`setSettings`改为false后，淡变和稳定帧均匹配。按当前参考与色彩流程决定并记录，不把这个SDR选择照搬到HDR工程。
-- 保存到新路径时使用`app.project.saveAs(new File(destination).fsName)`，拒绝覆盖已存在版本。候选`save_project_as`拼接正斜杠在本轮虽创建了文件并返回成功，却使随后`save()`出现目录写入错误；原生路径保存后已通过save、关闭及重开。保存返回值之外检查文件时间/大小，重开读回轨道和效果。
+- 统计透明度定位`AE.ADBE Opacity`组件，23.5的透明度为0–100。`setTimeVarying(true)`后，对每个源时间创建`Time`，设置精确`ticks`，调用`addKey(time)`、`setValueAtKey(time,value,true)`，并用`getValueAtTime(time)`读回。关键帧使用clip源时间：例如30fps、8秒、inPoint=0的PNG，四个关键帧为0/9/231/239；非零inPoint需加源偏移。保持线性插值并检查实际过渡帧；不要重放未知结果的写入。
+- Stereo音量组件可用`Internal Volume Stereo`识别；23.5的0 dB原始值约0.177828，不能把1当作统一的0 dB。先读取并保留当前原声基准及已有关键帧，再写入首尾包络并读回。用PCM对照检查声道、增益和样本偏移，单独检查AAC等交付编码的延迟；不要为补偿编码延迟而移动源片剪口。
+- SDR透明面板须核实序列色彩与合成设置。`compositeLinearColor`会影响半透明图层的合成；与HTML/PNG参照比较时，可在scratch序列通过`setSettings`检查false设置下的淡变和稳定帧。按当前参考与色彩流程选择，不照搬到HDR工程。
+- 保存到新路径时使用`app.project.saveAs(new File(destination).fsName)`，拒绝覆盖已存在版本。若封装工具使用不兼容的路径形式，改用原生路径保存。检查文件时间/大小，关闭重开后读回轨道和效果，不能只看保存返回值。
 - 关闭最后一个工程会卸载CEP面板，关闭操作可能已经完成而客户端报告桥失联。先确认关闭结果，再从终端用实际Pr可执行文件和带正确引号的绝对`.prproj`参数打开保存工程；不要通过依赖已卸载桥的`open_project`陷入循环。例如PowerShell使用`Start-Process -FilePath $premiereExe -ArgumentList ('"' + $projectPath + '"') -WindowStyle Hidden`，两个变量均来自本机已核实路径。打开后再只读验证，不能仅凭进程启动成功认定桥已恢复。
-- 本轮还在只打开scratch工程的前提下保存并退出Pr，确认进程退出，再用同一终端文件参数重启；23.5的已激活面板自动恢复，MCP返回正确工程与7条测试序列。新机器仍需自己的首次激活/重启验证，不把本机结果当作所有安装的自动保证。
-- `get_encoder_presets`在本轮只列用户预设，空列表不等于无导出能力。可在当前Pr安装目录`MediaIO/systempresets`查找实际`.epr`；本轮验证了H.264 Match Source和48 kHz/16-bit Waveform Audio。保留所用预设路径与哈希，不把版本相关目录名写死成所有机器的路径。
-- 1.2.8在host模态对话框阻塞时可能报告“bridge is not running”。错误可能来自缺失媒体、错误保存路径或MOGRT加载，而命令已发生部分变更。`export_frame`也曾返回Illegal Parameter type但稍后生成了正确PNG。保存原始响应、检查新文件/工程实际状态，停止后续依赖变更；终端agent确需清除对话框时请用户处理具体提示。不要反复导入、重装桥、改权限或宣称失败等于无副作用。
+- `get_encoder_presets`可能只列用户预设，空列表不等于无导出能力。在当前Pr安装目录`MediaIO/systempresets`查找实际`.epr`，检查H.264或PCM等所需预设。保留所用预设路径与哈希，不把版本相关目录名写死成所有机器的路径。
+- 1.2.8在host模态对话框阻塞时可能报告“bridge is not running”。检查缺失媒体、保存路径或MOGRT加载错误，并确认命令是否发生部分变更。导帧报错后也须检查是否已有输出文件。保存响应、检查文件与工程状态，停止后续依赖变更；终端agent确需清除对话框时请用户处理具体提示。不要反复导入、重装桥、改权限或假定失败无副作用。

@@ -3,6 +3,29 @@ from pathlib import Path
 spec=importlib.util.spec_from_file_location('transport',Path(__file__).with_name('package.py'))
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 class PackageTests(unittest.TestCase):
+    def test_distribution_excludes_development_records(self):
+        files=m.read_package()
+        archive=json.loads(files[m.ARCHIVE])['files']
+        self.assertEqual(set(archive),set(files)-{m.ARCHIVE})
+        for names in (files,archive):
+            self.assertFalse(any('/history/' in name for name in names))
+            self.assertTrue({'references/validation.md','references/reorganization-map.md',
+                'references/reorganization-manifest.json','scripts/check_reorganization.py'}.isdisjoint(names))
+        for name,content in files.items():
+            if not name.endswith('.md'):continue
+            for retired in ('历史验收','本轮检查版本','本轮host','本次旧项目','仓库调研报告','交接提示词','先前会话','本次七原因版'):
+                self.assertNotIn(retired,content,name)
+    def test_package_documentation_links_are_self_contained(self):
+        import re
+        files=m.read_package()
+        root=m.SKILL.resolve()
+        for name,content in files.items():
+            if not name.endswith('.md'):continue
+            for target in re.findall(r'!?\[[^\]]*\]\(([^)]+)\)',content):
+                if re.match(r'\w+://',target) or target.startswith('#'):continue
+                path=(root/name).parent/target.split('#')[0]
+                self.assertTrue(path.resolve().is_relative_to(root),(name,target))
+                self.assertTrue(path.exists(),(name,target))
     def test_v1_archive_import_remains_supported(self):
         values={'SKILL.md':'旧版中文','references/package-version.json':'{"version":"legacy"}'}
         archive={'version':'legacy','files':{k:{'text':v,'sha256':m.sha(v)} for k,v in values.items()}}

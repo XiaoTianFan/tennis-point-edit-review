@@ -1,6 +1,6 @@
 # 辅助材料用法与边界
 
-判读、计分、统计与复核脚本不连接编辑器、不编辑时间线，也不携带原项目绝对路径或素材ID。路径通过参数传入。Python基础脚本用标准库；逐帧和单应映射需要OpenCV及NumPy。浏览器复核页离线运行，无外部库。v20另提供可选编辑/图形适配器，职责与依赖见下节；其中终端MCP客户端会执行请求中的host操作，不能当成只读计算器。
+判读、计分、统计与复核脚本不连接编辑器、不编辑时间线。路径通过参数传入。Python基础脚本用标准库；逐帧和单应映射需要OpenCV及NumPy。浏览器复核页离线运行，无外部库。编辑/图形适配器的职责与依赖见下节；终端MCP客户端会执行请求中的host操作，不能当成只读计算器。
 
 这些辅助脚本不是完整剪辑器；先按[环境分流](editing-environments.md)在ChatCut、Premiere与本地流水线中选择，不能把辅助脚本的职责边界误读为必须使用ChatCut。
 
@@ -36,7 +36,7 @@ stats输入每分须有：pointId、statsIncluded、winner、server、serveNumbe
 计分输出states同时包含before/after；画面比分在死球前用before，死球后才切after。局末after已重置小分，必要时短暂停留赢局状态再开始下一局。
 
 ## 重用前检查
-参数化版本源自本次已用过的HTML/CV/估速/显示方法，但扩展赛制须用边界样例再验证。脚本并不是黑箱自动识别比赛；不可因它输出JSON就声称判球可靠。
+扩展赛制须用边界样例验证。脚本不自动判读比赛；输出JSON不代表判球可靠。
 
 
 ## 人工无法归属的交换字段
@@ -51,11 +51,11 @@ HTML 的状态字段仅驱动标记、数量和导出，不能驱动隐藏、移
 - 现场未完局判局：在最后真实分填recordedGameWinner、exceptionType=onsite_award_before_rule_completion、exceptionConfirmed=true、exceptionNote。score_audit将实际分保留，输出rulesWinner=null、rulesComplete=false及现场归属，接续换发与下一局；统计器消费同一审计，不额外补分。
 - 球速质量：audit_speed_quality(records)接受逐发初速及可选fitAtParameterBoundary、ballIdentityVerified、flightSegmentVerified、fastestCandidateReviewed。输出agentChecks和分组补估影响；flag不是自动判无效，不新增用户表单。
 - 正式UI：python scripts/template_pack.py COMPONENT --props current-props.json --output template-bundle.json，COMPONENT见ui-manifest.json。输出与当前产品工具参数无关的源代码、可编辑属性、自然尺寸和1080p比例；按当前动效创作能力导入。统计行从stats-pages.json构建，需显式逐盘/全场范围；不复用旧飞行均速作为初速。
-- 包检查：python scripts/check_canonical.py；python scripts/package_check.py；原check_helpers.py和check_launch_speed.py仍需通过。浏览器检查模板的正常/长文案与11行统计，运行记录写入validation.md，不伪称已跨录像验证。
+- 包检查：python scripts/check_canonical.py；python scripts/package_check.py。检查模板的实际文案、长姓名与11行统计页，并核实最终合成画面。
 
 文字完整性：scripts/restore_package.py 默认核对ASCII安全文本备份；--repair仅恢复当前本地技能副本，不写回保存的技能。再运行package_check.py。模板校验对换行格式归一化，兼容Windows与其他平台。
 
-v20恢复记录为zlib+Base64编码的UTF-8，逐文件SHA-256保持；当前工具兼容旧text记录与新压缩记录。只压缩冗余恢复副本，可读技能文件不变；新归档不能交给旧恢复脚本处理。
+恢复记录使用zlib+Base64编码的UTF-8及逐文件SHA-256；用随包提供的恢复脚本核对。
 
 
 ## 逐发球速时段
@@ -84,15 +84,14 @@ python scripts/serve_overlay.py input.json plan.json。输入fps（支持整数�
 - [球速计算助手](../scripts/serve_speed.py)：已确认的击球/落地端点、时间误差和场地标定；不自动宣称出拍速度。
 - [视觉模板说明](visual-templates.md)；examples 下保存正式计分板、主剪/复核发球标签、稳定复核编号、临时说明及五页统计模板；[模板装配工具](../scripts/template_pack.py) 输出源代码、属性和比例。
 - [最小样例](../examples/review-data.json) 与 [规则边界检查](../scripts/check_helpers.py)。所有示例均为虚构占位数据，不继承原比赛。
-- [草案验证记录](validation.md) 说明哪些已实际验证、哪些仍需在新项目里检查。
-这些脚本只辅助取证、计算、交换数据，不代替当前产品的剪辑、素材管理或导出能力；不要把历史工具参数写死进技能。
+这些脚本只辅助取证、计算、交换数据，不代替当前产品的剪辑、素材管理或导出能力；工具参数以当前环境公开的接口为准。
 
 ## 接发数据完整性边界
 
-新增统计由 [接发汇总助手](../scripts/serve_return_stats.py) 消费agent逐分视觉标注；模板在证据未齐时拒绝把缺失绘成0。用户不需额外填写接发技术字段，定义与分母见 [统计口径](statistics.md)。
+接发统计由 [接发汇总助手](../scripts/serve_return_stats.py) 消费agent逐分视觉标注；模板在证据未齐时拒绝把缺失绘成0。用户不需额外填写接发技术字段，定义与分母见 [统计口径](statistics.md)。
 
-## v19 估速取证工具
+## 估速取证工具
 
-依[发球估速取证](serve-speed-audit.md)使用 serve_event_audit.audit_attempts 核对发次与真实触拍资格，speed_evidence.estimate_endpoint 验证事件夹逼并计算物理敏感性，partial_trajectory.fit_partial 与 alternating_holdouts 产生并检验三维候选，speed_evidence.assess_partial_quality 决定候选是否可采用。三维工具另需 NumPy、SciPy；其余新增工具使用标准库。speed_evidence.impute_same_group 只从同组独立证据补估。通过 build_speed_case.py 重建匿名合成示例，不将示例当实测。
+依[发球估速取证](serve-speed-audit.md)使用 serve_event_audit.audit_attempts 核对发次与真实触拍资格，speed_evidence.estimate_endpoint 验证事件夹逼并计算物理敏感性，partial_trajectory.fit_partial 与 alternating_holdouts 产生并检验三维候选，speed_evidence.assess_partial_quality 决定候选是否可采用。三维工具另需 NumPy、SciPy；其余工具使用标准库。speed_evidence.impute_same_group 只从同组独立证据补估。通过 build_speed_case.py 重建匿名合成示例，不将示例当实测。
 
-serve_overlay 新增可选 letConfirmedUs（源片整数微秒），只在 eventType=let 使用，且不得同时标双误。大标签在重发判定证实之后改字，球速与共同退出点保持原计时；确认过晚只记录 outcomeAfterOverlayWindow。真实发球挥空的无速度标签例外见[显示说明](serve-speed-overlay.md)。
+serve_overlay 接受可选 letConfirmedUs（源片整数微秒），只在 eventType=let 使用，且不得同时标双误。大标签在重发判定证实之后改字，球速与共同退出点保持原计时；确认过晚只记录 outcomeAfterOverlayWindow。真实发球挥空的无速度标签例外见[显示说明](serve-speed-overlay.md)。

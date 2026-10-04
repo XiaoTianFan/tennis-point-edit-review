@@ -8,8 +8,9 @@ def run(args,cwd=ROOT):
 def main():
     run(['-m','unittest','discover','-p','check_*.py'],PACKAGE/'scripts')
     run(['-m','unittest','discover','-s','tools','-p','test_*.py'])
-    for name in ('package_check.py','check_reorganization.py','restore_package.py'):
+    for name in ('package_check.py','restore_package.py'):
         run(['scripts/'+name],PACKAGE)
+    run(['tools/check_skill_contract.py'])
     from importlib.util import spec_from_file_location,module_from_spec
     spec=spec_from_file_location('restore',PACKAGE/'scripts/restore_package.py')
     module=module_from_spec(spec);spec.loader.exec_module(module)

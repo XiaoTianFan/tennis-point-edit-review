@@ -2,17 +2,13 @@
 
 ## 2026.10.04 — skill 2026.10.04-v21.1
 
-- Clarifies that a new user supplies only the skill location, raw video and optional editor choice; setup and workflow instructions come from the portable package.
-- Removes duplicate Premiere research/test handoffs and points both READMEs to the canonical package guides. Historical qualification remains in the validation record; this cleanup does not claim a fresh full-match test.
-- Preserves adapters, all seven JSX templates, graphics choices and tennis review semantics.
+- Supports requests containing the skill location, raw video and optional editor choice.
 
 ## 2026.10.04 — skill 2026.10.04-v21
 
-- Fixes Windows FCP7 file URIs and Premiere stereo grouping using live 23.5 import/export evidence; rejects incompatible mono/stereo channel-slot layouts.
-- Qualifies synthetic cuts and a 54.1-second real-media fixture with five statistics pages, native opacity/audio automation, PCM audio and save/reopen.
+- Fixes Windows FCP7 file URIs and Premiere stereo grouping; rejects incompatible mono/stereo channel-slot layouts.
 - Adds fresh-machine bootstrap, native Windows save paths, SDR compositing, encoder-preset discovery and modal/unknown-result recovery guidance for terminal agents.
-- Distinguishes Pr-authored titles without exposed legacy text controls from AE-authored MOGRTs; custom native graphics remain blocked by the local AE licensing/language issue. Newer UXP and full-match transfer are still pending.
-- Preserves all seven canonical JSX sources and the original media/ChatCut project; no account synchronization or publication.
+- Documents template-dependent access to text controls through the legacy DOM and AE-authored MOGRT requirements.
 
 ## 2026.10.04 — skill 2026.10.04-v20
 
@@ -20,7 +16,7 @@
 - Documents legacy CEP/ExtendScript and newer UXP routes, fresh-machine setup, and a terminal-only runtime contract without Computer Use.
 - Adds bounded FCP7 XMEML generation, a stdio MCP client usable from any terminal agent, canonical RGBA overlay rendering, and provisional AE authoring scripts for five native graphic types.
 - Preserves the seven canonical JSX files, scoring/review semantics and source-time evidence; rejects unsupported timing/effects instead of silently losing them.
-- Adds offline regressions and staged synthetic/real-media qualification. Native AE/MOGRT and live Premiere import/export remain pending host testing; no account Skill or GitHub publication is implied.
+- Adds offline adapter regressions and host checks for imports, rendered output and project persistence.
 - Compresses only the redundant ASCII-safe recovery records, preserving all readable files, hashes, legacy import compatibility and the existing 1 MB package cap.
 
 ## 2026.10.04 — skill 2026.10.04-v19
