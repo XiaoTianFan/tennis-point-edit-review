@@ -1,6 +1,6 @@
 # Stage-based workflow maintenance
 
-Revisions v23–v23.3 clarify agent-owned work, concrete stage delivery, necessary
+Revisions v23–v23.4 clarify agent-owned work, concrete stage delivery, necessary
 interactive review, and the distinction between main-cut and review labels.
 This is repository maintenance context, not additional match instructions.
 
@@ -27,7 +27,7 @@ expected behavior to that agent.
 | Raw footage, no execution preference | Stage 1 cuts every point from serve to dead ball with required reactions and places it on a playable timeline. Keep the ledger internal; scoring starts in stage 2. |
 | Already cut points and a known final score | Check cuts and internal mappings, then reuse the timeline for agent-owned point adjudication, scoring and basic graphics in stage 2. |
 | A few clipped endings or uncertain serves | Inspect source gaps and continuous context; adopt clear decisions. Only unresolved material questions and necessary related points enter review. |
-| Review is necessary | Deliver matching review sequence and interactive HTML, or the standalone review workspace. Every selected review row stays visible; unrelated points are not added by default. |
+| Review is necessary | Schedule stage 3 and proactively build, verify and deliver its review sequence and interactive HTML, or the standalone review workspace. A questions list without the required interactive file is incomplete; waiting for answers does not block building it. Every selected row stays visible; unrelated points are not added by default. |
 | Scoring still disagrees with the supplied final game/set score after source checks | Include each problem game's points individually, with necessary adjacent evidence. Preserve known answers; repeat stages 3–4 as needed without fabricating a matching score. |
 | Statistics and speed data are ready | Stage 6 renders both five-page panels and per-serve speed overlays from stage 5's shared data and timing; neither requires its own stage or fixed rendering order. |
 | A long rally, before speed estimation | Serve label starts before service and exits no later than three seconds after the confirmed post-contact display start, or at an earlier boundary. It does not fill the rally. |
@@ -35,7 +35,7 @@ expected behavior to that agent.
 | “Do everything continuously; ask only when necessary” | Continue across stages with progress reports, required reading and self-checks; genuine unanswered questions block only dependent conclusions. |
 | Familiar user, “skip the introduction” or “start directly” | Omit onboarding; do not infer permission to replace default staged delivery with one full pass. |
 | Any stage completes, including a review/recalculation repeat | Name the completed and next applicable stages, report results, and ask whether to proceed. Wait unless continuous execution was explicitly requested; at final delivery, state that the workflow is complete. |
-| A batch or a few serve-label examples pass, with executable work remaining | Continue the same stage without asking to proceed. Stage 2 covers point outcomes, serves and basic graphics for every target point; only unresolved questions after source checks enter review. An actual interruption remains an incomplete stage, not a new stage. |
+| Any stage has a successful batch or partial artifact, with executable work remaining | Continue that stage without asking to proceed. All seven stages and rework require full scoped coverage, every prescribed deliverable and required checks. Stage 2 includes point outcomes, serves and basic graphics together. An actual interruption remains an incomplete stage, not a new stage. |
 | Reporting progress or asking for point review | Use chat and the existing interactive review HTML/sequence. Do not add mock audio, listening samples, demonstrations or separate reports unless requested; internal logs stay internal. |
 | Delete or merge points after review | Rebuild consecutive display numbers; preserve stable point IDs, published review mappings and answers. |
 
