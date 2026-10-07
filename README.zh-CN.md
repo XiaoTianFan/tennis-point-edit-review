@@ -59,3 +59,7 @@ MIT许可证；参见[发布步骤](docs/publishing.md)与[贡献说明](CONTRIB
 ## 本地编辑与复核
 
 未使用ChatCut或Pr时，复用技能内的[Courtside工作台](skills/tennis-point-edit-review/references/local-editor.md)：成片/原片播放、单帧与逐分跳转、剪口/顺序/图层时序编辑、左侧逐分审核、可追溯JSON回填及FFmpeg导出。agent只需终端，用户在本机浏览器操作。
+
+## 中英文产物
+
+七个图层模板、五页39行统计、复核HTML及对比矩阵按用户主要交互语言生成；明确指定的渲染语言优先。工作台界面语言独立。接口、术语和重生成规则见[产物语言](skills/tennis-point-edit-review/references/output-language.md)。

@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026.10.08-v23.9
+
+- Add shared English/Chinese output selection for all seven canonical templates, 39 statistics rows, serve labels, native/PNG adapters and offline review HTML. Preserve canonical JSX, score data, timing and review drafts.
+- Document interaction-language defaults, explicit rendering overrides, terminology, and the independent studio UI language.
+
 ## 2026.10.05 — skill 2026.10.05-v23.1
 
 - Makes stage 1 deliver the complete point-cut timeline, with an internal ledger and no scoring; stage 2 owns point adjudication, scoring and basic graphics.
