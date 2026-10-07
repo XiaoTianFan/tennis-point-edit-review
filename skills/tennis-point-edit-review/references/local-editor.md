@@ -73,3 +73,7 @@ Export video提供分辨率预设和自定义宽高、整数或有理数fps、�
 Export video与终端`render`使用同一路径：逐段精准取帧、同源PNG合成、统计淡变、剪口两帧音频淡变、定格静音，然后输出H.264/AAC MP4。输出文件写入用户选定目录；每次在工程内使用新的渲染工作目录，保存`project-snapshot.json`与带帧数/哈希的`export.json`；不能只验证PNG、忽略最终视频。至少检查发球前后、大小标签同帧退出、分界、五页统计、定格接点、原声及起止帧；确认总帧数、时长和有效音轨。两帧音频淡变不代替人工检查剪口声音。
 
 当前实现为单视频主轨、顺序拼接、原速片段与静帧、七种正式覆盖层；不含多机位、任意转场、音频混音、变速曲线或HDR。需要这些能力时明确扩展计划或选择用户认可的编辑环境；不要静默丢失特性。源文件、代理和workspace一并移动后需更新路径并验证；本地服务器仅服务已注册素材和图形，不提供任意文件浏览。
+
+## Output language
+
+Set project `outputLanguage` to `en` or `zh-CN` using the [output-language policy](output-language.md). The context command returns it, and graphics rendering forwards it to canonical templates. Explicit overlay props remain authoritative; regenerate visible text and graphics when changing output language. The studio interface toggle controls UI text independently.

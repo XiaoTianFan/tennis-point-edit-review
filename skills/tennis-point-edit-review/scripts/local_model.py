@@ -1,4 +1,5 @@
 """Portable local timeline model, review protocol and revision-fenced persistence."""
+from output_language import resolve_language
 import copy
 import json
 import os
@@ -58,6 +59,7 @@ def overlay_range(overlay, clip):
     return max(0, start), min(duration(clip), end)
 
 def validate(project, check_files=False):
+    resolve_language(project.get("outputLanguage"))
     if project.get('schema') != SCHEMA:
         raise ValueError('Unsupported project schema')
     integer(project.get('revision'), 'revision')
@@ -172,6 +174,7 @@ def review_payload(project):
 
 def context(project):
     return {'schema': 'tennis-local-context/v1', 'revision': project['revision'],
+        'outputLanguage': resolve_language(project.get('outputLanguage')),
         'review': review_payload(project), 'timeline': layout(project), 'assets': project['assets'],
         'overlays': project.get('overlays', []), 'selection': project.get('selection', {}),
         'needsRebuild': project.get('needsRebuild', []), 'events': project.get('events', [])}

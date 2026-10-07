@@ -1,16 +1,37 @@
 """Build an offline review file or merge exported reviews into a separate ledger copy."""
-import argparse, copy, json
+import argparse, copy, json, re
 from pathlib import Path
+from output_language import resolve_language
 
 CAUSES={"out","net","two_bounces","replay","ace","winner","other"}
-def build(data, target):
+def review_template(language):
+    language=resolve_language(language)
+    root=Path(__file__).parent.parent
+    template=(root/'examples/review-template.html').read_text(encoding='utf-8')
+    if language=='zh-CN': return template
+    translations=json.loads((root/'references/review-en.json').read_text(encoding='utf-8'))
+    # Reorder numbered nouns before translating literals. Never touch DATA,
+    # user notes, protocol enums, localStorage keys or review-state behavior.
+    template=template.replace("'第'+r.gameNumber+'局'", "'Game '+r.gameNumber")
+    template=template.replace("'第'+r.setNumber+'盘 · '", "'Set '+r.setNumber+' · '")
+    def replace(match):
+        value=next((g for g in match.groups() if g), '')
+        if not re.search('[\u3400-\u9fff]',value): return match.group(0)
+        if value not in translations: raise ValueError('Missing English review text: '+value)
+        return match.group(0).replace(value,translations[value])
+    template=re.sub(r"'([^'\n]*)'|\"([^\"\n]*)\"|>([^<>\n]+)<",replace,template)
+    if re.search('[\u3400-\u9fff]',template): raise ValueError('Untranslated review template')
+    return template.replace('lang="zh-CN"','lang="en"')
+
+def build(data, target, language=None):
+    language=resolve_language(language or data.get('outputLanguage'))
     players=data["players"]; ids={p["id"] for p in players}
     if len(players)!=2 or len(ids)!=2: raise ValueError("Exactly two unique player IDs required")
     pids=[r["pointId"] for r in data["rows"]]
     if len(pids)!=len(set(pids)): raise ValueError("Duplicate pointId")
     if any(r.get("serverId") not in ids for r in data["rows"]): raise ValueError("Unknown server")
     if not data.get("source") or not data.get("ledgerRevision"): raise ValueError("Source and revision required")
-    template=(Path(__file__).parent.parent/"examples/review-template.html").read_text(encoding="utf-8")
+    template=review_template(language)
     payload=json.dumps(data,ensure_ascii=False).replace("&","\\u0026").replace("<","\\u003c").replace(">","\\u003e")
     if template.count("__DATA__")!=1: raise ValueError("Template placeholder missing/duplicated")
     Path(target).write_text(template.replace("__DATA__",payload),encoding="utf-8")
@@ -69,11 +90,11 @@ def merge(ledger, review):
 
 if __name__=="__main__":
     p=argparse.ArgumentParser(); sub=p.add_subparsers(dest="command",required=True)
-    b=sub.add_parser("build"); b.add_argument("data"); b.add_argument("output")
+    b=sub.add_parser("build"); b.add_argument("data"); b.add_argument("output"); b.add_argument('--language')
     m=sub.add_parser("merge"); m.add_argument("ledger"); m.add_argument("review"); m.add_argument("output")
     a=p.parse_args()
     def read(path): return json.loads(Path(path).read_text(encoding="utf-8-sig"))
-    if a.command=="build": build(read(a.data),a.output)
+    if a.command=="build": build(read(a.data),a.output,a.language)
     else:
         if Path(a.output).resolve()==Path(a.ledger).resolve(): raise ValueError("Write a new ledger revision, not the original")
         text=Path(a.review).read_text(encoding="utf-8-sig"); review=json.loads(text[text.index("{"):])

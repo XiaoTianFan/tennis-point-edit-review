@@ -1,6 +1,7 @@
 // Render canonical React JSX to full-canvas RGBA PNGs; never operate an editor.
 // Requires react, react-dom, esbuild, playwright in Node's module search path.
 const fs=require('node:fs');
+const {resolveLanguage,defaultProps}=require('./output_language.cjs');
 const path=require('node:path');
 const crypto=require('node:crypto');
 const React=require('react');
@@ -15,12 +16,13 @@ function interpolate(v,xs,ys) {
   for(let i=1;i<xs.length;i++)if(v<=xs[i])return ys[i-1]+(ys[i]-ys[i-1])*(v-xs[i-1])/(xs[i]-xs[i-1]);
   return ys.at(-1);
 }
-function prepare(entry,manifest,canvas,layout) {
+function prepare(entry,manifest,canvas,layout,language="zh-CN") {
+  language=resolveLanguage(entry.outputLanguage??language);
   if(!/^[A-Za-z0-9_-]+$/.test(entry.id))throw new Error('Use a safe unique overlay id');
   const def=manifest.components[entry.component]; if(!def)throw new Error('Unknown component');
   const source=fs.readFileSync(path.join(root,def.codeFile),'utf8').replace(/\r\n/g,'\n');
   if(hash(source)!==def.sha256)throw new Error('Canonical template hash mismatch');
-  const props=Object.fromEntries(def.properties.map(p=>[p.key,p.defaultValue]));
+  const props=defaultProps(def,language);
   for(const [key,value] of Object.entries(entry.props||{})) {
     const property=def.properties.find(p=>p.key===key);
     if(!property)throw new Error('Unknown property: '+key);
@@ -53,7 +55,7 @@ function prepare(entry,manifest,canvas,layout) {
   const Component=new Function('React','useCurrentFrame','interpolate',code+';return Component;')(React,()=>frame,interpolate);
   const markup=renderToStaticMarkup(React.createElement(Component,{item:{props}}));
   const style=`position:absolute;left:${offsetX+placement.left*scale}px;top:${offsetY+placement.top*scale}px;width:${def.naturalSize.width}px;height:${h}px;transform-origin:top left;transform:scale(${placement.width/def.naturalSize.width*scale},${placement.height/h*scale})`;
-  return {html:`<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:transparent;width:100%;height:100%;overflow:hidden}*{animation:none!important}</style></head><body><div id="overlay" style="${style}">${markup}</div></body></html>`,props,placement,naturalHeight:h,frame,
+  return {outputLanguage:language,html:`<!doctype html><html lang="${language}"><head><meta charset="utf-8"><style>html,body{margin:0;background:transparent;width:100%;height:100%;overflow:hidden}*{animation:none!important}</style></head><body><div id="overlay" style="${style}">${markup}</div></body></html>`,props,placement,naturalHeight:h,frame,
     sourceSha256:def.sha256,fade:entry.component==='statsPanel'?{frames:[0,9,props.panelFrames-9,props.panelFrames-1],values:[0,1,1,0]}:null};
 }
 async function render(request,outDir) {
@@ -63,7 +65,7 @@ async function render(request,outDir) {
   const ids=new Set();
   const prepared=request.entries.map(entry=>{
     if(ids.has(entry.id))throw new Error('Duplicate overlay id');ids.add(entry.id);
-    return {entry,data:prepare(entry,manifest,canvas,request.layout)};
+    return {entry,data:prepare(entry,manifest,canvas,request.layout,request.outputLanguage)};
   });
   if(fs.existsSync(outDir))throw new Error('Use a new output directory to preserve render evidence');
   fs.mkdirSync(outDir,{recursive:true});

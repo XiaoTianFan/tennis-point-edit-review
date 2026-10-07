@@ -97,10 +97,10 @@ def frame_image(asset, frame, fps, output):
 
 def render_graphics(project, directory):
     directory = Path(directory)
-    entries = [{k: o[k] for k in ('id', 'component', 'props', 'placement', 'naturalHeight') if k in o} for o in project.get('overlays', [])]
+    entries = [{k: o[k] for k in ('id', 'component', 'props', 'placement', 'naturalHeight', 'outputLanguage') if k in o} for o in project.get('overlays', [])]
     if not entries:
         return project
-    request = {'canvas': {'width': project['width'], 'height': project['height']}, 'layout': 'fit', 'entries': entries}
+    request = {'canvas': {'width': project['width'], 'height': project['height']}, 'layout': 'fit', 'entries': entries, 'outputLanguage': project.get('outputLanguage', 'zh-CN')}
     if project.get('browserChannel'):
         request['browserChannel'] = project['browserChannel']
     template_manifest = (HERE.parent / 'examples/ui-manifest.json').read_bytes()

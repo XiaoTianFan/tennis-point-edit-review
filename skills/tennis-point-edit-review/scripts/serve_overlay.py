@@ -1,18 +1,20 @@
 """Pure timing plan for verified, retained serves; no media or editor writes."""
 import argparse, json, math
 from fractions import Fraction
+from output_language import resolve_language, text
 from pathlib import Path
 
 def fraction(value):
     return Fraction(str(value))
 
-def build_plan(records, fps):
+def build_plan(records, fps, language="zh-CN"):
     """See helper-usage.md. All source timestamps are integer microseconds.
 
     confirmedPostContactUs is visually verified outgoing-ball evidence, NOT a
     fitted launch time. The caller supplies the current source-to-edit mapping.
     Nonlinear time remaps must be split into constant-rate spans beforehand.
     """
+    language=resolve_language(language)
     fps=fraction(fps)
     if fps<=0:raise ValueError('fps must be positive')
     limit=math.floor(3*fps)
@@ -48,7 +50,7 @@ def build_plan(records, fps):
                 caps.append(r[field])
         end=min(caps)
         if end<=start:raise ValueError('No visible frame remains after outgoing evidence')
-        label='一发' if r['serveNumber']==1 else '二发'
+        label=text('一发' if r['serveNumber']==1 else '二发',language)
         states=[dict(startFrame=c['startFrame'],endFrame=end,label=label)]
         fault_after_window=False
         if 'doubleFaultConfirmedUs' in r:
@@ -58,7 +60,7 @@ def build_plan(records, fps):
             fault_frame=c['startFrame']+math.floor(Fraction(fault-c['sourceInUs'],1000000)*fps/rate)+1
             if fault_frame<end:
                 states[0]['endFrame']=fault_frame
-                states.append(dict(startFrame=fault_frame,endFrame=end,label='二发 · 双误'))
+                states.append(dict(startFrame=fault_frame,endFrame=end,label=text('二发 · 双误',language)))
             else:fault_after_window=True
         if 'letConfirmedUs' in r:
             confirmed=r['letConfirmedUs']
@@ -67,15 +69,15 @@ def build_plan(records, fps):
             let_frame=c['startFrame']+math.floor(Fraction(confirmed-c['sourceInUs'],1000000)*fps/rate)+1
             if let_frame<end:
                 states[0]['endFrame']=let_frame
-                states.append(dict(startFrame=let_frame,endFrame=end,label=label+' · 擦网'))
+                states.append(dict(startFrame=let_frame,endFrame=end,label=text('一发 · 擦网' if r['serveNumber']==1 else '二发 · 擦网',language)))
             else:fault_after_window=True
         out.append(dict(setNumber=r['setNumber'],pointId=r['pointId'],serveId=r['serveId'],startFrame=start,endFrame=end,durationFrames=end-start,
                         labelStartFrame=c['startFrame'],labelEndFrame=end,labelStates=states,outcomeAfterOverlayWindow=fault_after_window,
-                        qualifier='补估' if method=='model_imputed' else '约',speed=str(math.floor(speed+.5)),unit='km/h',statsIncluded=r['statsIncluded']))
+                        qualifier=text('补估' if method=='model_imputed' else '约',language),speed=str(math.floor(speed+.5)),unit='km/h',statsIncluded=r['statsIncluded']))
     return out
 
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('input');p.add_argument('output');a=p.parse_args()
     d=json.loads(Path(a.input).read_text(encoding='utf-8-sig'))
-    Path(a.output).write_text(json.dumps(build_plan(d['records'],d['fps']),ensure_ascii=False,indent=2),encoding='utf8')
+    Path(a.output).write_text(json.dumps(build_plan(d['records'],d['fps'],d.get('outputLanguage','zh-CN')),ensure_ascii=False,indent=2),encoding='utf8')
 

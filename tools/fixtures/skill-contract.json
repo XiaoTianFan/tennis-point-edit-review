@@ -735,7 +735,7 @@
     },
     {
       "path": "scripts/review_io.py",
-      "sha256": "9aafa778a25dc72454447ce4df6aaadac0c4b5384afda16b60c5e28b66b348b5"
+      "sha256": "da30babfa1507d40b271e5806f60e62437a6a427dadc88efe53ab12466269e3d"
     },
     {
       "path": "scripts/score_audit.py",
@@ -829,6 +829,24 @@
     },
     {
       "path": "references/source-inspection.md"
+    },
+    {
+      "path": "references/output-language.md"
+    },
+    {
+      "path": "references/output-en.json"
+    },
+    {
+      "path": "references/review-en.json"
+    },
+    {
+      "path": "scripts/output_language.py"
+    },
+    {
+      "path": "scripts/output_language.cjs"
+    },
+    {
+      "path": "scripts/check_output_language.py"
     }
   ]
 }

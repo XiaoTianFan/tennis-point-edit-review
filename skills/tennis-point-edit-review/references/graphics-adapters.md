@@ -1,5 +1,7 @@
 # 图形层与编辑层分别选择
 
+语言选择与英文术语遵循[产物语言](output-language.md)；全部可见文案按用户主要交互语言生成，明确指定的渲染语言优先。
+
 正式视觉语言仍来自[清单](../examples/ui-manifest.json)与[七个模板](visual-templates.md)；网球逻辑不绑定React、Remotion、MOGRT或某个agent。转换的是表现格式，不是计分、统计、发次或复核语义。
 
 | 实现 | 适合 | 可编辑性与验收 |

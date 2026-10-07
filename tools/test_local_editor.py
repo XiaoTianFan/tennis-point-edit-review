@@ -14,9 +14,20 @@ from pathlib import Path
 
 SCRIPTS = Path(__file__).resolve().parents[1] / 'skills/tennis-point-edit-review/scripts'
 sys.path.insert(0, str(SCRIPTS))
-from local_model import SCHEMA, Store, Conflict, write, validate, layout, review_payload, overlay_range
+from local_model import SCHEMA, Store, Conflict, write, validate, layout, review_payload, overlay_range, context
 from local_editor import make_server, initialize
 from local_media import export_video, export_settings, prepare_media, probe, run, source_settings
+
+
+class OutputLanguageTests(unittest.TestCase):
+    def test_saved_language_is_available_on_resume(self):
+        with tempfile.TemporaryDirectory() as d:
+            project=sample(d)
+            project['outputLanguage']='en-US'
+            validate(project)
+            self.assertEqual(context(project)['outputLanguage'],'en')
+            project['outputLanguage']='fr'
+            with self.assertRaises(ValueError): validate(project)
 
 
 def sample(directory):

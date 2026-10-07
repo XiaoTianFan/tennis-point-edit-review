@@ -2,9 +2,11 @@
 // Execute the generated .jsx in a compatible After Effects host, then qualify in Pr.
 // Usage: node make_mogrt.cjs new-output-directory [PostScript-font-name]
 const fs=require('node:fs');
+const {resolveLanguage,defaultProps}=require('./output_language.cjs');
 const path=require('node:path');
 const crypto=require('node:crypto');
-function build(outDir,font='MicrosoftYaHei') {
+function build(outDir,font='MicrosoftYaHei',language='zh-CN') {
+  language=resolveLanguage(language);
   const root=path.resolve(__dirname,'..');
   const mf=JSON.parse(fs.readFileSync(path.join(root,'examples/ui-manifest.json'),'utf8'));
   const components=['scoreboard','serveLabel','serveSpeed','reviewId','reviewLabel'];
@@ -12,7 +14,7 @@ function build(outDir,font='MicrosoftYaHei') {
     const d=mf.components[name];
     const actual=crypto.createHash('sha256').update(fs.readFileSync(path.join(root,d.codeFile),'utf8').replace(/\r\n/g,'\n')).digest('hex');
     if(actual!==d.sha256)throw new Error('Canonical source hash mismatch');
-    return [name,{size:d.naturalSize,props:Object.fromEntries(d.properties.map(p=>[p.key,p.defaultValue])),sha256:d.sha256}];
+    return [name,{size:d.naturalSize,props:defaultProps(d,language),sha256:d.sha256}];
   }));
   const config={outDir:path.resolve(outDir).replace(/\\/g,'/'),font,version:mf.version,specs};
   const literal=JSON.stringify(config).replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029');
@@ -101,17 +103,17 @@ function build(outDir,font='MicrosoftYaHei') {
   if(!result.open("w"))throw new Error("Cannot save generation log");result.write(report.join("\\n"));result.close();
 })();
 `;
-  return {source,manifest:{schema:'tennis-native-adapter/v1',templateVersion:mf.version,font,
+  return {source,manifest:{schema:'tennis-native-adapter/v1',outputLanguage:language,templateVersion:mf.version,font,
     components:specs,propertyMap:{scoreboard:['rule','gamesLabel','pointsLabel','nameA','nameB','gamesA','gamesB','pointsA','pointsB','serverAOpacity','serverBOpacity'],serveLabel:['label'],serveSpeed:['qualifier','speed','unit'],reviewId:['reviewId','separator','pointId'],reviewLabel:['phaseLabel','serverText','serveLabel']},
     qualification:'authoring_script_only; AE execution and Premiere property/render tests required',
     note:'Native approximation of canonical layout; validate typography and bounds. Natural duration 120s; set and read back every instance duration.'}};
 }
 module.exports={build};
 if(require.main===module) {
-  const [output,font]=process.argv.slice(2);
+  const [output,font,language]=process.argv.slice(2);
   if(!output)throw new Error('Usage: node make_mogrt.cjs new-output-directory [PostScript-font-name]');
   if(fs.existsSync(output))throw new Error('Use a new output directory; existing authoring work is protected');
-  const result=build(output,font);fs.mkdirSync(output,{recursive:true});
+  const result=build(output,font,language);fs.mkdirSync(output,{recursive:true});
   fs.writeFileSync(path.join(output,'build-native.jsx'),result.source);
   fs.writeFileSync(path.join(output,'native-manifest.json'),JSON.stringify(result.manifest,null,2));
   console.log('Created an AE authoring script; no MOGRT has been generated or tested yet.');

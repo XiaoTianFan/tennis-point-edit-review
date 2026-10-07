@@ -10,6 +10,21 @@ const {prepare}=require('../skills/tennis-point-edit-review/scripts/render_overl
 const mf=require('../skills/tennis-point-edit-review/examples/ui-manifest.json');
 const canvas={width:1920,height:1080};
 
+test('English adapters localize all defaults and retain explicit names and language overrides',()=>{
+  for(const component of Object.keys(mf.components)) {
+    const en=prepare({id:component,component},mf,canvas,undefined,'en');
+    assert.doesNotMatch(JSON.stringify(en.props),/[\u3400-\u9fff]/);
+    assert.match(en.html,/<html lang="en">/);
+    assert.equal(en.sourceSha256,mf.components[component].sha256);
+  }
+  const explicit=prepare({id:'override',component:'scoreboard',outputLanguage:'zh-CN',props:{nameA:'Custom Name'}},mf,canvas,undefined,'en');
+  assert.equal(explicit.props.nameA,'Custom Name');assert.equal(explicit.props.gamesLabel,'局');
+  const native=build('synthetic-output','Arial','en');
+  assert.equal(native.manifest.outputLanguage,'en');
+  assert.equal(native.manifest.components.serveLabel.props.label,'1st serve');
+  assert.throws(()=>prepare({id:'bad',component:'scoreboard'},mf,canvas,undefined,'fr'),/Unsupported/);
+});
+
 async function server(mode,run) {
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'tennis-mcp-test-'));
   const filename=path.join(dir,'server.cjs'),log=path.join(dir,'calls.txt');
