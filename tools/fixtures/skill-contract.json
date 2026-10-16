@@ -613,6 +613,33 @@
       "id": "R046",
       "path": "references/initial-labeling.md",
       "text": "Both ledger and export must match purpose, source\nand revision."
+    },
+    {
+      "id": "R047",
+      "path": "references/inputs-and-rules.md",
+      "text": "用户已剪时间线/成片必问（已答沿用）"
+    },
+    {
+      "id": "R048",
+      "path": "references/adjudication.md",
+      "text": "不能据此直接合并P号或判发次"
+    },
+    {
+      "id": "R049",
+      "checks": [
+        {
+          "path": "SKILL.md",
+          "text": "阶段2交付、统计前告知"
+        },
+        {
+          "path": "references/statistics.md",
+          "text": "仅缺let未必影响发次"
+        },
+        {
+          "path": "references/statistics.md",
+          "text": "可见发球最高初速·估算"
+        }
+      ]
     }
   ],
   "files": [

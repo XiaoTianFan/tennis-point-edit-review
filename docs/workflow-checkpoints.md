@@ -50,6 +50,14 @@ diff and the scenarios below when reorganizing instructions.
 
 ## Scenario review
 
+For supplied timeline/rendered edits, ask whether first faults and first/second
+service lets were retained and whether originals are accessible. Same server and
+service half only suggest a continued point. Missing faults without recoverable
+evidence require a stage-2 disclosure before statistics and visible-sample or
+unavailable panel labels; missing lets alone need not invalidate serve identity.
+Do not relabel the first visible attempt as a first serve or fabricate zeros.
+
+
 For initial labeling, verify both working modes and all entry paths. Raw-point
 cuts, existing timelines and rendered partitions must expose usable review before
 agent outcome recognition. Default agent work must not become a full human

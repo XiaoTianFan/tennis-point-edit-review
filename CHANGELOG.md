@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026.10.16-v24.1
+
+- Ask about retained first-serve faults and service lets for supplied edits, distinguish repeated attempts from new points, and disclose unavailable serve statistics before statistical analysis. Use explicit visible-sample panel labels when evidence is incomplete; preserve runtime code and JSX templates.
+
+
 ## 2026.10.16-v24
 
 - Add rendered-video seam scanning with full-frame metrics, reproducible source/configuration identity, guarded boundary decisions and full-coverage local edit plans.

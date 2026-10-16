@@ -1,9 +1,8 @@
 # Rendered edits: reconstruct clip seams
 
-Use this branch when the user supplies an edited, rendered file without an
-accessible clip timeline. Preserve that edit and its audio. A raw continuous
-match still uses visual point cutting; this detector does not locate tennis
-points in unedited footage or infer winners, serves, games or statistics.
+For an edited render without a clip timeline, preserve its edit and audio.
+Raw matches still require visual point cutting; this detector infers no tennis
+points, winners, serves, games or statistics.
 
 ## Scan and reconstruct
 
@@ -27,11 +26,10 @@ verify CFR timing and import/read back in Pr. For ChatCut, use available host to
 to place the mapped ranges and read them back. A JSON plan alone is not an
 imported or verified host timeline. Do not switch the user's requested editor.
 
-Before any outcome recognition, run the [initial labeling preparer](initial-labeling.md)
-on the generated plan. If grouping is unverified, use `--provisional-points` to
-expose candidate segments immediately; manual users can note needed merges/splits.
-Agent-dominant remains the default. Human-first hands over this surface and waits.
-Do not describe a rough partition as completed stage-1 point cutting.
+Prepare [initial labeling](initial-labeling.md) before outcome recognition;
+use `--provisional-points` for unverified groups. Rough segmentation does not
+complete stage 1. Check [retained serve attempts](inputs-and-rules.md#核实当前输入)
+and [statistics limits](statistics.md#已剪素材的发球证据限制) for supplied edits.
 
 ## Detector and evidence
 
@@ -84,9 +82,8 @@ set `status: "reviewed"` only after actual inspection. `scanId` and
 corrections; never overwrite a published review or its drafts. Preserve full
 coverage and original audio until explicit exclusions are justified.
 
-An accepted seam is an edit boundary, not proof of a new scoring point. Several
-clips may belong to one point (first/second serve, let, replay); a clip may contain
-multiple points or non-match material. Group or split from actual context and
-retain lineage before adopting stable P numbers. No score or statistics are
-invented from clip count. Missing first serves, endings or original speed remain
-missing evidence. Qualification on the user's real footage is a separate gate.
+Seams are not points: several clips may share a point (fault/let/replay), and
+one clip may contain several points or non-match material. Group/split from
+context, preserve lineage and adopt stable P IDs; never derive score/statistics
+from clip count. Missing attempts, endings and original speed remain evidence
+gaps. Real-footage qualification is separate.
