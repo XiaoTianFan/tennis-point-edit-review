@@ -50,6 +50,14 @@ diff and the scenarios below when reorganizing instructions.
 
 ## Scenario review
 
+Rendered-video seam reconstruction is an exception to the raw-footage detector
+boundary: it proposes existing edit seams, never tennis point identities. Verify
+full-frame decoding, source/decision identity, half-open full coverage, zero-hit
+behavior, fractional rates and source/proxy residuals. Adjacent flashes and short
+clips must remain inspectable; motion, invisible cuts and dissolves still require
+visual inspection, including non-hit spans. `check_seams.py` uses synthetic media;
+passing it does not qualify the user's eventual footage or editor import.
+
 These are documentation walk-throughs, not a live-editor or model reliability
 benchmark. Use them for a future fresh-agent evaluation without supplying the
 expected behavior to that agent.
