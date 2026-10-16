@@ -20,6 +20,14 @@ illustration. No match footage, player identities or measured serve speeds are i
 - Estimates launch speed for every included serve, then adds post-contact speed labels.
 - Reuses the navy/lime scoreboard, review labels, notes and statistics templates.
 
+Rendered edits without a source timeline can use [deterministic seam reconstruction](skills/tennis-point-edit-review/references/rendered-video.md)
+to propose editable clip ranges while preserving every frame. Cut detection is
+separate from tennis point recognition; invisible edits and ambiguous transitions
+still require inspection. Before outcome recognition, the skill prepares an
+[initial labeling surface](skills/tennis-point-edit-review/references/initial-labeling.md).
+The default is agent-dominant work; human-first mode lets you start manually in
+offline HTML or the local workbench and hand back complete or partial answers.
+
 The workflow resumes from the current stage and defaults to stage checkpoints,
 with inspected deliverables, the current/next stage, and a question asking whether to proceed.
 When stage 2 needs human review, continue through stage 3 and deliver its verified
@@ -29,10 +37,10 @@ still apply. Stage 1 delivers the complete point-cut timeline and keeps its ledg
 as an internal log. Stage 2 performs point adjudication, scoring and basic graphics.
 Stages 3–4 repeat review and recalculation as needed. Stage 5 prepares all statistics,
 speeds and timing; stage 6 builds panels and speed overlays together; stage 7 verifies
-the result. Review covers unresolved points or problem games that still disagree
+the result. Later exception review covers unresolved points or problem games that still disagree
 with the supplied final score after the agent's own checks.
 
-Current skill revision: **2026.10.08-v23.9**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, optional 3D fitting, quality checks and fallbacks.
+Current skill revision: **2026.10.16-v24**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, optional 3D fitting, quality checks and fallbacks.
 
 ChatCut, **Premiere Pro** and a standalone pipeline are primary editing choices.
 The [environment contract](skills/tennis-point-edit-review/references/editing-environments.md)

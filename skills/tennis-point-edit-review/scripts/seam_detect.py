@@ -18,7 +18,8 @@ import time
 from media_probe import identity, metadata, assess_timestamps
 from local_model import read, write
 
-DEFAULTS = dict(width=320, sceneThreshold=8.0, differenceFloor=2.0,
+DETECTOR = 'rgb-adaptive-v1'
+DEFAULTS = dict(width=320, sceneThreshold=8.0, differenceFloor=0.5,
                 adaptiveRatio=3.0, madMultiplier=6.0, windowFrames=30)
 
 
@@ -95,6 +96,7 @@ def analyze(rows, config, video):
 
 
 def scan(source, directory, config=None):
+    start = time.monotonic()
     config = settings(config)
     directory = Path(directory).resolve()
     if directory.exists():
@@ -107,23 +109,24 @@ def scan(source, directory, config=None):
     version = subprocess.check_output(['ffmpeg', '-version'], text=True, encoding='utf-8').splitlines()[0]
     directory.mkdir(parents=True)
     # Relative filter output path avoids FFmpeg filter escaping of Windows paths.
-    graph = (f"scale={config['width']}:-2:flags=area,format=yuv420p,settb=AVTB,"
+    graph = (f"scale={config['width']}:-2:flags=area,format=rgb24,settb=AVTB,"
              'scdet,metadata=mode=print:file=metrics.txt')
     command = ['ffmpeg', '-hide_banner', '-v', 'error', '-nostdin', '-xerror',
                '-err_detect', 'explode', '-copyts', '-i', source['path'], '-map', '0:v:0',
                '-an', '-sn', '-dn', '-vf', graph, '-fps_mode', 'passthrough', '-f', 'null', '-']
-    start = time.monotonic()
     # Logs and per-frame metrics survive failed/interrupted runs. Only scan.json
     # marks success. Decode at all timestamps, without keyframe-only seeking.
     with (directory / 'decode.log').open('w', encoding='utf-8') as errors:
         subprocess.run(command, cwd=directory, stdout=subprocess.DEVNULL, stderr=errors, check=True)
     pts, candidates, timing = analyze(metric_rows(directory / 'metrics.txt'), config, video)
+    if str(video.get('nb_frames', '')).isdigit() and int(video['nb_frames']) != len(pts):
+        raise ValueError('Decoded frame count differs from container count; diagnose before publishing a scan')
     if identity(source['path']) != source:
         raise ValueError('Source changed during scan')
-    fingerprint = hashlib.sha256(json.dumps([source['sha256'], config, version], sort_keys=True).encode()).hexdigest()
-    report = dict(schema='tennis-seams/v1', scanId=fingerprint, source=source,
+    fingerprint = hashlib.sha256(json.dumps([DETECTOR, source['sha256'], config, version], sort_keys=True).encode()).hexdigest()
+    report = dict(schema='tennis-seams/v1', detector=DETECTOR, scanId=fingerprint, source=source,
                   settings=config, ffmpegVersion=version, frameCount=len(pts), firstPtsUs=pts[0],
-                  lastPtsUs=pts[-1], timing=timing, candidates=candidates,
+                  lastPtsUs=pts[-1], timestampsSha256=hashlib.sha256(json.dumps(pts,separators=(',',':')).encode()).hexdigest(), timing=timing, candidates=candidates,
                   coverage='every decoded video frame; visual/tennis review not performed',
                   coordinate='zero-based decoded display frame; seam is first frame of next clip',
                   limitations=['Invisible edits cannot be recovered from rendered pixels.',
@@ -134,7 +137,9 @@ def scan(source, directory, config=None):
     write(directory / 'decisions.json', dict(schema='tennis-seam-decisions/v1', scanId=fingerprint,
           sourceSha256=source['sha256'], boundaryFrames=[c['frame'] for c in candidates],
           status='proposed', note='Edit boundaryFrames to reject, move or add seams; then set status=reviewed.'))
-    write(directory / 'runtime.json', dict(elapsedSeconds=round(time.monotonic()-start, 3)))
+    elapsed = time.monotonic()-start
+    write(directory / 'runtime.json', dict(elapsedSeconds=round(elapsed, 3), decodedFrames=len(pts),
+                                          framesPerSecond=round(len(pts)/elapsed, 2)))
     write(directory / 'scan.json', report)
     return report
 
@@ -170,7 +175,8 @@ def make_plan(scan_path, media_path, decisions=None, players=None, language='en'
     if original != report['source']:
         raise ValueError('Proxy original does not match scanned source; rescan after moving/changing source')
     pts = read(scan_path.with_name('timestamps.json'))
-    if len(pts) != report['frameCount'] or pts[0] != report['firstPtsUs'] or pts[-1] != report['lastPtsUs']:
+    if (len(pts) != report['frameCount'] or pts[0] != report['firstPtsUs'] or pts[-1] != report['lastPtsUs']
+            or hashlib.sha256(json.dumps(pts,separators=(',',':')).encode()).hexdigest() != report['timestampsSha256']):
         raise ValueError('Timestamp mapping does not match scan')
     source_clips = partition(report, decisions)
     fps = Fraction(media['fps'])
@@ -179,8 +185,8 @@ def make_plan(scan_path, media_path, decisions=None, players=None, language='en'
         a, b = clip['inFrame'], clip['outFrame']
         # Nearest CFR boundary, with explicit residual; original display frames
         # and PTS remain authoritative. No keyframe copy or seconds accumulation.
-        first = round(Fraction(pts[a] - pts[0], 1000000) * fps)
-        last = media['frames'] if b == len(pts) else round(Fraction(pts[b] - pts[0], 1000000) * fps)
+        first = int(Fraction(pts[a] - pts[0], 1000000) * fps + Fraction(1,2))
+        last = media['frames'] if b == len(pts) else int(Fraction(pts[b] - pts[0], 1000000) * fps + Fraction(1,2))
         if not 0 <= first < last <= media['frames']:
             raise ValueError('Proxy collapses source seams; use a higher verified CFR rate or native editor')
         clips.append(dict(id=clip['id'], assetId='rendered', inFrame=first, outFrame=last,

@@ -42,6 +42,21 @@ export class Review {
       card.append(head, el("span", "", { class: "row-status" }));
       card.append(el("div", "", { class: "point-meta" }), el("p", r.reason ?? "", { class: "point-reason" }));
       const inputs = [];
+      const labels = [];
+      if (this.p.review.purpose === 'initial-labeling') {
+        const group = el('div', null, {class:'review-checks'});
+        for (const field of ['serverId','serveNumber','gameNumber','setNumber']) {
+          const lab = el('label'), title = el('span', t(field));
+          const input = el(field === 'serverId' || field === 'serveNumber' ? 'select' : 'input', null, {'aria-label':r.pointId+' '+t(field)});
+          if (input.tagName === 'SELECT') {
+            input.append(el('option', t('unassigned'), {value:''}));
+            for (const [id,name] of field === 'serverId' ? this.p.players.map(p=>[p.id,p.name]) : [[1,'1'],[2,'2']]) input.append(el('option', name, {value:id}));
+          } else { input.type='number'; input.min='1'; input.step='1'; input.style.width='5em'; }
+          input.onchange = () => { if (!input.checkValidity()) { input.reportValidity(); return; } this.changed(r, field, input.value === '' ? null : field === 'serverId' ? input.value : Number(input.value)); };
+          lab.append(title,input); group.append(lab); labels.push({field,input,title});
+        }
+        card.append(group);
+      }
       for (const [field, choices] of [["scoringPlayerId", [...this.p.players.map((p) => [p.id, p.name]), ["undetermined", t("uncertain")]]], ["deadBallType", causes]]) {
         const group = el("fieldset", null, { class: "choices " + (field === "deadBallType" ? "causes" : "winners") });
         group.append(el("legend", t(field === "deadBallType" ? "deadBall" : "winner")));
@@ -76,16 +91,21 @@ export class Review {
         if (note.value !== this.savedNotes?.[r.pointId]) this.changed(r, "note", note.value);
       };
       card.append(note);
-      this.nodes.set(r.pointId, { card, inputs, note });
+      this.nodes.set(r.pointId, { card, inputs, note, labels });
       $("review-list").append(card);
     }
   }
   localize() {
+    document.querySelector('[data-i18n="review"]').textContent = t(this.p.review.purpose === 'initial-labeling' ? 'initialLabeling' : 'review');
     for (const r of this.p.review.rows) {
-      const n = this.nodes.get(r.pointId), server = this.p.players.find(p => p.id === r.serverId)?.name ?? r.serverId;
+      const n = this.nodes.get(r.pointId), x = answer(this.p,r), sid = this.p.review.purpose === 'initial-labeling' ? x.serverId : r.serverId, server = this.p.players.find(p => p.id === sid)?.name ?? t('unassigned');
       n.card.querySelector('.point-heading').setAttribute('aria-label', t('jump', {point: r.pointId}));
       n.card.setAttribute('aria-label', t('jump', {point: r.pointId}));
-      n.card.querySelector('.point-meta').textContent = t('pointMeta', {set: r.setNumber ?? 1, game: r.gameNumber ?? '?', server, serve: (r.serveNumbers ?? [r.serveNumber ?? '?']).join(' → ')});
+      n.card.querySelector('.point-meta').textContent = t('pointMeta', {set: x.setNumber ?? r.setNumber ?? '?', game: x.gameNumber ?? r.gameNumber ?? '?', server, serve: (r.serveNumbers ?? [x.serveNumber ?? r.serveNumber ?? '?']).join(' → ')});
+      for (const {field,input,title} of n.labels) {
+        title.textContent=t(field); input.setAttribute('aria-label',r.pointId+' '+t(field));
+        if (input.tagName==='SELECT') input.options[0].textContent=t('unassigned');
+      }
       n.card.querySelector('.winners legend').textContent = t('winner');
       n.card.querySelector('.causes legend').textContent = t('deadBall');
       for (const {input, field, value, lab} of n.inputs) {
@@ -119,15 +139,18 @@ export class Review {
     this.savedNotes = {};
     for (const r of this.p.review.rows) {
       const x = answer(this.p, r), n = this.nodes.get(r.pointId), s = reviewStatus(r, x);
+      const sid = this.p.review.purpose === 'initial-labeling' ? x.serverId : r.serverId;
       this.savedNotes[r.pointId] = x.note;
       n.card.dataset.status = s;
       for (const { input, field, value } of n.inputs) {
         input.checked = value ? value === "undetermined" ? x.winnerUndetermined : x[field] === value : !!x[field];
-        input.disabled = x.deadBallType === "replay" && ["scoringPlayerId", "doubleFaultConfirmed", "extra"].includes(field);
+        input.disabled = x.deadBallType === "replay" && ["scoringPlayerId", "doubleFaultConfirmed", "extra"].includes(field) || !sid && (field === 'doubleFaultConfirmed' || field === 'deadBallType' && value === 'ace');
       }
+      for (const {field,input} of n.labels) if (document.activeElement !== input) input.value=x[field] ?? '';
       if (document.activeElement !== n.note) n.note.value = x.note;
     }
     this.progress();
+    this.localize();
     this.search();
   }
   highlight(pid) {

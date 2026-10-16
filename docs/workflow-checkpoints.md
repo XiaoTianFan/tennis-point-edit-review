@@ -41,7 +41,7 @@ clause to its owner first. Keep technical compatibility boundaries, review-state
 semantics and all seven canonical JSX templates. A local section link must resolve;
 useful cross-references may be reciprocal, but whole-file self-links add no route.
 
-The 42 workflow contract IDs remain stable. A relocated rule may have multiple
+Existing workflow contract IDs remain stable; new capability contracts extend them. A relocated rule may have multiple
 `checks`, each naming its current file and a required clause; all must pass.
 This preserves obligations without requiring the removed summary paragraph to
 survive verbatim. Existing single-text rules remain supported. These checks guard
@@ -50,12 +50,23 @@ diff and the scenarios below when reorganizing instructions.
 
 ## Scenario review
 
+For initial labeling, verify both working modes and all entry paths. Raw-point
+cuts, existing timelines and rendered partitions must expose usable review before
+agent outcome recognition. Default agent work must not become a full human
+review requirement. Human-first waits for user answers; partial handoff resumes
+from current state. Full initial rows and later exception subsets keep separate
+purpose/revision/draft identities. Validate unknown metadata, server-dependent
+ACE/double-fault safeguards, grouped clip evidence, save/reload/export, stale
+revision rejection and preservation of confirmed answers. `tools/test_initial_review.py`
+and local model tests exercise the helpers; browser interaction remains a
+separate acceptance check.
+
 Rendered-video seam reconstruction is an exception to the raw-footage detector
 boundary: it proposes existing edit seams, never tennis point identities. Verify
 full-frame decoding, source/decision identity, half-open full coverage, zero-hit
 behavior, fractional rates and source/proxy residuals. Adjacent flashes and short
 clips must remain inspectable; motion, invisible cuts and dissolves still require
-visual inspection, including non-hit spans. `check_seams.py` uses synthetic media;
+visual inspection, including non-hit spans. `tools/test_seams.py` uses synthetic media;
 passing it does not qualify the user's eventual footage or editor import.
 
 These are documentation walk-throughs, not a live-editor or model reliability
@@ -64,11 +75,11 @@ expected behavior to that agent.
 
 | Starting request or condition | Expected behavior |
 |---|---|
-| Raw footage, no execution preference | Stage 1 cuts every point from serve to dead ball with required reactions and places it on a playable timeline. Keep the ledger internal; scoring starts in stage 2. |
+| Raw footage, no execution preference | Stage 1 cuts every point from serve to dead ball with required reactions and places it on a playable timeline. Keep the ledger internal and prepare the initial review surface before outcome recognition; scoring starts in stage 2. |
 | Stage 1 needs serve order or point grouping to cut correctly | Make those event judgments now, save their evidence and reuse/check them in stage 2. Stage boundaries govern delivery, not permission to reason about needed events. |
 | Players have stopped, but the ending event is unclear | Trace the same ball backward to the first ending event; locate it from source frames before setting the cut. Stage 2 completes cause/winner adjudication; only gaps remaining after source checks enter review. |
 | Suitable source frames already exist | Reuse frames with adequate source/time identity, clarity and density; crop/rearrange them as needed. Extract more only for missing context or detail. |
-| Choosing an analysis method | Use agent visual inspection of source context to identify events. Extraction/crops support viewing; detection/tracking only helps investigate a specific uncertainty. Do not build or rely on whole-match automatic boundary detection. Existing calculation and rendering helpers retain their roles. |
+| Choosing an analysis method | Use agent visual inspection of source context to identify events. Extraction/crops support viewing; detection/tracking only helps investigate a specific uncertainty. Do not build or rely on automatic tennis point detection across raw footage; rendered edit seams use their separate candidate workflow. Existing calculation and rendering helpers retain their roles. |
 | A match-specific helper seems useful | Keep necessary temporary scripts in the task workspace. Match execution does not authorize skill changes; adding a tool to the skill requires an explicit user request and demonstrated utility. |
 | Already cut points and a known final score | Check cuts and internal mappings, then reuse the timeline for agent-owned point adjudication, scoring and basic graphics in stage 2. |
 | A few clipped endings or uncertain serves | Inspect source gaps and continuous context; adopt clear decisions. Only unresolved material questions and necessary related points enter review. |

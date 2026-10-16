@@ -1,6 +1,6 @@
 ---
 name: tennis-point-edit-review
-description: 分阶段完成网球单打逐分精剪、计分、必要复核、全量发球初速估算与五页技术统计；可从原片开始或接续已有时间线、复核及统计，支持ChatCut、Premiere Pro和本地工作台，默认复用深蓝青柠模板。 English/Chinese tennis point editing, scoreboards, serve labels, statistics and review HTML; output follows the user language unless explicitly overridden.
+description: 分阶段完成网球单打逐分精剪、计分、必要复核、全量发球初速估算与五页技术统计；支持原片、已有时间线或渲染成片剪口重建，以及agent主导或人工先行标注。支持ChatCut、Premiere Pro和本地工作台，复用深蓝青柠模板。 English/Chinese tennis editing, rendered cut reconstruction and early collaborative review; output follows the user language unless overridden.
 ---
 
 # 网球逐分精剪、计分与复核
@@ -9,9 +9,10 @@ description: 分阶段完成网球单打逐分精剪、计分、必要复核、�
 
 ## 工作原则：主动完成本阶段，再交付检查点
 
-包版本 **2026.10.08-v23.9**。网球剪辑任务即使用户未手动点选本技能，也应按任务类型检索并加载；未另指定UI技能/模板/风格时，直接复用本包正式模板，禁止随机重设计。优先级为用户当前明确要求、项目已确认风格、本包默认。
+包版本 **2026.10.16-v24**。网球剪辑任务即使用户未手动点选本技能，也应按任务类型检索并加载；未另指定UI技能/模板/风格时，直接复用本包正式模板，禁止随机重设计。优先级为用户当前明确要求、项目已确认风格、本包默认。
 
 - **从实际进度接续。** 先检查用户目标、已有工程和确认记录，选择尚未完成的阶段；复用已完成成果，不重做前序。首次回复通常用2–4句说明从当前起点到成片的流程、本轮产物与下一步；明确要求一口气完成、跳过介绍或上下文已表明熟悉本技能时可省略。继续、修正、回填不重复介绍。具体见[首次引导](references/onboarding.md)。
+- **两种协作模式，判分前先备好复核界面。** 默认`agent-dominant`，agent继续承担逐分判读与补查；用户明确希望先自行标注时用`human-first`，交付可操作界面后等待其答案或切回指令。阶段1剪辑完成、已有时间线接续或成片粗分段后，在agent首次判赢家之前按[首次标注与协作](references/initial-labeling.md)准备全范围交互HTML或工作台复核区；未知字段留空，不预填虚构球果，不要求默认模式的用户填完整场。此为阶段1交付的一部分，不新增例行批准点。后续阶段3仍是必要疑点子集，两种页面分别保留版本与草稿。
 - **默认按阶段分轮交付。** 每阶段完成实质工作和自检后，明确当前阶段编号/名称、完成范围与剩余问题，说明下一阶段编号/名称及动作，并询问是否继续，等答复后推进；**阶段2有复核需求时直接完成阶段3的复核时间线与HTML，一并交付后等待用户复核**，中间不询问是否继续。其余阶段及返工沿用分轮交付，最终阶段明确全流程完成。分批仅用于阶段内执行与进度汇报；无真实阻塞时须持续完成本阶段全范围及自检，不能因批次或样例成功收工。用户明确要求“一口气完成／连续执行，只在必要时问我”时免逐阶段询问，仍报告当前与下一阶段、读细则并自检。熟悉技能、说“直接开始”只省介绍，不自动等于连续模式。
 - **所有阶段共用完成门槛：完整覆盖＋规定产物＋必需自检。** 开始前读该阶段细则，收尾前按内部清单逐项核对；任一项仍可执行却未完成，就继续本阶段，不以计划、疑点列表或局部样例收工，也不等用户提醒补交规定产物。阶段接续只确认是否继续，不让用户重审既定流程、样式或清晰球。续轮从保存的[阶段记录](references/workflow.md#阶段记录与接续)开始；不靠记忆越过细则。
 - **以agent视觉判读为主，补查由agent负责。** 根据原片画面与连续上下文判断分界、得分方、发球方、发次及技术事件；连续原片不开发或依赖自动查找整场各分的工具。已剪辑但仅有渲染成片时，用[成片剪口重建](references/rendered-video.md)确定性扫描已有剪口候选，不能将剪口当作真实分界或计分证据。抽帧与裁切辅助观察，检测/追踪仅辅助核验具体疑点，见[原片检查](references/source-inspection.md)。证据足够就采用并记录依据。未检查属于待办；查过仍缺关键证据才是未知。先扩大原片、看连续帧和邻接上下文，再把仍影响结果的具体疑点交用户。未知只阻塞依赖它的结论，其他工作继续；不得为显得完成而猜数。
@@ -28,7 +29,7 @@ description: 分阶段完成网球单打逐分精剪、计分、必要复核、�
 | 剪辑段 clip | 编辑器中的片段；一分可含多个片段，一发、二发、擦网不各算一分 |
 | 内部账本 / P编号 | agent工作log，记录全部候选与真实分的稳定`pointId`及证据，供后续核分与分母校验；默认不交付。有效分总数按核实后的计分资格汇总 |
 | 主剪“第N分” | 当前版本有效计分顺序的`displayNumber`，连续1…N；增删合并后重生成，P号不改。分析中计分资格未定时先显示“定位 P…”而不冒称第N个有效分 |
-| 人工复核子集 / R编号 | 自行回查后仍不确定的分，或计分无法与指定终局核对一致的问题整局（逐分呈现）；每行`R / P`，不复制全场账本 |
+| 人工复核子集 / R编号 | 阶段3仅含自行回查后仍不确定的分，或计分无法与指定终局核对一致的问题整局；每行`R / P`，不复制全场账本。判分前的首次标注页另有`purpose=initial-labeling`与独立版本，可展示全部当前分/候选供用户先做 |
 | “所有行常显” | **已选入本轮人工复核的行**不因填写状态而隐藏；不要求把全场每分送审，也不改动正在使用的审核版本和草稿 |
 
 ## 开工与接续
@@ -45,9 +46,11 @@ description: 分阶段完成网球单打逐分精剪、计分、必要复核、�
 
 若仅有已剪辑渲染的完整视频，先按[成片剪口重建](references/rendered-video.md)生成保留全片的粗分段计划，核验剪口并完成真实分的归组后才称为阶段1逐分精剪；不要求用户先提供原工程。成片缺失的一发、结束证据与原速不能从剪口数量补造。
 
+上述三类入口都先建立[首次标注界面](references/initial-labeling.md)再开始阶段2球果判读；成片粗分段可显式用候选P号提前开放人工入口，但不能将其当作有效分母。`human-first`收到完整或部分答案后从相同版本接续，复用确认事实，其余工作仍由agent按阶段完成。
+
 | 阶段 | agent执行、产物与完成检查 | 开始前必读 |
 |---|---|---|
-| 1 逐分精剪并排入时间线 | 判读剪辑所需的真实发球、发次与分的归组，按既定保留规则剪至首次死球及必要反应，顺序放入主时间线并检查剪口、原声与全片覆盖。暂不推进比分；P映射、源定位和证据留在内部log，供后续沿用核实。交付可播放、可定位的逐分精剪时间线 | [判读](references/adjudication.md)、[原片检查](references/source-inspection.md)、[内部账本](references/ledger-and-review.md#内部账本)、[覆盖与编号](references/coverage-and-exceptions.md#原片覆盖清单agent内部)及[编号谱系](references/coverage-and-exceptions.md#稳定编号与合并拆分)、[精剪](references/presentation-and-qa.md#剪辑) |
+| 1 逐分精剪并排入时间线 | 判读剪辑所需的真实发球、发次与分的归组，按既定保留规则剪至首次死球及必要反应，顺序放入主时间线并检查剪口、原声与全片覆盖。暂不推进比分；P映射、源定位和证据留在内部log，供后续沿用核实。交付可播放、可定位的逐分精剪时间线及判分前可用的首次标注HTML/工作台 | [判读](references/adjudication.md)、[原片检查](references/source-inspection.md)、[内部账本](references/ledger-and-review.md#内部账本)、[覆盖与编号](references/coverage-and-exceptions.md#原片覆盖清单agent内部)及[编号谱系](references/coverage-and-exceptions.md#稳定编号与合并拆分)、[精剪](references/presentation-and-qa.md#剪辑)、[首次标注](references/initial-labeling.md) |
 | 2 判读计分与基础图层 | 同阶段逐分核查赢家、发球方、发次与局界，推进小分/局分/盘分并核对指定终局；完成全部目标分的计分板、显示序号和短时发次标签，不能把发球核查另列下一阶段。已知照填，仅自查后真疑点留空/待核；检查编号切换与角标退出。有复核需求直接进入阶段3，完成复核材料后再交付 | [判读](references/adjudication.md)、[规则](references/inputs-and-rules.md)、[异常](references/coverage-and-exceptions.md)、[计分板](references/presentation-and-qa.md#动态计分板)与[基础图层](references/presentation-and-qa.md#分析期逐分定位与基础图层) |
 | 3 必要人工复核 | 自行补查后，收录剩余疑点；计分仍与指定终局不符时，将问题整局逐分纳入。主动制作并同批交付**独立复核时间线＋可打开的交互HTML链接**，不只列疑点或等用户索要HTML；本地模式用独立复核工作区。核对R/P、常显信息与填写/保存/导出后才交用户判读；无疑点则跳过 | [复核范围与协议](references/ledger-and-review.md#独立复核时间线与-html)、[常驻列表](references/ledger-and-review.md#常驻列表要求)、[复核布局](references/presentation-and-qa.md#局分与逐分复核时间线)与[HTML](references/presentation-and-qa.md#html-复核列表)、[交互验收](references/presentation-and-qa.md#行可见性验收) |
 | 4 回填与再核算 | 按P号和版本合并答案、保护历史，重算后续计分与图层；仍有矛盾则返回阶段3，可多轮往返。复用已确认事实，不重复要求审核清晰分；报告已解决与仍未知范围 | [回填规则](references/ledger-and-review.md#回填规则)与[逆推](references/ledger-and-review.md#人工无法归属与后续逆推)、[依赖与检查点](references/workflow.md#更正后的依赖) |

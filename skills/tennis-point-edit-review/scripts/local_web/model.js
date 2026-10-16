@@ -66,7 +66,8 @@ export function tc(frame, fps) {
 export const causes = [["out", "Out"], ["net", "Net"], ["two_bounces", "Two bounces"], ["replay", "Replay"], ["ace", "Ace"], ["winner", "Winner"], ["other", "Other"]];
 export const blank = () => ({ scoringPlayerId: null, winnerUndetermined: false, deadBallType: null, doubleFaultConfirmed: null, extra: false, reviewConfirmed: false, countingIssueResolved: false, note: "" });
 export function answer(p, r) {
-  return { ...blank(), ...p.answers[r.pointId] ?? { ...r.initial, reviewConfirmed: false } };
+  const labels = p.review?.purpose === 'initial-labeling' ? {serverId:r.serverId ?? null, serveNumber:r.serveNumber ?? null, gameNumber:r.gameNumber ?? null, setNumber:r.setNumber ?? null} : {};
+  return { ...blank(), ...labels, ...p.answers[r.pointId] ?? { ...r.initial, reviewConfirmed: false } };
 }
 export function reviewStatus(r, x) {
   if (!x.reviewConfirmed) return x.scoringPlayerId || x.deadBallType || x.note ? "partial" : "pending";
@@ -77,6 +78,9 @@ export function reviewStatus(r, x) {
 }
 export function changeAnswer(p, r, x, field, value) {
   x = { ...x, [field]: value, updatedAt: (/* @__PURE__ */ new Date()).toISOString() };
+  const server = p.review?.purpose === 'initial-labeling' ? x.serverId : r.serverId;
+  if ((field === 'deadBallType' && value === 'ace' || field === 'doubleFaultConfirmed' && value) && !server) throw new Error('Resolve server before ACE/double fault');
+  if (field === 'serverId' && (x.deadBallType === 'ace' || x.doubleFaultConfirmed)) Object.assign(x, {scoringPlayerId:null, deadBallType:null, doubleFaultConfirmed:null});
   if (field !== "reviewConfirmed" && field !== "note") x.reviewConfirmed = true;
   if (field === "scoringPlayerId") {
     x.winnerUndetermined = value === "undetermined";
@@ -86,14 +90,14 @@ export function changeAnswer(p, r, x, field, value) {
       x.countingIssueResolved = false;
       if (x.deadBallType === "ace") x.deadBallType = null;
     }
-    if (x.deadBallType === "ace" && x.scoringPlayerId !== r.serverId) x.deadBallType = null;
-    if (x.scoringPlayerId === r.serverId) x.doubleFaultConfirmed = null;
+    if (x.deadBallType === "ace" && x.scoringPlayerId !== server) x.deadBallType = null;
+    if (x.scoringPlayerId === server) x.doubleFaultConfirmed = null;
   }
   if (field === "deadBallType" && value === "replay") Object.assign(x, { scoringPlayerId: null, winnerUndetermined: false, doubleFaultConfirmed: null, extra: false });
-  if (field === "deadBallType" && value === "ace") Object.assign(x, { scoringPlayerId: r.serverId, winnerUndetermined: false, doubleFaultConfirmed: null });
+  if (field === "deadBallType" && value === "ace") Object.assign(x, { scoringPlayerId: server, winnerUndetermined: false, doubleFaultConfirmed: null });
   if (field === "doubleFaultConfirmed" && value) {
     x.winnerUndetermined = false;
-    x.scoringPlayerId = p.players.find((v) => v.id !== r.serverId).id;
+    x.scoringPlayerId = p.players.find((v) => v.id !== server).id;
     if (["ace", "winner", "two_bounces", "replay"].includes(x.deadBallType)) x.deadBallType = null;
   }
   if (field === "deadBallType" && ["winner", "two_bounces"].includes(value)) x.doubleFaultConfirmed = null;

@@ -1,5 +1,6 @@
 """Portable local timeline model, review protocol and revision-fenced persistence."""
 from output_language import resolve_language
+from review_io import validate_labels, LABEL_FIELDS
 import copy
 import json
 import os
@@ -91,7 +92,8 @@ def validate(project, check_files=False):
     if len(set(pids)) != len(pids) or len(set(rids)) != len(rids):
         raise ValueError('Review point and review IDs must be unique')
     for row in rows:
-        if row['serverId'] not in players:
+        validate_labels(row, players)
+        if row.get('serverId') is None and project['review'].get('purpose') != 'initial-labeling':
             raise ValueError('Unknown server')
     clips = keyed(project['clips'], 'clip')
     if not clips:
@@ -127,6 +129,7 @@ def normalize_answer(raw, players):
     x = {'scoringPlayerId': None, 'winnerUndetermined': False, 'deadBallType': None,
          'doubleFaultConfirmed': None, 'extra': False, 'reviewConfirmed': False,
          'countingIssueResolved': False, 'note': '', **raw}
+    validate_labels(x, players)
     if x['scoringPlayerId'] is not None and x['scoringPlayerId'] not in players:
         raise ValueError('Unknown scoring player')
     if x['deadBallType'] is not None and x['deadBallType'] not in CAUSES:
@@ -161,12 +164,14 @@ def review_payload(project):
             status = 'replay'
         else:
             status = 'resolved' if x['scoringPlayerId'] and x['deadBallType'] else 'partial'
-        result.append({**x, 'reviewId': row['reviewId'], 'pointId': row['pointId'], 'serverId': row['serverId'],
+        labels = {k: x.get(k, row.get(k)) for k in LABEL_FIELDS} if project['review'].get('purpose') == 'initial-labeling' else {'serverId': row['serverId']}
+        result.append({**x, **labels, 'reviewId': row['reviewId'], 'pointId': row['pointId'],
             'scoringPlayer': players.get(x['scoringPlayerId'], {}).get('name'), 'status': status,
             'inferenceRequired': x['winnerUndetermined'] and x['reviewConfirmed'] and not x['extra'],
             'countsTowardScore': False if x['extra'] or x['deadBallType'] == 'replay' else None,
             'countingStatus': 'extra' if x['extra'] else 'replay' if x['deadBallType'] == 'replay' else None})
-    return {'schema': 'tennis-point-review/v1', 'source': project['review']['source'],
+    return {**({'purpose': project['review']['purpose']} if project['review'].get('purpose') else {}),
+        'schema': 'tennis-point-review/v1', 'source': project['review']['source'],
         'ledgerRevision': project['review']['ledgerRevision'], 'timelineName': project['title'],
         'totalRows': len(result), 'completedRows': sum(r['status'] in ('resolved', 'replay', 'unresolved') for r in result),
         'unresolvedRows': sum(r['status'] == 'unresolved' for r in result),
@@ -175,6 +180,7 @@ def review_payload(project):
 def context(project):
     return {'schema': 'tennis-local-context/v1', 'revision': project['revision'],
         'outputLanguage': resolve_language(project.get('outputLanguage')),
+        'workingMode': project.get('workingMode', 'agent-dominant'),
         'review': review_payload(project), 'timeline': layout(project), 'assets': project['assets'],
         'overlays': project.get('overlays', []), 'selection': project.get('selection', {}),
         'needsRebuild': project.get('needsRebuild', []), 'events': project.get('events', [])}
@@ -255,9 +261,12 @@ class Store:
             elif kind == 'review':
                 row = next(r for r in value['review']['rows'] if r['pointId'] == operation['pointId'])
                 answer = normalize_answer(operation['answer'], {p['id'] for p in value['players']})
-                if answer['deadBallType'] == 'ace' and answer['scoringPlayerId'] != row['serverId']:
+                server = answer.get('serverId', row.get('serverId')) if value['review'].get('purpose') == 'initial-labeling' else row['serverId']
+                if (answer['deadBallType'] == 'ace' or answer['doubleFaultConfirmed']) and server is None:
+                    raise ValueError('Resolve server before ACE/double fault')
+                if answer['deadBallType'] == 'ace' and answer['scoringPlayerId'] != server:
                     raise ValueError('ACE must belong to the server')
-                if answer['doubleFaultConfirmed'] and answer['scoringPlayerId'] == row['serverId']:
+                if answer['doubleFaultConfirmed'] and answer['scoringPlayerId'] == server:
                     raise ValueError('Double fault cannot score for server')
                 value.setdefault('answers', {})[row['pointId']] = answer
                 value['needsRebuild'] = sorted(set(value.get('needsRebuild', []) + ['score-and-statistics']))

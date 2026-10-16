@@ -19,6 +19,8 @@
 
 ## 数据与命令
 
+- `prepare_review.py plan.json NEW_DIRECTORY --mode agent-dominant|human-first --surface html|local|both`：在agent首次判分前建立初始标注入口；分的归组未核实时显式加`--provisional-points`，不从剪口数推有效分。完整契约见[首次标注与协作](initial-labeling.md)。正常阶段3子集仍用下列复核生成命令；初始页不替代它。
+
 - `seam_detect.py scan/plan`：仅对已有剪辑的渲染成片扫描剪口候选并重建完整覆盖的粗分段；输入、阈值、决策文件和源帧/代理映射见[成片剪口重建](rendered-video.md)。不判断网球球果，不取代连续原片逐分观察。
 按需选用下列工具；输入示例均为虚构占位数据。业务判读及复核状态见各专题，本页保留调用契约。
 原片概览、可配置CV及PTS检查见[原片检查工具](source-inspection.md)；agent查看原帧、完成判读后登记已审范围。`evidence_audit.display_order`另生成当前有效分的连续显示号码，保留稳定P/R。

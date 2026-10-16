@@ -29,6 +29,8 @@ python "<skill>/scripts/local_editor.py" serve "<work>/edit" --open
 
 ## 剪辑计划
 
+在阶段2判赢家前，先用[首次标注准备器](initial-labeling.md)生成可用复核区；默认agent主导，用户明确人工先行时交付后等待其标注。此模式允许未知serverId且提供人工元数据控件，与下文阶段3必要疑点子集分别保存。渲染成片先按[剪口重建](rendered-video.md)生成计划。
+
 从[最小计划](../examples/local-edit-plan.json)开始，替换所有示例身份、素材与事实。`init`只接受新工程目录；素材`metadata`及`path`可相对计划文件，其余生成的媒体/图形路径保存为绝对路径。
 
 | 字段 | 契约 |
@@ -41,7 +43,7 @@ python "<skill>/scripts/local_editor.py" serve "<work>/edit" --open
 | `review` | `source/ledgerRevision/rows`沿用[复核输入](../examples/review-data.json)，稳定R/P、局/盘、发球方、疑点及证据定位；初始AI判断放`initial`，不预填人工已审 |
 | `overlays` | 稳定`id`、`clipId`、正式`component/props`、`startFrame/endFrame`；`anchor: "source"`绑定代理源帧，`"clip"`绑定片段局部帧；自动裁到片段可见范围 |
 
-逐分说明`review.rows[].reason`由agent依据当前素材证据生成；工作台只展示工程中的说明，加载视频不会自动生成分析。`review.rows`只放自行回查后的必要人工复核子集，不能为了让每个主剪片段可跳转而把全场变成待审；全场定位用主剪时间线、clip/pointId映射与可见编号。无复核需求时可用空rows。
+逐分说明`review.rows[].reason`由agent依据当前素材证据生成；工作台只展示工程中的说明，加载视频不会自动生成分析。阶段3的`review.rows`只放自行回查后的必要人工复核子集，不能为了让每个主剪片段可跳转而把全场变成待审；全场定位用主剪时间线、clip/pointId映射与可见编号。无复核需求时可用空rows。
 
 覆盖层的属性与位置复用[正式清单](../examples/ui-manifest.json)和[图形适配](graphics-adapters.md)。源码模板不复制、不修改；`init/update`渲染整画幅透明PNG，浏览器和导出复用同一批图形及props。静态标签直接切换，其他比例采用等比居中的参考布局适配，播放器画布继承实际宽高比；统计页由工作台按当前帧率负责首尾约0.3秒淡变，不能再叠加第二份动画。文字与分数从账本重生成，网页支持修改图层时序，不声称图片内文字可直接编辑。
 

@@ -26,6 +26,23 @@ test('replay clears scoring implications; initial data never claims human review
   assert.equal(x.scoringPlayerId,null); assert.equal(x.extra,false); assert.equal(m.reviewStatus(row,x),'replay');
   assert.equal(m.answer(project,{...row,initial:{reviewConfirmed:true}}).reviewConfirmed,false);
 });
+
+test('manual first labeling never infers a serving side; explicit edits survive', async () => {
+  const m=await model;
+  const p={...project,review:{purpose:'initial-labeling'}};
+  const r={...row,serverId:null};
+  let x=m.answer(p,r);
+  assert.equal(x.serverId,null);
+  assert.equal(m.reviewStatus(r,x),'pending');
+  assert.throws(()=>m.changeAnswer(p,r,x,'doubleFaultConfirmed',true));
+  assert.throws(()=>m.changeAnswer(p,r,x,'deadBallType','ace'));
+  x=m.changeAnswer(p,r,x,'serverId','B');
+  x=m.changeAnswer(p,r,x,'deadBallType','ace');
+  assert.equal(x.scoringPlayerId,'B');
+  x=m.changeAnswer(p,r,x,'serverId','A');
+  assert.equal(x.scoringPlayerId,null);
+  assert.equal(x.deadBallType,null);
+});
 test('multiple clips per point retain independent offsets and half-open overlay bounds', async () => {
   const m=await model;
   const p={...project,clips:[{id:'c1',pointId:'P001',inFrame:10,outFrame:40},{id:'c2',pointId:'P001',inFrame:50,outFrame:65}]};

@@ -593,6 +593,26 @@
       "id": "LOCAL001",
       "path": "references/local-editor.md",
       "text": "重排只改变呈现，不能自动重排比赛事实。"
+    },
+    {
+      "id": "R043",
+      "path": "references/rendered-video.md",
+      "text": "no frames\nare skipped in time"
+    },
+    {
+      "id": "R044",
+      "path": "references/initial-labeling.md",
+      "text": "`agent-dominant` is the default."
+    },
+    {
+      "id": "R045",
+      "path": "references/initial-labeling.md",
+      "text": "before agent outcome\nrecognition starts"
+    },
+    {
+      "id": "R046",
+      "path": "references/initial-labeling.md",
+      "text": "Both ledger and export must match purpose, source\nand revision."
     }
   ],
   "files": [
@@ -621,7 +641,7 @@
     },
     {
       "path": "examples/review-template.html",
-      "sha256": "63050890a71dde7a790b6ff2b5f607fece273b069a97c0f1e16400eba7e56dbd"
+      "sha256": "cbf53e4b2e0a74d099eceb1321caa58350200e22e59d343c2fcf353458070a46"
     },
     {
       "path": "examples/scoreboard.jsx",
@@ -735,7 +755,7 @@
     },
     {
       "path": "scripts/review_io.py",
-      "sha256": "da30babfa1507d40b271e5806f60e62437a6a427dadc88efe53ab12466269e3d"
+      "sha256": "aa19823fa9d1e8eeb4983862b1698b6db494cf4ebb5b8322771e5d1225165f5b"
     },
     {
       "path": "scripts/score_audit.py",
@@ -847,6 +867,18 @@
     },
     {
       "path": "scripts/check_output_language.py"
+    },
+    {
+      "path": "scripts/seam_detect.py"
+    },
+    {
+      "path": "scripts/prepare_review.py"
+    },
+    {
+      "path": "references/rendered-video.md"
+    },
+    {
+      "path": "references/initial-labeling.md"
     }
   ]
 }

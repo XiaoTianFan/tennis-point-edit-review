@@ -4,6 +4,16 @@ from pathlib import Path
 from output_language import resolve_language
 
 CAUSES={"out","net","two_bounces","replay","ace","winner","other"}
+LABEL_FIELDS=('serverId','serveNumber','gameNumber','setNumber')
+
+def validate_labels(raw, ids):
+    if raw.get('serverId') is not None and raw['serverId'] not in ids:
+        raise ValueError('Unknown server')
+    for field in LABEL_FIELDS[1:]:
+        value=raw.get(field)
+        if value is not None and (type(value) is not int or value < 1 or (field=='serveNumber' and value > 2)):
+            raise ValueError('Invalid '+field)
+
 def review_template(language):
     language=resolve_language(language)
     root=Path(__file__).parent.parent
@@ -29,7 +39,9 @@ def build(data, target, language=None):
     if len(players)!=2 or len(ids)!=2: raise ValueError("Exactly two unique player IDs required")
     pids=[r["pointId"] for r in data["rows"]]
     if len(pids)!=len(set(pids)): raise ValueError("Duplicate pointId")
-    if any(r.get("serverId") not in ids for r in data["rows"]): raise ValueError("Unknown server")
+    for row in data['rows']:
+        validate_labels(row,ids)
+        if row.get('serverId') is None and data.get('purpose')!='initial-labeling': raise ValueError('Unknown server')
     if not data.get("source") or not data.get("ledgerRevision"): raise ValueError("Source and revision required")
     template=review_template(language)
     payload=json.dumps(data,ensure_ascii=False).replace("&","\\u0026").replace("<","\\u003c").replace(">","\\u003e")
@@ -40,6 +52,7 @@ def merge(ledger, review):
     if review.get("schema")!="tennis-point-review/v1": raise ValueError("Unsupported schema")
     if review.get("source")!=ledger.get("source"): raise ValueError("Source mismatch")
     if review.get("ledgerRevision")!=ledger.get("ledgerRevision"): raise ValueError("Revision mismatch: reconcile before merge")
+    if review.get('purpose')!=ledger.get('purpose'): raise ValueError('Review purpose mismatch')
     out=copy.deepcopy(ledger); points={p["pointId"]:p for p in out["points"]}
     ids={p["id"] for p in ledger["players"]}; seen=set()
     for r in review["rows"]:
@@ -55,6 +68,16 @@ def merge(ledger, review):
             raise ValueError("Undetermined winner conflicts with a determinate result")
         p=points[pid]; p.setdefault("reviewHistory",[]).append(copy.deepcopy(r))
         if r.get("status")=="pending": continue
+        if review.get('purpose')=='initial-labeling':
+            validate_labels(r,ids)
+            if (r.get('deadBallType')=='ace' or r.get('doubleFaultConfirmed') is True) and r.get('serverId') is None:
+                raise ValueError('Resolve server before ACE/double fault')
+            if r.get('deadBallType')=='ace' and r.get('scoringPlayerId')!=r['serverId']:
+                raise ValueError('ACE must belong to server')
+            if r.get('doubleFaultConfirmed') is True and r.get('scoringPlayerId')==r['serverId']:
+                raise ValueError('Double fault cannot score for server')
+            for key in LABEL_FIELDS:
+                if r.get(key) is not None: p[key]=r[key]
         p["reviewStatus"]=r["status"]
         if undetermined:
             p.setdefault("winnerResolutionHistory",[]).append({k:copy.deepcopy(p.get(k)) for k in ("scoringPlayerId","winner","adoptedWinner","doubleFaultConfirmed","userReviewConfirmed","provenance")})

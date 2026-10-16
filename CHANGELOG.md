@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026.10.16-v24
+
+- Add rendered-video seam scanning with full-frame metrics, reproducible source/configuration identity, guarded boundary decisions and full-coverage local edit plans.
+- Prepare offline HTML or the local review workbench before outcome recognition; retain agent-dominant default and support explicit human-first labeling and partial handoff.
+- Add nullable manual server/serve/game/set controls only to initial labeling, with protected revisions, pending/unknown semantics and separate later exception-review drafts. Preserve all seven canonical JSX templates.
+- Document operational commands, source/proxy coordinates, limitations and real-footage qualification; validate with synthetic media and browser interactions.
+
+
 ## 2026.10.08-v23.9
 
 - Add shared English/Chinese output selection for all seven canonical templates, 39 statistics rows, serve labels, native/PNG adapters and offline review HTML. Preserve canonical JSX, score data, timing and review drafts.

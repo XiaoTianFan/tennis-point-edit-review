@@ -27,12 +27,18 @@ verify CFR timing and import/read back in Pr. For ChatCut, use available host to
 to place the mapped ranges and read them back. A JSON plan alone is not an
 imported or verified host timeline. Do not switch the user's requested editor.
 
+Before any outcome recognition, run the [initial labeling preparer](initial-labeling.md)
+on the generated plan. If grouping is unverified, use `--provisional-points` to
+expose candidate segments immediately; manual users can note needed merges/splits.
+Agent-dominant remains the default. Human-first hands over this surface and waits.
+Do not describe a rough partition as completed stage-1 point cutting.
+
 ## Detector and evidence
 
-One full sequential decode spatially reduces each frame to width 320; **no frames
+One full sequential decode spatially reduces each frame to RGB at width 320; **no frames
 are skipped in time**. FFmpeg's [scdet](https://ffmpeg.org/ffmpeg-filters.html#scdet)
 provides scene score and mean absolute frame difference. A candidate is emitted
-when scene score reaches 8, or difference reaches the maximum of 2, three times
+when scene score reaches 8, or RGB difference reaches the maximum of 0.5, three times
 the preceding 30-frame median, and median plus six median absolute deviations.
 This second signal can expose small jumps in a stable court view. All defaults
 are starting values, not real-match calibrated accuracy claims. No minimum clip
@@ -41,8 +47,8 @@ applied. Consecutive hits are flagged for inspection.
 
 `--settings settings.json` overrides the named `width`, `sceneThreshold`,
 `differenceFloor`, `adaptiveRatio`, `madMultiplier`, `windowFrames` settings.
-Record settings and the FFmpeg build; rerun into a new directory when changing
-them. Identical bytes/settings/build yield the same scan identity and candidates.
+Record the detector revision, settings and FFmpeg build; rerun into a new directory when changing
+them. Identical detector/bytes/settings/build yield the same scan identity and candidates.
 `scan.json` is written only after successful full decoding and source rehashing;
 a partial folder or empty hit list does not establish a successful scan.
 

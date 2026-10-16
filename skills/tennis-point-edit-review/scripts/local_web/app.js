@@ -1,4 +1,4 @@
-import { $, rate, length, layout, buttonIcon, exportSummary } from "./model.js";
+import { $, rate, length, layout, buttonIcon, exportSummary, answer } from "./model.js";
 import { Review } from "./review.js";
 import { Timeline } from "./timeline.js";
 import { Player } from "./player.js";
@@ -93,7 +93,8 @@ const player = new Player(url, (frame, clip, mode, linked) => {
   }
   timeline.highlight(selectedClip, selectedOverlay);
   const row = linked && project.review.rows.find((r) => r.pointId === clip.pointId);
-  $("viewer-context").textContent = row ? t("viewerMeta", {review: row.reviewId, point: row.pointId, game: row.gameNumber ?? "?", server: project.players.find((p) => p.id === row.serverId)?.name ?? row.serverId, serve: clip.serveNumber ?? row.serveNumber ?? "?"}) : linked && clip.pointId ? clip.pointId : mode === "source" ? t("sourceOutside") : clip.label ?? t("statistics");
+  const x = row ? answer(project,row) : {}, sid = project.review.purpose === 'initial-labeling' ? x.serverId : row?.serverId;
+  $("viewer-context").textContent = row ? t("viewerMeta", {review: row.reviewId, point: row.pointId, game: x.gameNumber ?? row.gameNumber ?? "?", server: project.players.find((p) => p.id === sid)?.name ?? t('unassigned'), serve: x.serveNumber ?? clip.serveNumber ?? row.serveNumber ?? "?"}) : linked && clip.pointId ? clip.pointId : mode === "source" ? t("sourceOutside") : clip.label ?? t("statistics");
 }, notice);
 function setProject(p) {
   project = p;
