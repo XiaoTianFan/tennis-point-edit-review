@@ -10,6 +10,17 @@ const geometry = loadUi('view-state.js');
 const project = { players: [{id:'A'}, {id:'B'}], fps:'30000/1001', answers:{} };
 const row = { pointId:'P001', serverId:'A' };
 
+test('human-reviewed badges distinguish count and detail gaps without resolving them', async () => {
+  const m=await model, r={...row,countingIssueRequired:true};
+  const x={...m.blank(),scoringPlayerId:'B',deadBallType:'out',reviewConfirmed:true};
+  assert.equal(m.reviewStatus(r,x),'partial');
+  assert.equal(m.reviewBadge(r,x),'reviewedCounting');
+  assert.equal(m.reviewBadge(r,{...x,countingIssueResolved:true}),'status.resolved');
+  assert.equal(m.reviewBadge(row,{...x,deadBallType:null}),'reviewedIncomplete');
+  assert.equal(m.reviewBadge(r,{...x,reviewConfirmed:false}),'status.partial');
+  assert.equal(m.reviewBadge(r,{...x,winnerUndetermined:true,scoringPlayerId:null}),'status.unresolved');
+});
+
 test('unknown winner cannot retain ACE or double fault; returning to a side is explicit', async () => {
   const m = await model;
   let x = m.changeAnswer(project,row,{...m.blank(),scoringPlayerId:'A',deadBallType:'ace'},'scoringPlayerId','undetermined');

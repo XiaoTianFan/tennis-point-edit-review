@@ -86,6 +86,12 @@ export function reviewStatus(r, x) {
   if (x.deadBallType === "replay") return "replay";
   return x.scoringPlayerId && x.deadBallType ? "resolved" : "partial";
 }
+export function reviewBadge(r, x) {
+  const status = reviewStatus(r, x);
+  return x.reviewConfirmed && status === 'partial'
+    ? r.countingIssueRequired && !x.countingIssueResolved ? 'reviewedCounting' : 'reviewedIncomplete'
+    : 'status.' + status;
+}
 export function changeAnswer(p, r, x, field, value) {
   x = { ...x, [field]: value, updatedAt: (/* @__PURE__ */ new Date()).toISOString() };
   const server = p.review?.purpose === 'initial-labeling' ? x.serverId : r.serverId;

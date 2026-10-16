@@ -191,7 +191,7 @@ def review_payload(project):
     return {**({'purpose': project['review']['purpose']} if project['review'].get('purpose') else {}),
         'schema': 'tennis-point-review/v1', 'source': project['review']['source'],
         'ledgerRevision': project['review']['ledgerRevision'], 'timelineName': project['title'],
-        'totalRows': len(result), 'completedRows': sum(r['status'] in ('resolved', 'replay', 'unresolved') for r in result),
+        'totalRows': len(result), 'completedRows': sum(r['reviewConfirmed'] for r in result),
         'unresolvedRows': sum(r['status'] == 'unresolved' for r in result),
         'inferenceRequiredRows': sum(r['inferenceRequired'] for r in result), 'rows': result}
 

@@ -138,6 +138,22 @@ class ModelTest(unittest.TestCase):
         self.p['answers']['P002'] = dict(scoringPlayerId='A', deadBallType='net', reviewConfirmed=True)
         self.assertEqual(review_payload(self.p)['rows'][1]['status'], 'partial')
 
+    def test_human_completion_does_not_resolve_counting_or_unlock_export(self):
+        from local_model import export_blockers
+        self.p['review']['rows'][0]['initial'] = dict(scoringPlayerId='A', deadBallType='net', reviewConfirmed=True)
+        self.p['answers']['P002'] = dict(scoringPlayerId='B', deadBallType='out', reviewConfirmed=True)
+        payload = review_payload(self.p)
+        self.assertEqual(payload['completedRows'], 1)
+        self.assertFalse(payload['rows'][0]['reviewConfirmed'])
+        self.assertEqual(payload['rows'][1]['status'], 'partial')
+        self.assertFalse(payload['rows'][1]['countingIssueResolved'])
+        self.assertTrue(export_blockers(self.p))
+        write(self.store.path, self.p)
+        with self.assertRaises(ValueError):
+            self.store.apply(0, dict(type='approval', field='pointAttribution', confirmed=True))
+        self.p['answers']['P002']['reviewConfirmed'] = False
+        self.assertEqual(review_payload(self.p)['completedRows'], 0)
+
     def test_invalid_edits_leave_revision_intact(self):
         for operation in [dict(type='reorder', ids=['first','first']), dict(type='trim',id='first',inFrame=30,outFrame=30),
                           dict(type='review',pointId='P001',answer=dict(scoringPlayerId='B', deadBallType='ace'))]:

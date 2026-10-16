@@ -1,5 +1,5 @@
 import { t } from "./i18n.js";
-import { $, el, answer, causes, changeAnswer, reviewStatus } from "./model.js";
+import { $, el, answer, causes, changeAnswer, reviewStatus, reviewBadge } from "./model.js";
 export class Review {
   constructor(select, save) {
     this.select = select;
@@ -122,10 +122,10 @@ export class Review {
   progress() {
     let reviewed = 0, unknown = 0;
     for (const r of this.p.review.rows) {
-      const status = reviewStatus(r, answer(this.p, r));
-      if (['resolved', 'replay', 'unresolved'].includes(status)) reviewed++;
+      const x = answer(this.p, r), status = reviewStatus(r, x);
+      if (x.reviewConfirmed) reviewed++;
       if (status === 'unresolved') unknown++;
-      this.nodes.get(r.pointId).card.querySelector('.row-status').textContent = t('status.' + status);
+      this.nodes.get(r.pointId).card.querySelector('.row-status').textContent = t(reviewBadge(r, x));
     }
     $('review-progress').textContent = t('progress', {reviewed, total: this.p.review.rows.length}) + (unknown ? t('unknown', {count: unknown}) : '');
   }

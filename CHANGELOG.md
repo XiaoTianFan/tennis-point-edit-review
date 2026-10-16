@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026.10.17-v25.2
+
+- Show human review completion independently from pending counting or missing result fields; count explicit reviewed rows consistently in local review exports. Preserve adjudication states and export gates.
+
 ## 2026.10.17-v25.1
 
 - Reveal the matching review row when cursor navigation enters another review point; keep focus, answers and row order, without repeated scrolling during playback or answer edits.
