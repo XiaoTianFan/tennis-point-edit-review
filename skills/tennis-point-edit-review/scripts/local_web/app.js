@@ -86,9 +86,9 @@ const timeline = new Timeline(url, select, (frame) => {
   if (player.mode !== "edited") player.switchMode("edited");
   player.seek(frame);
 }, save);
-const player = new Player(url, (frame, clip, mode, linked) => {
+const player = new Player(url, (frame, clip, mode, linked, navigated) => {
   timeline.setFrame(mode === "edited" ? frame : clip.startFrame + Math.max(0, Math.min(length(clip) - 1, frame - clip.inFrame)));
-  review.highlight(linked ? clip.pointId : null);
+  review.highlight(linked ? clip.pointId : null, {reveal: navigated});
   if (selectedClip !== clip.id) {
     selectedClip = clip.id;
     selectedOverlay = null;

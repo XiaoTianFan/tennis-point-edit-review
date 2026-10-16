@@ -56,6 +56,7 @@ export class Player {
   async seek(frame, play = false) {
     if (!this.p) return;
     const generation = ++this.seekGeneration;
+    this.navigationPending = !play;
     this.playing = false;
     cancelAnimationFrame(this.holdTimer);
     this.video.pause();
@@ -181,6 +182,8 @@ export class Player {
     const original = (this.asset.sourceStartSeconds ?? 0) + this.sourceFrame() / this.fps;
     $("source-time").textContent = t("sourceTime", {seconds: original.toFixed(3), fps: this.p.fps});
     $("frame-status").textContent = this.playing ? t("playing") : this.frameImage.hidden ? t("decoding") : t("decodedFrame", {frame: this.sourceFrame()});
-    this.changed(this.frame, c, this.mode, linked);
+    const navigated = this.navigationPending === true;
+    this.navigationPending = false;
+    this.changed(this.frame, c, this.mode, linked, navigated);
   }
 }

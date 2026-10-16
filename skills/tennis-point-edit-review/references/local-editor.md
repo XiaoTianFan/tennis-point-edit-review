@@ -39,14 +39,14 @@ python "<skill>/scripts/local_editor.py" serve "<work>/edit" --open
 | overlays | id/clipId/component/props/startFrame/endFrame；anchor=source或clip，裁到可见范围；view=both（默认）/full/review |
 | statistics/approval | 当前账本统计完成状态与用户确认；见导出门禁 |
 
-理由由agent依据素材生成，播放器不自动分析。阶段3 rows仅为补查后必要疑点／问题局；全场跳转使用clip/P映射，不为定位把全场变成待审。[正式图形](graphics-adapters.md)通过`init/update`生成整画幅透明PNG与哈希，浏览器与最终输出复用同份props；模板保持原样，文字修改需重生成。统计页首尾约0.3秒淡变由工作台处理，不重复动画。
+理由由agent生成；阶段3仅列补查后必要疑点／问题局，全场定位用clip/P映射。[正式图形](graphics-adapters.md)经`init/update`缓存为整画幅透明PNG与哈希，预览和输出同源；模板不变，改文字须重生成。工作台处理统计页首尾约0.3秒淡变。
 
 完整／复核视图共用一个clips数组：完整视图保留全部段；复核按rows中的P号保留其全部源段，其余暂时波纹隐藏，不复制、重剪或删除master。已剪成片不再删除失败发球、等待或尾段。计分板在两视图均可见；复核R/P、常显发球与说明仅review显示，短发次标签仅full显示。切换保留源帧锚点、各自缩放和滚动，不改答案；无复核片段时禁用review。说明放计分板上方避让。阶段5数据、阶段6图层、阶段7输出顺序见[阶段衔接](workflow.md)。
 
 ## 用户操作与agent接续
 
 - 顶栏English/中文仅改UI。拖动面板分隔条调整布局；键盘方向键、Shift大步及Home／双击复位。时间线Ctrl/Cmd+滚轮横移，Alt+滚轮以指针缩放。
-- 点审核行文字／空白或Enter/空格跳分；答案控件不触发跳转。所有行原序常驻，搜索仅高亮；协议和人工未知语义见[账本](ledger-and-review.md)。
+- 点审核行文字／空白或Enter/空格跳分；答案控件不触发跳转。游标定位到另一待审分时，列表自动滚动露出该行，不改焦点、答案或行序；播放和同分移动不反复拉动列表。所有行常驻，搜索仅高亮；协议见[账本](ledger-and-review.md)。
 - 下方完整全片／仅复核切换视图。Edited/Source切换播放模式；Space播放，方向键±1帧、Shift±10帧、方括号逐分。拖clip边缘修剪，靠近游标8屏幕像素内吸附并高亮，Shift临时绕过；随缩放换算帧，不能越过合法源范围。入出帧框支持精确修剪；图层条可移动或改长，局部帧与源锚定帧不混用。片段重排仅改变呈现，不自动改比赛事实；复核重排保留隐藏段。
 - 操作写project.json并递增revision，history保存前版，Undo/Redo保留40步。旧revision被拒后重读差异，不盲重试；未提交操作留浏览器草稿，用Recover edits交agent恢复，不覆盖新状态。
 - “交给agent”写agent-context.json与review.json，保留当前clip、帧、模式和视图，用户复制消息回会话；网页不接云模型、不自动发送。`context`可直接读最新状态，不依赖先点击。

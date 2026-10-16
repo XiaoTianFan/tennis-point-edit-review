@@ -137,3 +137,5 @@ instruction text is approximately 6.7% shorter. Account readback and fresh-agent
 behavior are separate verification steps.
 
 Full movie export is forbidden until the owner confirms all point outcomes and completed statistics for the current ledger revision. Before then, preview source media and canonical overlays live. Supplied rendered edits keep all source frames and exact edit boundaries; reviewing hides other clips temporarily, without shortening retained clips.
+
+Cursor navigation into another review point reveals its row inside the review list. Playback, answer updates and moves within the same point retain the user's list position and focus.

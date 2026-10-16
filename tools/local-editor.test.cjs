@@ -164,3 +164,24 @@ test('export remains locked until both current approvals and complete statistics
  p.statistics={ledgerRevision:'v2',status:'complete'};assert.equal(m.exportBlockers(p),false);
  p.needsRebuild=['score'];assert.equal(m.exportBlockers(p),true);
 });
+
+test('cursor point changes reveal only the review scroller; playback and answers preserve scroll', async()=>{
+ const encode=source=>'data:text/javascript;base64,'+Buffer.from(source).toString('base64');
+ const source=fs.readFileSync(path.join(root,'scripts/local_web/review.js'),'utf8')
+  .replace('./model.js',encode(fs.readFileSync(path.join(root,'scripts/local_web/model.js'),'utf8')))
+  .replace('./i18n.js',encode(fs.readFileSync(path.join(root,'scripts/local_web/i18n.js'),'utf8')));
+ const {Review}=await import(encode(source));
+ const list={scrollTop:0,getBoundingClientRect:()=>({top:100,bottom:600})};
+ const selected=new Set();
+ const card=(pid,top)=>({classList:{toggle:(name,on)=>on?selected.add(pid):selected.delete(pid)},getBoundingClientRect:()=>({top:top-list.scrollTop,bottom:top+350-list.scrollTop})});
+ const view=Object.assign(Object.create(Review.prototype),{nodes:new Map([['P1',{card:card('P1',108)}],['P2',{card:card('P2',900)}]])});
+ const previous=global.document;global.document={getElementById:id=>{assert.equal(id,'review-list');return list;}};
+ try {
+  view.highlight('P1',{reveal:true});assert.equal(list.scrollTop,0);
+  view.highlight('P2',{reveal:true});assert.equal(list.scrollTop,792);assert.deepEqual([...selected],['P2']);
+  list.scrollTop=42;view.highlight('P2',{reveal:true});assert.equal(list.scrollTop,42);
+  view.highlight('P1');assert.equal(list.scrollTop,42);
+  view.highlight('unlisted',{reveal:true});assert.equal(list.scrollTop,42);assert.equal(selected.size,0);
+  view.highlight('P2',{reveal:true});assert.equal(list.scrollTop,792);
+ } finally {global.document=previous;}
+});

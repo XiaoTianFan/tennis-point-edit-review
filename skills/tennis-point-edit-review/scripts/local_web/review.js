@@ -153,8 +153,16 @@ export class Review {
     this.localize();
     this.search();
   }
-  highlight(pid) {
+  highlight(pid, { reveal = false } = {}) {
+    const changed = this.highlightedPoint !== pid;
+    this.highlightedPoint = pid;
     for (const [id, n] of this.nodes) n.card.classList.toggle("selected", id === pid);
+    if (reveal && changed) {
+      const card = this.nodes.get(pid)?.card;
+      if (!card) return;
+      const list = $('review-list'), box = list.getBoundingClientRect(), row = card.getBoundingClientRect();
+      if (row.top < box.top + 8 || row.bottom > box.bottom - 8) list.scrollTop += row.top - box.top - 8;
+    }
   }
   search() {
     const q = $("search").value.trim().toLowerCase();

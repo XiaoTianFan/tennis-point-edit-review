@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026.10.17-v25.1
+
+- Reveal the matching review row when cursor navigation enters another review point; keep focus, answers and row order, without repeated scrolling during playback or answer edits.
+
 ## 2026.10.17-v25.0
 
 - Preserve every supplied edit frame and source boundary; add local tile, temporal innovation and bidirectional optical-flow seam evidence.
