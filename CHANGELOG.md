@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026.10.17-v25.0
+
+- Preserve every supplied edit frame and source boundary; add local tile, temporal innovation and bidirectional optical-flow seam evidence.
+- Use one local project with full/review ripple-hide views, shared scoreboard and cursor-snapping trims; no redundant offline HTML.
+- Lock CLI, HTTP and UI movie export until owner confirmation of all point outcomes and completed statistics.
+
+
 ## 2026.10.16-v24.1
 
 - Ask about retained first-serve faults and service lets for supplied edits, distinguish repeated attempts from new points, and disclose unavailable serve statistics before statistical analysis. Use explicit visible-sample panel labels when evidence is incomplete; preserve runtime code and JSX templates.

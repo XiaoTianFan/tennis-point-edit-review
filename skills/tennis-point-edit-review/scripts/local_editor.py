@@ -15,7 +15,7 @@ from fractions import Fraction
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
-from local_model import SCHEMA, Store, Conflict, context, read, write, validate
+from local_model import SCHEMA, Store, Conflict, context, read, write, validate, export_blockers
 from local_media import prepare_media, frame_image, render_graphics, export_video, export_settings, probe, source_settings
 
 WEB = Path(__file__).resolve().parent / 'local_web'
@@ -25,7 +25,7 @@ def initialize(plan, directory, base=None):
     if directory.exists():
         raise ValueError('Create a new project directory')
     p = copy.deepcopy(plan)
-    p.update(schema=SCHEMA, projectId=secrets.token_hex(12), revision=0, answers={}, needsRebuild=[], undo=[], redo=[], events=[])
+    p.update(schema=SCHEMA, projectId=secrets.token_hex(12), revision=0, answers={}, approval={}, needsRebuild=[], undo=[], redo=[], events=[])
     p.setdefault('overlays', [])
     base = Path(base or Path.cwd())
     for asset in p['assets']:
@@ -230,6 +230,8 @@ def make_server(directory, port=0):
                         picker_lock.release()
                 elif route == '/api/render':
                     p = store.get()
+                    if export_blockers(p):
+                        raise ValueError('Full export locked: ' + '; '.join(export_blockers(p)))
                     if data['revision'] != p['revision']:
                         raise Conflict('Reload before exporting video')
                     options = export_settings(p, data.get('options'))
@@ -317,7 +319,7 @@ def main():
             raise Conflict('Stale revision; read current context before updating')
         if updated['review']['source'] != old['review']['source'] or updated['review']['ledgerRevision'] != old['review']['ledgerRevision'] or [(r['reviewId'], r['pointId']) for r in updated['review']['rows']] != [(r['reviewId'], r['pointId']) for r in old['review']['rows']]:
             raise ValueError('Preserve the current review source, revision and point mapping')
-        updated.update(projectId=old.get('projectId'), answers=old.get('answers', {}), needsRebuild=[], undo=[], redo=[])
+        updated.update(projectId=old.get('projectId'), answers=old.get('answers', {}), approval={}, needsRebuild=[], undo=[], redo=[])
         validate(updated, check_files=True)
         render_graphics(updated, store.directory)
         result = store.commit(updated, args.expected_revision, {'type': 'agent-reconciliation'})

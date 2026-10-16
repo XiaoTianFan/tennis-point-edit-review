@@ -136,3 +136,31 @@ test('export summary uses the actual project dimensions, rational fps and hold d
   assert.ok(Math.abs(converted.seconds-summary.seconds)<=.5/60);
   assert.equal(JSON.stringify(p),before);
 });
+
+test('review is a reversible layout of the same clips, not copied cuts or answer changes', async () => {
+  const m=await model;
+  const p={...project,review:{rows:[{pointId:'P2'}]},overlays:[{id:'score'},{id:'r',view:'review'},{id:'s',view:'full'}],clips:[{id:'a',pointId:'P1',inFrame:0,outFrame:20},{id:'b',pointId:'P2',inFrame:20,outFrame:40},{id:'c',pointId:'P2',inFrame:40,outFrame:60},{id:'d',pointId:'P3',inFrame:60,outFrame:100}]};
+  const original=JSON.stringify(p);
+  assert.deepEqual(m.layout(p,'review').map(c=>[c.id,c.startFrame,c.endFrame]),[['b',0,20],['c',20,40]]);
+  assert.equal(m.layout(p,'full').at(-1).endFrame,100);
+  assert.equal(JSON.stringify(p),original);
+  assert.deepEqual(m.viewOverlays(p,'review').map(o=>o.id),['score','r']);
+  assert.deepEqual(m.viewOverlays(p,'full').map(o=>o.id),['score','s']);
+});
+test('trim cursor snap uses screen distance at multiple zoom levels; shift bypass and distant edges',async()=>{
+  const m=await model;
+  for(const px of [.25,1,8]) {
+    const near=100+Math.floor(7/px);
+    assert.deepEqual(m.snapEdge(near-50,50,100,px),{delta:50,snapped:true});
+    assert.equal(m.snapEdge(60,50,100,px,true).snapped,false);
+    assert.equal(m.snapEdge(Math.ceil(9/px),100,100,px).snapped,false);
+  }
+});
+test('export remains locked until both current approvals and complete statistics exist',async()=>{
+ const m=await model,p={...project,review:{ledgerRevision:'v2'},needsRebuild:[]};
+ assert.equal(m.exportBlockers(p),true);
+ p.approval={ledgerRevision:'v2',pointAttribution:true,statistics:true};
+ assert.equal(m.exportBlockers(p),true);
+ p.statistics={ledgerRevision:'v2',status:'complete'};assert.equal(m.exportBlockers(p),false);
+ p.needsRebuild=['score'];assert.equal(m.exportBlockers(p),true);
+});

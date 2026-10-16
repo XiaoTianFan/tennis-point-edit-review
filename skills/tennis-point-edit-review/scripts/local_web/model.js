@@ -47,13 +47,23 @@ export function exportSummary(p, options = {}) {
   const frames = Math.max(1, Math.round(seconds * outputRate));
   return {width:options.width ?? p.width, height:options.height ?? p.height, fps, frames, seconds:frames / outputRate, reasons:[...(p.needsRebuild ?? [])]};
 }
-export function layout(p) {
+export function layout(p, view = 'full') {
   let start = 0;
-  return p.clips.map((c) => {
+  const points = new Set((p.review?.rows ?? []).map(r => r.pointId));
+  return p.clips.filter(c => view !== 'review' || points.has(c.pointId)).map((c) => {
     const x = { ...c, startFrame: start, endFrame: start + length(c) };
     start = x.endFrame;
     return x;
   });
+}
+export const viewOverlays = (p, view) => p.overlays.filter(o => !o.view || o.view === 'both' || o.view === view);
+export function snapEdge(delta, edge, cursor, pixelsPerFrame, bypass = false) {
+  const snapped = !bypass && Math.abs((edge + delta - cursor) * pixelsPerFrame) <= 8;
+  return {delta: snapped ? cursor - edge : delta, snapped};
+}
+export function exportBlockers(p) {
+  const a = p.approval ?? {}, revision = p.review?.ledgerRevision, s = p.statistics ?? {};
+  return a.ledgerRevision !== revision || a.pointAttribution !== true || a.statistics !== true || s.status !== 'complete' || s.ledgerRevision !== revision || !!p.needsRebuild?.length;
 }
 export function bounds(o, c) {
   const offset = o.anchor === "source" ? c.inFrame : 0;

@@ -85,7 +85,7 @@ def prepare(plan, base, provisional=False, mode='agent-dominant'):
     return p, review, ledger
 
 
-def publish(plan_path, directory, mode='agent-dominant', surface='both', provisional=False):
+def publish(plan_path, directory, mode='agent-dominant', surface='local', provisional=False):
     plan_path, directory = Path(plan_path).resolve(), Path(directory).resolve()
     if directory.exists():
         raise ValueError('Use a new review directory; resume existing drafts in place')
@@ -111,7 +111,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('plan'); parser.add_argument('directory')
     parser.add_argument('--mode', choices=['agent-dominant', 'human-first'], default='agent-dominant')
-    parser.add_argument('--surface', choices=['html', 'local', 'both'], default='both')
+    parser.add_argument('--surface', choices=['html', 'local', 'both'], default='local')
     parser.add_argument('--provisional-points', action='store_true')
     args = parser.parse_args()
     print(publish(args.plan, args.directory, args.mode, args.surface, args.provisional_points))

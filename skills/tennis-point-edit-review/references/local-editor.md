@@ -1,12 +1,10 @@
 # 本地编辑与复核工作台
 
-没有使用ChatCut或Premiere Pro时，默认复用包内 **Courtside / Edit**，不再为每场比赛重写播放器、时间线或审核表。agent通过终端和JSON操作，用户通过本机浏览器操作；agent不需要Computer Use。比赛判读、计分、统计和估速仍依照本技能各阶段执行。
+本地模式复用包内 **Courtside / Edit**。agent使用终端与JSON，用户在本机浏览器剪辑和填写集成审核表；不为比赛重写UI，不另建离线HTML或复核工程。网球判读、统计与估速仍遵循各阶段细则。
 
 ## 启动与依赖
 
-先确定用户素材与可写的任务工作区。媒体、工程、答案和导出均存工作区，不能写回技能目录。需要Python 3.10+、FFmpeg/ffprobe、Node 20+及现代Chromium浏览器。网页自身没有打包步骤、CDN或第三方脚本；正式图形渲染另需React、React DOM、esbuild、Playwright及Chromium。
-
-以下`<skill>`、`<work>`、`<source>`由当前任务路径替换，命令参数中的路径始终加引号：
+素材、工程、答案与输出放任务工作区，不写技能目录。需要Python 3.10+、FFmpeg/ffprobe、Node 20+、现代Chromium；图形渲染需要React、React DOM、esbuild、Playwright。网页无构建步骤、CDN和第三方脚本。
 
 ```sh
 python "<skill>/scripts/local_editor.py" doctor
@@ -15,67 +13,70 @@ python "<skill>/scripts/local_editor.py" init "<work>/plan.json" "<work>/edit"
 python "<skill>/scripts/local_editor.py" serve "<work>/edit" --open
 ```
 
-缺少图形依赖时，在工作区独立依赖目录运行`npm install --prefix "<work>/runtime" --save-exact react react-dom esbuild playwright`，保留生成的版本锁；设置本进程`NODE_PATH`为该目录的`node_modules`，再运行`doctor`。如无已安装可用浏览器，在该依赖目录执行`npx playwright install chromium`；已安装Edge/Chrome可在计划中指定`browserChannel: "msedge"`或`"chrome"`。`doctor`检查可执行文件和模块，实际小规模`init`才能证明图形渲染可用。不得以安装成功代替合成验收。
+`<skill>/<work>/<source>`替换为当前任务路径，参数加引号。缺模块时在工作区独立runtime运行`npm install --prefix "<work>/runtime" --save-exact react react-dom esbuild playwright`，保留锁文件并设置本进程`NODE_PATH`。可用已装Edge/Chrome，计划指定`browserChannel=msedge/chrome`；无浏览器时在runtime执行`npx playwright install chromium`。`doctor`仅证明依赖存在，实际`init`和合成预览才证明可用。
 
-`serve`打印带会话令牌的回环URL，并写入工作区`session.json`；保持进程运行，把URL交给用户。终止用Ctrl+C；重启同一目录即恢复工程与答案，并生成新的会话URL。无浏览器控制能力的agent仍可完成全部构建和导出，再请用户打开该URL。不要绑定公网、转发此端口或把会话令牌上传到仓库。
+`serve`打印带令牌回环URL并写`session.json`，保持进程运行并把URL交用户。Ctrl+C停止；重启同目录恢复工程与答案并换令牌。不绑定公网、转发端口或上传令牌。没有浏览器控制能力仍可构建工程，再请用户打开会话URL。
 
 ## 媒体与时间
 
-`media`默认继承源片显示分辨率、标称有理数帧率、音频采样率及声道数，生成浏览器可解码的H.264/AAC恒定帧率媒体与`.media.json`，不改原片。旋转及像素宽高比归一为实际显示画幅；奇数尺寸补至偶数，源参数保留在元数据。`--fps`、`--width`仅用于用户明确要求的转换，不把低清代理作为默认交付源。可用`--start 秒 --duration 秒`制作有界片段。SDR颜色标签随媒体保留，最终合成统一输出SDR Rec.709；HDR先确定并验收色调映射，本工具拒绝静默转换PQ/HLG。
+`media`继承源显示分辨率、有理fps、音频采样率和声道，生成H.264/AAC CFR媒体及`.media.json`；不改原片。旋转、SAR归一，奇数尺寸补偶数，源参数保留；`--fps/--width`仅用于明确转换。`--start/--duration`为有界片段。SDR颜色保留，最终输出Rec.709；HDR先确定并验收色调映射，不静默转换PQ/HLG。
 
-计划可用`inSeconds/outSeconds/durationSeconds/startSeconds/endSeconds`，初始化按继承帧率一次换算并保存为**媒体整数帧、左闭右开**；同一边界不可同时提供秒和帧。已有整数帧计划保持原坐标，fps可用`30000/1001`等有理数字符串。原片呈现时间=`sourceStartSeconds + frame / fps`；VFR转CFR会重复/舍弃帧，代理帧号不等于原片帧号。估速、真实触拍及死球证据保留原片PTS/整数微秒，不能从代理帧数反推为原始测量精度。
+计划可写`in/out/duration/start/endSeconds`，初始化只换算一次为整数帧、左闭右开；同一边界不能同时给秒与帧。原片时间=`sourceStartSeconds+frame/fps`；VFR代理可能重采样，估速和触拍必须保留原PTS，不把代理帧当原始精度。
 
-暂停、单帧前后步进使用FFmpeg解码静帧，按原尺寸叠加正式PNG；播放使用浏览器视频帧回调与当前片段边界。浏览器连续播放在内部跳剪处可能短暂停顿，不能作为音画连续性或精确输出验收；最终FFmpeg成片单独检查。Source模式显示完整代理原声与画面，不显示成片覆盖层；Edited模式按剪辑计划播放。
+暂停／步进使用FFmpeg精确解码帧并叠加正式透明PNG；播放由浏览器视频帧回调实时合成，不预渲染整片。内部跳剪可能短暂停顿；最终编码音画验收须等[导出门禁](#导出与边界)开放。Source播放完整代理及原声、无图层；Edited播放当前视图。
 
 ## 剪辑计划
 
-在阶段2判赢家前，先用[首次标注准备器](initial-labeling.md)生成可用复核区；默认agent主导，用户明确人工先行时交付后等待其标注。此模式允许未知serverId且提供人工元数据控件，与下文阶段3必要疑点子集分别保存。渲染成片先按[剪口重建](rendered-video.md)生成计划。
-
-从[最小计划](../examples/local-edit-plan.json)开始，替换所有示例身份、素材与事实。`init`只接受新工程目录；素材`metadata`及`path`可相对计划文件，其余生成的媒体/图形路径保存为绝对路径。
+判赢家前按[首次标注](initial-labeling.md)准备集成列表，默认agent主导；已剪成片按[CV重建](rendered-video.md)保留完整源分段。`init`仅接受新目录；从[最小计划](../examples/local-edit-plan.json)替换示例。metadata/path相对计划解析，初始化后保存绝对路径。
 
 | 字段 | 契约 |
 |---|---|
-| `title`, `fps`, `width`, `height` | 时间线名称；省略`fps/width/height`时由首个媒体继承，偶数画幅各边≤8192，1–240 fps；混合帧率素材先显式统一到时间线帧率 |
-| `players` | 当前两方`id/name`映射；比赛身份与双打限制遵循输入规则 |
-| `assets` | 稳定`id`加`media`生成的`metadata`路径；初始化核实实际帧率与帧数 |
-| `clips` | 按播放顺序排列；稳定`id`、`assetId`、`inFrame/outFrame`；比赛段带`pointId/serveNumber/serveId`，同分可含多个clip，不另计分 |
-| 定格clip | `kind: "hold"`、源`inFrame`及`durationFrames`；默认为静音，用于干净尾帧上的统计页 |
-| `review` | `source/ledgerRevision/rows`沿用[复核输入](../examples/review-data.json)，稳定R/P、局/盘、发球方、疑点及证据定位；初始AI判断放`initial`，不预填人工已审 |
-| `overlays` | 稳定`id`、`clipId`、正式`component/props`、`startFrame/endFrame`；`anchor: "source"`绑定代理源帧，`"clip"`绑定片段局部帧；自动裁到片段可见范围 |
+| title/fps/width/height | 缺省由首资产继承；有理fps 1–240，偶数画幅各边≤8192；混合素材先显式统一 |
+| players/assets | 当前两方id/name；稳定asset id及media元数据，核实实际帧率和帧数 |
+| clips | 唯一master数组：稳定id、assetId、inFrame/outFrame、pointId与真实发球元数据；同分多段共P号 |
+| hold | kind=hold、源inFrame、durationFrames，静音统计背景 |
+| review | source/ledgerRevision/rows，稳定R/P、局盘、server、疑点和源定位；AI放initial，不预填人工已审 |
+| overlays | id/clipId/component/props/startFrame/endFrame；anchor=source或clip，裁到可见范围；view=both（默认）/full/review |
+| statistics/approval | 当前账本统计完成状态与用户确认；见导出门禁 |
 
-逐分说明`review.rows[].reason`由agent依据当前素材证据生成；工作台只展示工程中的说明，加载视频不会自动生成分析。阶段3的`review.rows`只放自行回查后的必要人工复核子集，不能为了让每个主剪片段可跳转而把全场变成待审；全场定位用主剪时间线、clip/pointId映射与可见编号。无复核需求时可用空rows。
+理由由agent依据素材生成，播放器不自动分析。阶段3 rows仅为补查后必要疑点／问题局；全场跳转使用clip/P映射，不为定位把全场变成待审。[正式图形](graphics-adapters.md)通过`init/update`生成整画幅透明PNG与哈希，浏览器与最终输出复用同份props；模板保持原样，文字修改需重生成。统计页首尾约0.3秒淡变由工作台处理，不重复动画。
 
-覆盖层的属性与位置复用[正式清单](../examples/ui-manifest.json)和[图形适配](graphics-adapters.md)。源码模板不复制、不修改；`init/update`渲染整画幅透明PNG，浏览器和导出复用同一批图形及props。静态标签直接切换，其他比例采用等比居中的参考布局适配，播放器画布继承实际宽高比；统计页由工作台按当前帧率负责首尾约0.3秒淡变，不能再叠加第二份动画。文字与分数从账本重生成，网页支持修改图层时序，不声称图片内文字可直接编辑。
-
-阶段1建立主剪计划，将各分精剪后排入可播放时间线，内部log保存P/源片映射；阶段2自主计分并加基础图层。阶段3另建必要复核工作区，使用`reviewId/reviewLabel/explanation`及常显规则，与阶段4回填可多轮往返；不能用主剪删去的一发替代审核证据。阶段5备齐统计/估速及显示数据，阶段6用`template_pack.py`制作五页统计和逐发球速图层，阶段7验收；示例不提供默认比赛结果。
+完整／复核视图共用一个clips数组：完整视图保留全部段；复核按rows中的P号保留其全部源段，其余暂时波纹隐藏，不复制、重剪或删除master。已剪成片不再删除失败发球、等待或尾段。计分板在两视图均可见；复核R/P、常显发球与说明仅review显示，短发次标签仅full显示。切换保留源帧锚点、各自缩放和滚动，不改答案；无复核片段时禁用review。说明放计分板上方避让。阶段5数据、阶段6图层、阶段7输出顺序见[阶段衔接](workflow.md)。
 
 ## 用户操作与agent接续
 
-- 顶栏可切换English/中文；语言与面板尺寸保存在本浏览器，不改比赛文字、图形或答案。拖动复核/预览之间、预览/时间线之间的分隔条调整布局；分隔条也支持方向键、Shift大步调整及Home或双击复位。时间线内`Ctrl/Cmd+滚轮`横移，`Alt+滚轮`以指针位置缩放。
-- 左侧逐分列表点击卡片文字或空白处定位该分首个保留片段；卡片聚焦后也可按Enter/空格定位。选项随面板宽度自动换行。查看得分方、人工无法确定、死球原因、双误、多打与备注；答案控件和备注框保持独立操作，不触发跳转。所有行保持原序常驻，搜索只高亮。与独立HTML使用相同`tennis-point-review/v1`导出及pending/partial/resolved/replay/unresolved语义。
-- 右侧切换Edited/Source，拖动播放条或时间线游标，按`Space`播放、方向键单帧、`Shift+方向键`十帧、`[`/`]`逐分跳转。按住clip两端修剪，拖动clip改变播放顺序；也可用入/出帧精确修剪。图层条可拖动或缩短/延长，点击后用同一数字框修改时序。局部图层帧与源锚定帧不可混用。
-- 有效更改自动写入`project.json`并增加revision；`history/`保存更改前版本，Undo/Redo最多保留40步。不要用新工程覆盖旧工程或替用户清空答案。agent同时写入或另一标签页修改时，旧revision被拒绝；重读当前上下文后处理差异，不盲目重试。未提交的操作保留在本浏览器草稿中；连接失败或版本冲突时用Recover edits下载，交agent与当前工程对比，不自动覆盖较新的状态。
-- **Send to agent**保存`agent-context.json`、`review.json`与当前片段/游标，给出可复制消息和完整JSON；用户自行粘贴到agent会话，网页不连接云端模型、不自动发送消息。单独导出的JSON也可交给现有`review_io.py merge`。
+- 顶栏English/中文仅改UI。拖动面板分隔条调整布局；键盘方向键、Shift大步及Home／双击复位。时间线Ctrl/Cmd+滚轮横移，Alt+滚轮以指针缩放。
+- 点审核行文字／空白或Enter/空格跳分；答案控件不触发跳转。所有行原序常驻，搜索仅高亮；协议和人工未知语义见[账本](ledger-and-review.md)。
+- 下方完整全片／仅复核切换视图。Edited/Source切换播放模式；Space播放，方向键±1帧、Shift±10帧、方括号逐分。拖clip边缘修剪，靠近游标8屏幕像素内吸附并高亮，Shift临时绕过；随缩放换算帧，不能越过合法源范围。入出帧框支持精确修剪；图层条可移动或改长，局部帧与源锚定帧不混用。片段重排仅改变呈现，不自动改比赛事实；复核重排保留隐藏段。
+- 操作写project.json并递增revision，history保存前版，Undo/Redo保留40步。旧revision被拒后重读差异，不盲重试；未提交操作留浏览器草稿，用Recover edits交agent恢复，不覆盖新状态。
+- “交给agent”写agent-context.json与review.json，保留当前clip、帧、模式和视图，用户复制消息回会话；网页不接云模型、不自动发送。`context`可直接读最新状态，不依赖先点击。
 
 ```sh
-python "<skill>/scripts/local_editor.py" context "<work>/edit" --output "<work>/current-context.json"
+python "<skill>/scripts/local_editor.py" context "<work>/edit" --output "<work>/context.json"
 python "<skill>/scripts/review_io.py" merge "<work>/ledger.json" "<work>/edit/review.json" "<work>/ledger-next.json"
 python "<skill>/scripts/local_editor.py" update "<work>/edit" "<work>/updated-project.json" --expected-revision 12
-python "<skill>/scripts/local_editor.py" render "<work>/edit" "<work>/new-export"
 ```
 
-`context`直接读取最新持久化状态，不依赖用户先点按钮。`updated-project.json`从**当前project.json副本**修改，保留用户剪口、顺序、映射及素材路径；不能把最初plan直接覆盖回来。先按[依赖重算](workflow.md)处理`needsRebuild`，再用原计分/统计/估速工具重算受影响事实和props。`update`保留用户answers、source、ledgerRevision和R/P映射，重新渲染图形并以预期revision原子提交；成功后清除待重算项，保留历史并开始新的Undo边界。发布另一轮审核或增删分时另建有版本的新计划，显式沿用已确认事实。
-
-修剪会标记证据与时序待查，重排标记呈现顺序待查，答案变化标记计分/统计待查。重排只改变呈现，不能自动重排比赛事实。未处理这些变化仍可直接导出；界面仅提示计分板、统计或图形时序可能与用户编辑不一致，导出报告保留待查项。不要为消除提示而直接清空`needsRebuild`；确认没有事实影响的纯呈现修改也需检查图层与源映射后通过`update`提交。
+updated-project从当前project副本修改，保留用户剪口、顺序、路径、answers和版本／R/P；不能拿初始plan覆盖。按needsRebuild回查证据、重算计分统计及图层后update，清除已处理项并留历史。纯呈现改动也先验映射和图层，不直接清提示。新增／合并／拆分审核点使用新版计划，按[谱系](coverage-and-exceptions.md)显式迁移确认事实和历史，不能静默移植分归属。
 
 ## 导出与边界
 
-Export video提供分辨率预设和自定义宽高、整数或有理数fps、文件名、目标目录及系统文件夹选择器。默认沿用当前时间线；输出变化不修改工程帧坐标或证据，整条合成后一次换帧率以避免各剪口累积舍入，输出时长误差≤半个输出帧。宽高不同比例时等比补边，图形随视频一起缩放。支持偶数尺寸各边≤8192及1–240 fps；音频沿用工程采样率与声道数。系统选择器使用Python Tk（Windows/macOS原生对话框，Windows启用逐显示器DPI感知）；缺少Tk或无桌面时可直接填路径。终端`render`同样接受`--width/--height/--fps/--filename`。不覆盖已有文件，请换名后导出。
+完整样片及复核片在确认前禁止渲染。UI、HTTP `/api/render`和CLI `render`共用门禁，缺字段默认锁定（含旧工程）：
 
-Export video与终端`render`使用同一路径：逐段精准取帧、同源PNG合成、统计淡变、剪口两帧音频淡变、定格静音，然后输出H.264/AAC MP4。输出文件写入用户选定目录；每次在工程内使用新的渲染工作目录，保存`project-snapshot.json`与带帧数/哈希的`export.json`；不能只验证PNG、忽略最终视频。至少检查发球前后、大小标签同帧退出、分界、五页统计、定格接点、原声及起止帧；确认总帧数、时长和有效音轨。两帧音频淡变不代替人工检查剪口声音。
+- 用户通过底部控件明确确认全部分归属：approval.pointAttribution=true。
+- statistics.status=complete且statistics.ledgerRevision与review.ledgerRevision一致，用户另确认approval.statistics=true。
+- approval.ledgerRevision一致且needsRebuild为空；修剪、判罚或图层更改撤销确认，回填重算后重新确认。
 
-当前实现为单视频主轨、顺序拼接、原速片段与静帧、七种正式覆盖层；不含多机位、任意转场、音频混音、变速曲线或HDR。需要这些能力时明确扩展计划或选择用户认可的编辑环境；不要静默丢失特性。源文件、代理和workspace一并移动后需更新路径并验证；本地服务器仅服务已注册素材和图形，不提供任意文件浏览。
+agent不得替用户勾确认。确认前实时合成预览，允许源代理、抽帧与透明图层缓存，不导出QA样片绕过。最终门禁开放后：
+
+```sh
+python "<skill>/scripts/local_editor.py" render "<work>/edit" "<work>/new-export"
+```
+
+UI与CLI同路导出H.264/AAC MP4：逐段精准取帧、同源图形、统计淡变、剪口两帧音频淡变、定格静音，再统一换输出fps避免逐段舍入。沿用分辨率／fps／音频；可指定偶数宽高≤8192、fps 1–240、文件名与目录；比例不同时等比补边，时长误差≤半输出帧。CLI有--width/--height/--fps/--filename；UI支持Tk系统目录选择，缺Tk/桌面时填路径。输出不覆盖已有文件，保存project-snapshot.json及含帧数／哈希的export.json。最终验收内容见[画面验收](presentation-and-qa.md#验证与交付)；编码成功不等于听审或整片视觉通过。
+
+当前为单视频顺序主轨、原速片段／静帧与七种正式覆盖层，无多机位、任意转场、混音、变速曲线或HDR；需要时显式扩展或用已认可编辑器。移动workspace后更新并核实素材路径；服务器仅服务注册资产，不开放任意文件浏览。
 
 ## Output language
 
-Set project `outputLanguage` to `en` or `zh-CN` using the [output-language policy](output-language.md). The context command returns it, and graphics rendering forwards it to canonical templates. Explicit overlay props remain authoritative; regenerate visible text and graphics when changing output language. The studio interface toggle controls UI text independently.
+project.outputLanguage与图形使用[产物语言策略](output-language.md)，UI切换独立；改产物语言要重生成图形，显式props优先。

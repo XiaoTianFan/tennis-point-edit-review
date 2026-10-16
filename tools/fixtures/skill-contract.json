@@ -116,11 +116,11 @@
       "checks": [
         {
           "path": "references/ledger-and-review.md",
-          "text": "主动制作、验证并同批交付两者，再等待用户复核；不在2→3之间停下或询问是否生成HTML。"
+          "text": "阶段2有疑点直接完成阶段3再交付：本地在同一工作台切换完整／复核视图并用集成列表填写，不生成离线HTML"
         },
         {
           "path": "references/ledger-and-review.md",
-          "text": "复核时间线必须每分独立精剪"
+          "text": "用户已剪成片保留该分全部源片段和边界，仅临时隐藏其他分"
         },
         {
           "path": "references/presentation-and-qa.md",
@@ -140,7 +140,7 @@
         },
         {
           "path": "SKILL.md",
-          "text": "独立复核时间线＋可打开的交互HTML链接"
+          "text": "本地在同一工程下方切换完整／复核时间线，不另建复核工程或离线HTML"
         }
       ]
     },
@@ -500,7 +500,7 @@
         },
         {
           "path": "references/presentation-and-qa.md",
-          "text": "复核专项检查：逐条核对 HTML 与时间线是否均为“R编号 / P编号”及相同映射"
+          "text": "复核专项检查：逐条核对列表与时间线的“R编号 / P编号”映射及常显局次、发球方。"
         },
         {
           "path": "references/presentation-and-qa.md",
@@ -508,7 +508,7 @@
         },
         {
           "path": "references/presentation-and-qa.md",
-          "text": "仅更新技能的任务不应修改既有 HTML、时间线或用户审核草稿。"
+          "text": "仅更新技能不改既有工程或草稿。"
         }
       ]
     },
@@ -517,11 +517,11 @@
       "checks": [
         {
           "path": "references/presentation-and-qa.md",
-          "text": "复核 HTML 列顺序固定为定位信息、选手A、选手B、人工无法确定、死球类型。"
+          "text": "列顺序为定位、双方、人工无法确定、死球类型"
         },
         {
           "path": "references/presentation-and-qa.md",
-          "text": "三种得分归属选项互斥"
+          "text": "互斥、清旧赢家和导出语义"
         },
         {
           "path": "references/ledger-and-review.md",
@@ -592,27 +592,27 @@
     {
       "id": "LOCAL001",
       "path": "references/local-editor.md",
-      "text": "重排只改变呈现，不能自动重排比赛事实。"
+      "text": "片段重排仅改变呈现，不自动改比赛事实"
     },
     {
       "id": "R043",
       "path": "references/rendered-video.md",
-      "text": "no frames\nare skipped in time"
+      "text": "Two full sequential decodes inspect every display frame"
     },
     {
       "id": "R044",
       "path": "references/initial-labeling.md",
-      "text": "`agent-dominant` is the default."
+      "text": "Default agent-dominant"
     },
     {
       "id": "R045",
       "path": "references/initial-labeling.md",
-      "text": "before agent outcome\nrecognition starts"
+      "text": "before agent outcome recognition"
     },
     {
       "id": "R046",
       "path": "references/initial-labeling.md",
-      "text": "Both ledger and export must match purpose, source\nand revision."
+      "text": "both sides must match"
     },
     {
       "id": "R047",
@@ -640,6 +640,21 @@
           "text": "可见发球最高初速·估算"
         }
       ]
+    },
+    {
+      "id": "R050",
+      "path": "SKILL.md",
+      "text": "禁止渲染完整样片或复核片"
+    },
+    {
+      "id": "R051",
+      "path": "references/local-editor.md",
+      "text": "修剪、判罚或图层更改撤销确认"
+    },
+    {
+      "id": "R052",
+      "path": "references/rendered-video.md",
+      "text": "each clip end equals the next start"
     }
   ],
   "files": [
@@ -906,6 +921,9 @@
     },
     {
       "path": "references/initial-labeling.md"
+    },
+    {
+      "path": "scripts/seam_cv.py"
     }
   ]
 }

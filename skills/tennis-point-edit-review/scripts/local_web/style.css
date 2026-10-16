@@ -111,7 +111,7 @@ h2 {
   height: 100dvh;
   min-height: 640px;
   display: grid;
-  grid-template-rows: 49px minmax(300px, 1fr) 6px var(--timeline-pane-height, 256px) 30px;
+  grid-template-rows: 49px minmax(300px, 1fr) 6px var(--timeline-pane-height, 256px) auto;
   overflow: hidden;
 }
 .topbar {
@@ -875,3 +875,7 @@ body.resizing-timeline, body.resizing-timeline * { cursor: row-resize !important
 .path-control button { flex-shrink: 0; }
 #export-dialog .export-warning { margin: 12px 16px 0; padding: 10px 12px; background: #292b21; border-left: 2px solid var(--lime); font-size: 12px; line-height: 1.5; }
 @media(max-width:440px) { .export-form { grid-template-columns: 1fr; } }
+
+#playhead.snapped{background:#DAF36D;box-shadow:0 0 0 1px #DAF36D} .approval-controls{display:flex;gap:16px;align-items:center;flex-wrap:wrap}.approval-controls label{display:flex;gap:6px;align-items:center}#export-gate{color:var(--muted,#9ba8b8)}
+
+footer{min-height:30px;flex-wrap:wrap;padding-block:5px} .approval-controls{font-size:11px}

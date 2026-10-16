@@ -44,6 +44,14 @@ def sample(directory):
         answers={}, needsRebuild=[], undo=[], redo=[], events=[])
 
 
+def approve(project):
+    # Synthetic final-stage fixtures only. Real projects require owner actions.
+    revision=project['review']['ledgerRevision']
+    project['approval']=dict(pointAttribution=True,statistics=True,ledgerRevision=revision)
+    project['statistics']=dict(status='complete',ledgerRevision=revision)
+    project['needsRebuild']=[]
+
+
 class ModelTest(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -51,6 +59,20 @@ class ModelTest(unittest.TestCase):
         self.p = sample(self.temp.name)
         write(Path(self.temp.name) / 'project.json', self.p)
         self.store = Store(self.temp.name)
+
+    def test_export_gate_defaults_stale_versions_and_mutations(self):
+        from local_model import export_blockers
+        self.assertTrue(export_blockers(self.p))
+        with self.assertRaisesRegex(ValueError,'Full export locked'):
+            export_video(self.p,Path(self.temp.name)/'forbidden')
+        self.assertFalse((Path(self.temp.name)/'forbidden').exists())
+        approve(self.p); self.assertEqual(export_blockers(self.p),[])
+        self.p['statistics']['ledgerRevision']='stale'; self.assertTrue(export_blockers(self.p))
+        approve(self.p); write(self.store.path,self.p)
+        changed=self.store.apply(0,dict(type='trim',id='first',inFrame=11,outFrame=40))
+        self.assertEqual(changed['approval'],{}); self.assertTrue(export_blockers(changed))
+        with self.assertRaisesRegex(ValueError,'Reconcile'):
+            self.store.apply(1,dict(type='approval',field='pointAttribution',confirmed=True))
 
     def test_frame_ranges_and_validation(self):
         self.assertEqual([c['startFrame'] for c in layout(self.p)], [0, 30])
@@ -169,11 +191,14 @@ class ModelTest(unittest.TestCase):
         self.assertEqual(request('POST','/api/operation',op,{'X-Session-Token':token})[0],200)
         self.assertEqual(request('POST','/api/operation',op,{'X-Session-Token':token})[0],409)
         with patch('local_editor.export_video', return_value={'state':'complete'}) as render:
+            blocked, body, _ = request('POST','/api/render',{'revision':1},{'X-Session-Token':token})
+            self.assertEqual(blocked,400,body); render.assert_not_called()
+            approved = self.store.get(); approve(approved); write(self.store.path,approved)
             status, body, _ = request('POST','/api/render',{'revision':1,'options':{'filename':'用户选择.mp4','fps':'25','width':640,'height':360}},{'X-Session-Token':token})
             self.assertEqual(status,202,body)
             render.assert_called_once()
             args = render.call_args.args
-            self.assertEqual(args[0]['needsRebuild'], ['presentation-order'])
+            self.assertEqual(args[0]['needsRebuild'], [])
             self.assertEqual(args[3]['fps'], '25')
             self.assertEqual(args[4].name, '用户选择.mp4')
         with patch('local_editor.pick_directory', return_value=self.temp.name) as picker:
@@ -207,7 +232,7 @@ class MediaTest(unittest.TestCase):
                 self.assertEqual(review_payload(project)['rows'], [])
                 self.assertEqual((project['width'],project['height'],project['fps']),(320,240,source_rate))
                 self.assertEqual(project['clips'][0]['inFrame'],round(Fraction(2,5)*Fraction(source_rate)))
-                project['needsRebuild'] = ['presentation-order','score-and-statistics']
+                approve(project)
                 before = copy.deepcopy(project)
                 result = export_video(project,Path(tmp)/'render',options=dict(width=640,height=480,fps=output_rate,filename='custom 中文.mp4'))
                 self.assertEqual(project,before)
@@ -230,6 +255,7 @@ class MediaTest(unittest.TestCase):
             graphic = Path(tmp) / 'red.png'
             run(['ffmpeg','-v','error','-f','lavfi','-i','color=red:size=320x180,format=rgba','-frames:v','1',graphic])
             p['clips'] = [dict(id='clip',assetId='src',pointId='P001',inFrame=0,outFrame=30)]
+            approve(p)
             for component,start,end,visible,hidden in [('serveLabel',5,15,[5,14],[4,15]),('statsPanel',0,30,[9,20],[0,29])]:
                 p['overlays'] = [dict(id='overlay',clipId='clip',component=component,startFrame=start,endFrame=end,image=str(graphic))]
                 for output_rate in (30,60):
@@ -250,6 +276,7 @@ class MediaTest(unittest.TestCase):
             meta = prepare_media(raw,proxy,width=320)
             p['assets'][0].update(meta)
             p['clips'].append(dict(id='hold',kind='hold',assetId='src',inFrame=89,durationFrames=30))
+            approve(p)
             result = export_video(p, Path(tmp) / 'render')
             self.assertEqual(result['frames'],90)
             info = probe(result['path'])

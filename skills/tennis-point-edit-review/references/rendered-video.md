@@ -1,89 +1,83 @@
 # Rendered edits: reconstruct clip seams
 
-For an edited render without a clip timeline, preserve its edit and audio.
-Raw matches still require visual point cutting; this detector infers no tennis
-points, winners, serves, games or statistics.
+A supplied edited render is an existing edit. Reconstruct its boundaries and
+preserve every frame and original audio; do not recut it using inferred dead-ball
+times. Detection proposes edit seams, never tennis points or winners. Continuous
+raw matches still use visual point cutting.
 
 ## Scan and reconstruct
 
-Requires Python 3.10+, FFmpeg with `scdet`, and ffprobe. Run in the task workspace,
-never the skill directory. Each scan uses a new output directory; source is read
-only. Replace paths and player identities with this task's values.
+Needs Python 3.10+, NumPy, opencv-python, FFmpeg/scdet and ffprobe. Missing CV
+modules stop the scan rather than falling back silently. Source is read-only;
+each scan/plan uses new task-workspace paths. Replace identities and paths:
 
 ```sh
-python "<skill>/scripts/seam_detect.py" scan "<rendered-video>" "<work>/seams-v1"
-python "<skill>/scripts/local_editor.py" media "<rendered-video>" "<work>/rendered-proxy.mp4"
-python "<skill>/scripts/seam_detect.py" plan "<work>/seams-v1/scan.json" "<work>/rendered-proxy.media.json" "<work>/rough-plan.json" --decisions "<work>/seams-v1/decisions.json" --players "<work>/players.json" --language en
+python "<skill>/scripts/seam_detect.py" scan "<render>" "<work>/scan"
+python "<skill>/scripts/local_editor.py" media "<render>" "<work>/proxy.mp4"
+python "<skill>/scripts/seam_detect.py" plan "<work>/scan/scan.json" "<work>/proxy.media.json" "<work>/plan.json" --decisions "<work>/scan/decisions.json" --players "<work>/players.json" --language en
 ```
 
-`players.json` is an array of the current two `id/name` pairs. Omit only for
-explicitly anonymous preparation; generated Player A/B labels are placeholders.
-The plan contains editable references to the single rendered media asset, not
-separate lossy re-encodes. `local_editor.py init/serve` can play its reconstructed
-clips; the same source mapping can feed the existing [editing adapters](editing-environments.md).
-For Premiere, translate the plan to the existing [exchange contract](premiere-pro.md),
-verify CFR timing and import/read back in Pr. For ChatCut, use available host tools
-to place the mapped ranges and read them back. A JSON plan alone is not an
-imported or verified host timeline. Do not switch the user's requested editor.
-
-Prepare [initial labeling](initial-labeling.md) before outcome recognition;
-use `--provisional-points` for unverified groups. Rough segmentation does not
-complete stage 1. Check [retained serve attempts](inputs-and-rules.md#核实当前输入)
-and [statistics limits](statistics.md#已剪素材的发球证据限制) for supplied edits.
+players is the current two id/name pairs; anonymous placeholders are only for
+explicit anonymous preparation. Plans reference one media asset, not re-encoded
+clips. Local init/serve opens it; use existing [host adapters](editing-environments.md)
+for ChatCut or [Premiere exchange](premiere-pro.md). JSON alone is not a verified
+host import. Keep the requested editor. Before outcome recognition prepare
+[initial labeling](initial-labeling.md), using --provisional-points until grouping
+is verified; candidates are not valid statistical denominators. Apply the
+[retained-attempts and input checks](inputs-and-rules.md#核实当前输入).
 
 ## Detector and evidence
 
-One full sequential decode spatially reduces each frame to RGB at width 320; **no frames
-are skipped in time**. FFmpeg's [scdet](https://ffmpeg.org/ffmpeg-filters.html#scdet)
-provides scene score and mean absolute frame difference. A candidate is emitted
-when scene score reaches 8, or RGB difference reaches the maximum of 0.5, three times
-the preceding 30-frame median, and median plus six median absolute deviations.
-This second signal can expose small jumps in a stable court view. All defaults
-are starting values, not real-match calibrated accuracy claims. No minimum clip
-duration, nearest-keyframe rounding, flash removal or adjacent-hit merging is
-applied. Consecutive hits are flagged for inspection.
+Two full sequential decodes inspect every display frame: RGB/scdet, then local
+tiles, temporal prediction innovation and bidirectional
+[DIS optical-flow](https://docs.opencv.org/4.x/de/d4f/classcv_1_1DISOpticalFlow.html)
+residuals. Local changes are not diluted by the static court; flow tests how much
+ordinary movement explains. Local metrics cover all frames, flow runs on local
+anomalies. Sensitive candidates remain for inspection, including consecutive
+hits; no minimum duration, keyframe rounding or merging removes a potential cut.
 
-`--settings settings.json` overrides the named `width`, `sceneThreshold`,
-`differenceFloor`, `adaptiveRatio`, `madMultiplier`, `windowFrames` settings.
-Record the detector revision, settings and FFmpeg build; rerun into a new directory when changing
-them. Identical detector/bytes/settings/build yield the same scan identity and candidates.
-`scan.json` is written only after successful full decoding and source rehashing;
-a partial folder or empty hit list does not establish a successful scan.
+--settings overrides width, sceneThreshold, differenceFloor, adaptiveRatio,
+madMultiplier, windowFrames. Defaults are starting values, not calibrated accuracy
+claims. Source hash, detector/configuration, FFmpeg/OpenCV/NumPy versions fence
+scan identity; reruns retain prior decisions. scan.json appears only after full
+decoding and source rehashing; partial output or zero candidates is not proof of
+complete seam recovery. Zero hits yields one full-length provisional clip.
 
-Outputs: `metrics.txt` contains every frame's scores; `timestamps.json` contains
-the decoded display-order PTS expressed as integer microseconds; `scan.json`
-records source SHA-256, configuration, build, timing assessment and candidates;
-`runtime.json` records elapsed scan time; `decode.log` retains errors.
-Zero candidates produces one full-length rough clip, with boundaries still
-unverified. Metrics coverage is not visual-review coverage.
+Metrics/PTS: metrics.txt contains each frame's RGB/scene scores; cv-metrics.csv
+contains local difference/innovation/residual; timestamps.json stores display PTS
+in integer microseconds. runtime.json records performance, decode logs retain
+errors. Metrics coverage is separate from visual-review coverage.
 
-Frame coordinates are zero-based and half open. A seam at frame N means frame N
-starts the next clip; all frames from 0 through the source end are covered once.
-Original display frames and PTS survive in `sourceMapping`. A CFR review proxy
-maps seams to its nearest integer frame and records `proxyBoundaryErrorUs`; VFR
-proxy frames are not original frames. Collapsed seams fail rather than disappear.
-Keep the original for precise evidence and use the existing PTS rules for speed.
-This does not restore the camera originals or material removed before rendering.
+Frame N is the first frame of the next clip, zero-based/half-open. sourceMapping
+retains original frames and PTS; CFR proxy boundaries use nearest integer frames
+with proxyBoundaryErrorUs. Collapsed boundaries fail. VFR proxy frames are not
+original measurements; keep original PTS for speed. A render cannot restore
+material previously removed or altered in speed.
 
 ## Review boundaries before calling them points
 
-Inspect candidate neighborhoods with [source inspection](source-inspection.md),
-including the frame before/at each seam and enough continuous context on both
-sides. Inspect non-hit ranges as well: same-court near-identical cuts, gradual
-transitions and small edits can be missed. Camera pans, lighting flashes,
-scoreboard changes and movement can produce false hits. Invisible edits cannot
-be inferred reliably from pixels. Transitions may span several frames and have
-no single original cut; preserve the transition footage and record the chosen
-split as an approximation. Do not silently trim it away.
+Inspect before/at frames, neighboring motion and non-hit spans using
+[source inspection](source-inspection.md). Fixed-court small jumps may be missed;
+fast motion, flashes, overlays and pans can be false hits. Invisible edits cannot
+be recovered reliably. Preserve transition frames and label approximate splits.
 
-Edit `decisions.json`'s sorted `boundaryFrames` to reject, move or add cuts, then
-set `status: "reviewed"` only after actual inspection. `scanId` and
-`sourceSha256` fence decisions to that exact scan. Generate a **new** plan after
-corrections; never overwrite a published review or its drafts. Preserve full
-coverage and original audio until explicit exclusions are justified.
+Edit sorted unique boundaryFrames in decisions.json to reject/move/add cuts.
+Set status=reviewed only after inspection; scanId/sourceSha256 must match. Publish
+a new plan; preserve old answers and [lineage](coverage-and-exceptions.md).
+Several source clips may share P (fault/let); one clip may contain multiple points
+or non-match footage. Group from complete context without changing clip bounds.
 
-Seams are not points: several clips may share a point (fault/let/replay), and
-one clip may contain several points or non-match material. Group/split from
-context, preserve lineage and adopt stable P IDs; never derive score/statistics
-from clip count. Missing attempts, endings and original speed remain evidence
-gaps. Real-footage qualification is separate.
+## Preserve the supplied edit
+
+Validate master start=0, end=media.frames, each clip end equals the next start,
+and summed lengths equal the input frame count. This proves every frame appears
+once. Preserve first faults, waits, dead-ball sends and tails. Review temporarily
+ripple-hides other points while retaining selected clips whole. Point grouping
+and inferred endings are annotations, not permission to shorten the user's edit.
+
+Inspect the complete point through its next source seam before adopting a winner;
+never call later hits dead-ball sends just to fit an early ending or final score.
+Missing ending evidence remains unknown. Repair a mistaken seam from exact
+neighboring frames while preserving the full partition. If the owner excludes
+project metadata, read only the named render. Preview live; obey the
+[full export gate](local-editor.md#导出与边界).

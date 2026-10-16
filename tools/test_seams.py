@@ -17,6 +17,25 @@ from seam_detect import analyze, settings, scan, partition, make_plan
 
 
 class SeamTests(unittest.TestCase):
+    @unittest.skipUnless(shutil.which('ffmpeg'), 'FFmpeg required')
+    def test_local_motion_evidence_recovers_tiny_foreground_cut(self):
+        import cv2
+        import numpy as np
+        with tempfile.TemporaryDirectory() as work:
+            work=Path(work); source=work/'local.mp4'
+            writer=cv2.VideoWriter(str(source),cv2.VideoWriter_fourcc(*'mp4v'),30,(640,360))
+            for i in range(60):
+                image=np.full((360,640,3),(30,100,30),np.uint8)
+                x=40+i if i<30 else 300+i
+                cv2.rectangle(image,(x,150),(x+9,169),(240,240,240),-1)
+                writer.write(image)
+            writer.release()
+            report=scan(source,work/'scan')
+            hit=next(c for c in report['candidates'] if c['frame']==30)
+            self.assertIn('motion_residual',hit['signals'])
+            self.assertEqual(report['computerVision']['decodedFrames'],60)
+            self.assertEqual([c['frame'] for c in report['candidates']],[30])
+
     def test_same_court_small_jump_and_motion_baseline(self):
         rows = [dict(frame=i, ptsUs=i*40000, difference=1.0, sceneScore=0.2) for i in range(60)]
         rows[30].update(difference=4.0, sceneScore=0.3)
@@ -113,9 +132,9 @@ class SeamTests(unittest.TestCase):
             project=Store(work/'initial/edit').get()
             self.assertEqual(len(project['review']['rows']),3)
             self.assertTrue(all(r['candidatePoint'] and r['initial']=={} for r in project['review']['rows']))
-            exported=export_video(project,work/'export')
-            self.assertEqual(exported['frames'],60)
-            self.assertTrue(any(s['codec_type']=='audio' for s in exported['probe']['streams']))
+            with self.assertRaisesRegex(ValueError,'Full export locked'):
+                export_video(project,work/'export')
+            self.assertFalse((work/'export').exists())
             with self.assertRaises(ValueError): scan(source, work/'a')
             source.write_bytes(b'changed')
             with self.assertRaises(ValueError): make_plan(work/'a/scan.json', work/'proxy.media.json')

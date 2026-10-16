@@ -1,5 +1,5 @@
 import { t } from "./i18n.js";
-import { $, rate, length, layout, bounds, tc, buttonIcon } from "./model.js";
+import { $, rate, length, layout, bounds, tc, buttonIcon, viewOverlays } from "./model.js";
 export class Player {
   constructor(url, changed, error) {
     this.url = url;
@@ -8,6 +8,7 @@ export class Player {
     this.video = $("video");
     this.frameImage = $("exact-frame");
     this.mode = "edited";
+    this.timelineView = 'full';
     this.frame = 0;
     this.playing = false;
     this.seekGeneration = 0;
@@ -41,7 +42,7 @@ export class Player {
     this.resize();
     if (this.mode === "source" && this.asset) this.asset = p.assets.find(a => a.id === this.asset.id);
     this.fps = rate(p);
-    this.clips = layout(p);
+    this.clips = layout(p, this.timelineView);
     this.total = this.clips.at(-1).endFrame;
     this.overlayIds = null;
     this.seek(this.mode === "source" ? this.frame : Math.min(this.frame, this.total - 1));
@@ -147,7 +148,7 @@ export class Player {
       if (match) this.clip = match;
     }
     const c = this.clip, local = this.frame - c.startFrame;
-    const active = this.mode === "edited" ? this.p.overlays.filter((o) => o.clipId === c.id && local >= bounds(o, c)[0] && local < bounds(o, c)[1]) : [];
+    const active = this.mode === "edited" ? viewOverlays(this.p, this.timelineView).filter((o) => o.clipId === c.id && local >= bounds(o, c)[0] && local < bounds(o, c)[1]) : [];
     const ids = active.map((o) => o.id).join("|");
     if (ids !== this.overlayIds) {
       this.overlayIds = ids;

@@ -92,7 +92,7 @@ expected behavior to that agent.
 | Already cut points and a known final score | Check cuts and internal mappings, then reuse the timeline for agent-owned point adjudication, scoring and basic graphics in stage 2. |
 | A few clipped endings or uncertain serves | Inspect source gaps and continuous context; adopt clear decisions. Only unresolved material questions and necessary related points enter review. |
 | Stage 2 finishes without review needs | Skip stages 3–4, report the result and ask whether to enter the next applicable stage; do not create an empty review file. |
-| Review is necessary | Continue from stage 2 directly into stage 3 without a proceed prompt; build, verify and deliver its review sequence and interactive HTML, or the standalone review workspace. A questions list without the required interactive file is incomplete; waiting for answers does not block building it. Every selected row stays visible; unrelated points are not added by default. |
+| Review is necessary | Continue from stage 2 directly into stage 3 without a proceed prompt; build, verify and deliver its review sequence and interactive HTML, or the local workbench’s full/review toggle and integrated list (no offline HTML). A questions list without the required interactive file is incomplete; waiting for answers does not block building it. Every selected row stays visible; unrelated points are not added by default. |
 | Scoring still disagrees with the supplied final game/set score after source checks | Include each problem game's points individually, with necessary adjacent evidence. Preserve known answers; repeat stages 3–4 as needed without fabricating a matching score. |
 | Statistics and speed data are ready | Stage 6 renders both five-page panels and per-serve speed overlays from stage 5's shared data and timing; neither requires its own stage or fixed rendering order. |
 | A long rally, before speed estimation | Serve label starts before service and exits no later than three seconds after the confirmed post-contact display start, or at an earlier boundary. It does not fill the rally. |
@@ -101,7 +101,7 @@ expected behavior to that agent.
 | Familiar user, “skip the introduction” or “start directly” | Omit onboarding; do not infer permission to replace default staged delivery with one full pass. |
 | A delivery checkpoint is reached, including a review/recalculation repeat | Stage 2 with review needs continues into stage 3; stage 3 requests review answers for stage 4. At other checkpoints name the completed and next applicable stages, report results, and ask whether to proceed. Wait unless continuous execution was explicitly requested; at final delivery, state that the workflow is complete. |
 | Any stage has a successful batch or partial artifact, with executable work remaining | Continue that stage without asking to proceed. All seven stages and rework require full scoped coverage, every prescribed deliverable and required checks. Stage 2 includes point outcomes, serves and basic graphics together. An actual interruption remains an incomplete stage, not a new stage. |
-| Reporting progress or asking for point review | Use chat and the existing interactive review HTML/sequence. Do not add mock audio, listening samples, demonstrations or separate reports unless requested; internal logs stay internal. |
+| Reporting progress or asking for point review | Use chat and the existing answer surface; local mode uses only its integrated list. Do not add mock audio, listening samples, demonstrations or separate reports unless requested; internal logs stay internal. |
 | Delete or merge points after review | Rebuild consecutive display numbers; preserve stable point IDs, published review mappings and answers. |
 
 ## Preserved contracts and validation
@@ -135,3 +135,5 @@ workflow contracts, local section links and archive checks passed. The 89-file
 package retains the same runtime helpers, review UI and seven JSX templates;
 instruction text is approximately 6.7% shorter. Account readback and fresh-agent
 behavior are separate verification steps.
+
+Full movie export is forbidden until the owner confirms all point outcomes and completed statistics for the current ledger revision. Before then, preview source media and canonical overlays live. Supplied rendered edits keep all source frames and exact edit boundaries; reviewing hides other clips temporarily, without shortening retained clips.

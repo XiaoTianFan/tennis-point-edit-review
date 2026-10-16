@@ -1,6 +1,6 @@
 """Propose rendered-video edit seams, preserving every source frame for review.
 
-Python standard library + FFmpeg/ffprobe; no learned model or temporal sampling.
+Python + NumPy/OpenCV + FFmpeg/ffprobe; no temporal sampling or learned model.
 Seams are edit candidates, never tennis point or scoring decisions.
 """
 import argparse
@@ -18,7 +18,7 @@ import time
 from media_probe import identity, metadata, assess_timestamps
 from local_model import read, write
 
-DETECTOR = 'rgb-adaptive-v1'
+DETECTOR = 'court-motion-v2'
 DEFAULTS = dict(width=320, sceneThreshold=8.0, differenceFloor=0.5,
                 adaptiveRatio=3.0, madMultiplier=6.0, windowFrames=30)
 
@@ -119,13 +119,25 @@ def scan(source, directory, config=None):
     with (directory / 'decode.log').open('w', encoding='utf-8') as errors:
         subprocess.run(command, cwd=directory, stdout=subprocess.DEVNULL, stderr=errors, check=True)
     pts, candidates, timing = analyze(metric_rows(directory / 'metrics.txt'), config, video)
+    from seam_cv import scan_local
+    local, cv = scan_local(source['path'], directory, config['width'], len(pts), config['windowFrames'])
+    combined = {row['frame']:row for row in candidates}
+    for row in local:
+        frame = row['frame']
+        if frame in combined:
+            row['signals'] = combined[frame]['signals'] + row['signals']
+        combined[frame] = {**combined.get(frame, {}), **row, 'id':'S'+str(frame).zfill(8),
+                           'ptsUs':pts[frame], 'sourceTimeUs':pts[frame]-pts[0], 'status':'proposed'}
+    candidates = [combined[f] for f in sorted(combined)]
+    for row in candidates:
+        row['adjacentHit'] = row['frame']-1 in combined or row['frame']+1 in combined
     if str(video.get('nb_frames', '')).isdigit() and int(video['nb_frames']) != len(pts):
         raise ValueError('Decoded frame count differs from container count; diagnose before publishing a scan')
     if identity(source['path']) != source:
         raise ValueError('Source changed during scan')
-    fingerprint = hashlib.sha256(json.dumps([DETECTOR, source['sha256'], config, version], sort_keys=True).encode()).hexdigest()
+    fingerprint = hashlib.sha256(json.dumps([DETECTOR, source['sha256'], config, version, cv], sort_keys=True).encode()).hexdigest()
     report = dict(schema='tennis-seams/v1', detector=DETECTOR, scanId=fingerprint, source=source,
-                  settings=config, ffmpegVersion=version, frameCount=len(pts), firstPtsUs=pts[0],
+                  settings=config, ffmpegVersion=version, computerVision=cv, frameCount=len(pts), firstPtsUs=pts[0],
                   lastPtsUs=pts[-1], timestampsSha256=hashlib.sha256(json.dumps(pts,separators=(',',':')).encode()).hexdigest(), timing=timing, candidates=candidates,
                   coverage='every decoded video frame; visual/tennis review not performed',
                   coordinate='zero-based decoded display frame; seam is first frame of next clip',

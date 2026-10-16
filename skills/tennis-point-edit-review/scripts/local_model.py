@@ -44,13 +44,29 @@ def keyed(items, label):
 def duration(clip):
     return clip['durationFrames'] if clip.get('kind') == 'hold' else clip['outFrame'] - clip['inFrame']
 
-def layout(project):
+def layout(project, view='full'):
     start = 0
     result = []
     for clip in project['clips']:
+        if view == 'review' and clip.get('pointId') not in {r['pointId'] for r in project['review']['rows']}:
+            continue
         result.append({**clip, 'startFrame': start, 'endFrame': start + duration(clip)})
         start += duration(clip)
     return result
+
+def export_blockers(project):
+    """Fail closed for both CLI and HTTP; previews do not use this gate."""
+    approval = project.get('approval', {})
+    revision = project['review']['ledgerRevision']
+    reasons = []
+    if approval.get('ledgerRevision') != revision or approval.get('pointAttribution') is not True:
+        reasons.append('point attribution requires owner confirmation')
+    stats = project.get('statistics', {})
+    if stats.get('status') != 'complete' or stats.get('ledgerRevision') != revision or approval.get('ledgerRevision') != revision or approval.get('statistics') is not True:
+        reasons.append('completed statistics require owner confirmation')
+    if project.get('needsRebuild'):
+        reasons.append('pending evidence/score/graphics rebuild')
+    return reasons
 
 def overlay_range(overlay, clip):
     if overlay.get('anchor', 'clip') == 'source':
@@ -117,6 +133,8 @@ def validate(project, check_files=False):
             raise ValueError('Unknown overlay target/component')
         if overlay.get('anchor', 'clip') not in ('clip', 'source'):
             raise ValueError('Unknown overlay anchor')
+        if overlay.get('view', 'both') not in ('both', 'full', 'review'):
+            raise ValueError('Unknown overlay view')
         if integer(overlay['endFrame'], 'overlay end', 1) <= integer(overlay['startFrame'], 'overlay start'):
             raise ValueError('Empty overlay')
     for pid, answer in project.get('answers', {}).items():
@@ -183,7 +201,9 @@ def context(project):
         'workingMode': project.get('workingMode', 'agent-dominant'),
         'review': review_payload(project), 'timeline': layout(project), 'assets': project['assets'],
         'overlays': project.get('overlays', []), 'selection': project.get('selection', {}),
-        'needsRebuild': project.get('needsRebuild', []), 'events': project.get('events', [])}
+        'needsRebuild': project.get('needsRebuild', []), 'events': project.get('events', []),
+        'reviewTimeline': layout(project, 'review'), 'exportBlockers': export_blockers(project),
+        'approval': project.get('approval', {}), 'statistics': project.get('statistics', {})}
 
 class Conflict(ValueError):
     pass
@@ -271,7 +291,24 @@ class Store:
                 value.setdefault('answers', {})[row['pointId']] = answer
                 value['needsRebuild'] = sorted(set(value.get('needsRebuild', []) + ['score-and-statistics']))
             elif kind == 'selection':
-                value['selection'] = {k: operation[k] for k in ('clipId', 'frame', 'mode') if k in operation}
+                value['selection'] = {k: operation[k] for k in ('clipId', 'frame', 'mode', 'timelineView') if k in operation}
+            elif kind == 'approval':
+                field = operation['field']
+                if field not in ('pointAttribution', 'statistics') or type(operation['confirmed']) is not bool:
+                    raise ValueError('Invalid approval')
+                if operation['confirmed']:
+                    if value.get('needsRebuild'):
+                        raise ValueError('Reconcile changes before confirming')
+                    if field == 'pointAttribution' and any(r['status'] not in ('resolved','replay') for r in review_payload(value)['rows']):
+                        raise ValueError('Resolve review rows before confirming point attribution')
+                    if field == 'statistics' and (value.get('statistics',{}).get('status') != 'complete' or value['statistics'].get('ledgerRevision') != value['review']['ledgerRevision']):
+                        raise ValueError('Statistics are not complete for this ledger revision')
+                if value.get('approval',{}).get('ledgerRevision') != value['review']['ledgerRevision']:
+                    value['approval'] = {}
+                value.setdefault('approval',{}).update(ledgerRevision=value['review']['ledgerRevision'])
+                value['approval'][field] = operation['confirmed']
             else:
                 raise ValueError('Unknown operation')
+        if kind not in ('selection', 'approval'):
+            value['approval'] = {}
         return self.commit(value, expected, {'type': kind, 'operation': operation})

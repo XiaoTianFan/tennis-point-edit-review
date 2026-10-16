@@ -1,6 +1,6 @@
 import { t } from "./i18n.js";
 import { zoomAt, wheelPixels } from "./view-state.js";
-import { $, el, layout, length, bounds, rate, tc } from "./model.js";
+import { $, el, layout, length, bounds, rate, tc, snapEdge, viewOverlays } from "./model.js";
 export class Timeline {
   constructor(url, select, seek, save) {
     this.url = url;
@@ -47,8 +47,9 @@ export class Timeline {
     this.render();
     $('timeline-scroll').scrollLeft = scroll;
   }
-  setProject(p) {
+  setProject(p, view = 'full') {
     this.p = p;
+    this.view = view;
     this.render();
   }
   reveal(frame) {
@@ -78,8 +79,9 @@ export class Timeline {
     document.addEventListener("pointerup", end, { once: true });
   }
   render() {
-    const clips = layout(this.p);
-    const reviewLanes = ["reviewId", "reviewLabel", "explanation"].filter(component => this.p.overlays.some(o => o.component === component));
+    const clips = layout(this.p, this.view);
+    const overlays = viewOverlays(this.p, this.view).filter(o => clips.some(c => c.id === o.clipId));
+    const reviewLanes = ["reviewId", "reviewLabel", "explanation"].filter(component => overlays.some(o => o.component === component));
     const reviewHeight = reviewLanes.length * 24;
     document.documentElement.style.setProperty("--review-height", reviewHeight + "px");
     document.querySelector(".track-labels>div:last-child").hidden = !reviewHeight;
@@ -122,7 +124,9 @@ export class Timeline {
         if (id === c.id || !clips.some((v) => v.id === id)) return;
         const ids = clips.map((v) => v.id).filter((v) => v !== id);
         ids.splice(ids.indexOf(c.id) + (e.offsetX > block.clientWidth / 2 ? 1 : 0), 0, id);
-        this.save({ type: "reorder", ids });
+        let next = 0;
+        const visible = new Set(ids);
+        this.save({ type: "reorder", ids: this.p.clips.map(c => visible.has(c.id) ? ids[next++] : c.id) });
       };
       for (const side of ["start", "end"]) {
         const handle = el("span", "", { class: "trim-handle " + side, role: "separator", "aria-label": t(side === "start" ? "trimStart" : "trimEnd", {id: c.id}) });
@@ -132,7 +136,7 @@ export class Timeline {
       }
       $("video-track").append(block);
     }
-    for (const o of this.p.overlays) {
+    for (const o of overlays) {
       const c = clips.find((v) => v.id === o.clipId), [a, b] = bounds(o, c);
       if (b <= a) continue;
       const track = o.component === "scoreboard" ? "score-track" : ["serveLabel", "serveSpeed"].includes(o.component) ? "serve-track" : o.component === "statsPanel" ? "stats-track" : "review-track";
@@ -163,7 +167,9 @@ export class Timeline {
     const start = e.clientX, baseIn = c.inFrame, baseOut = c.outFrame, baseDuration = length(c), limit = this.p.assets.find((a) => a.id === c.assetId).frames;
     let changed;
     const move = (event) => {
-      const delta = Math.round((event.clientX - start) / this.px);
+      const raw = Math.round((event.clientX - start) / this.px);
+      const snap = snapEdge(raw, side === 'start' ? c.startFrame : c.endFrame, this.frame, this.px, event.shiftKey);
+      const delta = snap.delta;
       if (c.kind === "hold") {
         const n = Math.max(1, baseDuration + delta * (side === "start" ? -1 : 1));
         changed = { type: "trim", id: c.id, durationFrames: n };
@@ -173,8 +179,12 @@ export class Timeline {
         changed = { type: "trim", id: c.id, inFrame: i, outFrame: o };
         block.style.width = (o - i) * this.px + "px";
       }
+      const applied = c.kind === 'hold' ? (changed.durationFrames-baseDuration)*(side==='start'?-1:1) : side==='start' ? changed.inFrame-baseIn : changed.outFrame-baseOut;
+      $('playhead').classList.toggle('snapped', snap.snapped && applied === delta);
     };
-    const end = () => {
+    const end = (event) => {
+      move(event);
+      $('playhead').classList.remove('snapped');
       document.removeEventListener("pointermove", move);
       document.removeEventListener("pointerup", end);
       setTimeout(() => this.trimming = false, 0);

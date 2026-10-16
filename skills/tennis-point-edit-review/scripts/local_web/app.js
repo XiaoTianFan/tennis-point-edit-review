@@ -1,4 +1,4 @@
-import { $, rate, length, layout, buttonIcon, exportSummary, answer } from "./model.js";
+import { $, rate, length, layout, buttonIcon, exportSummary, answer, exportBlockers, reviewStatus } from "./model.js";
 import { Review } from "./review.js";
 import { Timeline } from "./timeline.js";
 import { Player } from "./player.js";
@@ -19,6 +19,9 @@ let project, selectedClip, selectedOverlay, queue = Promise.resolve(), pending =
 let noticeState, noticeTimer, handoffValues;
 let exportJob = {state: "idle"}, exportBusy = false, exportError = null, exportTimer;
 let exportDefaults, pickerBusy = false;
+let timelineView = 'full', loaded = false;
+const viewPositions = {};
+const visibleLayout = () => layout(project, timelineView);
 function renderNotice() {
   const node = $('notice');
   node.hidden = !noticeState;
@@ -75,7 +78,7 @@ async function api(path, data) {
   return value;
 }
 const review = new Review((pid) => {
-  const c = layout(project).find((c2) => c2.pointId === pid);
+  const c = visibleLayout().find((c2) => c2.pointId === pid);
   if (c) select(c.id);
   else notice("noClip");
 }, save);
@@ -98,6 +101,9 @@ const player = new Player(url, (frame, clip, mode, linked) => {
 }, notice);
 function setProject(p) {
   project = p;
+  if (!loaded) { timelineView = p.selection?.timelineView === 'review' && p.review.rows.length ? 'review' : 'full'; loaded = true; }
+  if (timelineView === 'review' && !layout(p,'review').length) timelineView = 'full';
+  player.timelineView = timelineView;
   if (!p.overlays.some(o => o.id === selectedOverlay)) selectedOverlay = null;
   $("project-title").textContent = p.title;
   projectStatus();
@@ -107,12 +113,21 @@ function setProject(p) {
     else { delete $(id).dataset.i18nTitle; $(id).removeAttribute('title'); }
   }
   review.setProject(p);
-  timeline.setProject(p);
+  timeline.setProject(p, timelineView);
   player.setProject(p);
   inspector();
   if (p.needsRebuild?.length) notice("rebuild");
   else notice("");
-  $("export-video").disabled = false;
+  for (const view of ['full','review']) {
+    $('timeline-'+view).classList.toggle('active', timelineView === view);
+    $('timeline-'+view).setAttribute('aria-pressed', String(timelineView === view));
+  }
+  $('timeline-review').disabled = !layout(p,'review').length;
+  const approval = p.approval?.ledgerRevision === p.review.ledgerRevision ? p.approval : {};
+  $('confirm-points').checked = approval.pointAttribution === true;
+  $('confirm-statistics').checked = approval.statistics === true;
+  $('confirm-points').disabled = !!p.needsRebuild?.length || p.review.rows.some(r => !['resolved','replay'].includes(reviewStatus(r,answer(p,r))));
+  $('confirm-statistics').disabled = !!p.needsRebuild?.length || p.statistics?.status !== 'complete' || p.statistics?.ledgerRevision !== p.review.ledgerRevision;
   refreshExport();
   $("undo").disabled = !p.undo?.length;
   $("redo").disabled = !p.redo?.length;
@@ -143,7 +158,7 @@ function save(operation) {
   return queue;
 }
 function select(id, overlayId = null) {
-  const c = layout(project).find((c2) => c2.id === id);
+  const c = visibleLayout().find((c2) => c2.id === id);
   if (!c) return;
   selectedClip = id;
   selectedOverlay = overlayId;
@@ -165,7 +180,7 @@ function inspector(labelsOnly = false) {
   $("apply-trim").textContent = t(o ? "applyTiming" : "applyTrim");
 }
 function jump(direction) {
-  const clips = layout(project).filter((c) => c.pointId);
+  const clips = visibleLayout().filter((c) => c.pointId);
   const unique = clips.filter((c, i) => i === 0 || c.pointId !== clips[i - 1].pointId);
   if (!unique.length) { notice("noPoints"); return; }
   let index = unique.findIndex((c) => c.pointId === player.clip?.pointId);
@@ -179,6 +194,23 @@ $("prev-point").onclick = () => jump(-1);
 $("next-point").onclick = () => jump(1);
 $("edited").onclick = () => player.switchMode("edited");
 $("source").onclick = () => player.switchMode("source");
+function switchTimeline(view) {
+  if (view === timelineView || view === 'review' && !project.review.rows.length) return;
+  const clip = player.clip, sf = player.sourceFrame();
+  viewPositions[timelineView] = {zoom:timeline.zoom, scroll:$('timeline-scroll').scrollLeft};
+  player.pause();
+  timelineView = view; player.timelineView = view; player.mode = 'edited';
+  const position = viewPositions[view] ?? {zoom:1,scroll:0};
+  timeline.zoom = position.zoom;
+  setProject(project);
+  const clips = visibleLayout();
+  const next = clips.find(c => c.id === clip.id) ?? clips.find(c => c.assetId === clip.assetId && sf >= c.inFrame && sf < c.outFrame) ?? clips[0];
+  player.seek(next.startFrame + (next.id === clip.id ? Math.max(0,Math.min(length(next)-1,sf-next.inFrame)) : 0));
+  $('timeline-scroll').scrollLeft = position.scroll;
+}
+$('timeline-full').onclick = () => switchTimeline('full');
+$('timeline-review').onclick = () => switchTimeline('review');
+for (const [id,field] of [['confirm-points','pointAttribution'],['confirm-statistics','statistics']]) $(id).onchange = () => save({type:'approval',field,confirmed:$(id).checked});
 $("speed").onchange = () => player.video.playbackRate = Number($("speed").value);
 $("source-position").oninput = () => player.seek(Number($("source-position").value));
 $("apply-trim").onclick = () => {
@@ -222,7 +254,7 @@ document.addEventListener("keydown", (e) => {
 $("handoff").onclick = async () => {
   try {
     player.pause();
-    await save({ type: "selection", clipId: player.clip.id, frame: player.frame, mode: player.mode });
+    await save({ type: "selection", clipId: player.clip.id, frame: player.frame, mode: player.mode, timelineView });
     contextData = await api("/api/handoff", { revision: project.revision });
     handoffValues = {title: project.title, path: contextData.projectPath, revision: project.revision, point: player.clip.pointId ?? player.clip.label ?? player.clip.id, mode: player.mode, frame: player.frame};
     handoffText();
@@ -263,6 +295,10 @@ function exportOptions() {
 }
 function refreshExport() {
   if (!project) return;
+  const locked = exportBlockers(project);
+  $('export-video').disabled = locked;
+  $('export-video').title = locked ? t('exportLocked') : t('export');
+  $('export-gate').textContent = locked ? t('exportLocked') : t('exportReady');
   const options = exportOptions(), outputRate = rate(options), summary = exportSummary(project, options);
   const valid = $('export-form').checkValidity() && /^\d+(\.\d+)?(\/\d+)?$/.test(options.fps) && outputRate >= 1 && outputRate <= 240;
   $('export-duration').textContent = valid ? t('durationFrames', {seconds: summary.seconds.toFixed(2), frames: summary.frames}) : '—';
@@ -270,7 +306,7 @@ function refreshExport() {
   $('export-audio').textContent = audio ? t('audioSettings', {rate:audio.sampleRate/1000, channels:audio.channels}) : t('silentAudio');
   $('export-warning').hidden = !project.needsRebuild?.length;
   const running = exportJob.state === 'running';
-  $('start-export').disabled = exportBusy || running || pickerBusy || pending > 0 || drafts().length > 0 || !valid;
+  $('start-export').disabled = locked || exportBusy || running || pickerBusy || pending > 0 || drafts().length > 0 || !valid;
   $('browse-export').disabled = pickerBusy;
   $('export-status').textContent = exportError ? errorText(exportError.message) : pickerBusy ? t('pickerOpen') : exportBusy ? t('exportChecking') : running ? t('exporting', {done:exportJob.completedClips ?? 0, total:exportJob.totalClips}) : pending ? t('exportWaiting') : drafts().length ? t('exportUnsaved') : exportJob.state === 'failed' ? errorText(exportJob.error) : exportJob.state === 'complete' ? t('exportComplete') + ' · ' + t('exportJobRevision', {revision:exportJob.revision}) : !valid ? t('invalidExport') : '';
   $('export-download').hidden = exportJob.state !== 'complete';

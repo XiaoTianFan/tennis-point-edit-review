@@ -1,5 +1,13 @@
 // UI-only language state. Project content and protocol values are never translated.
 export const messages = {
+  timelineView: ['Timeline view', '时间线视图'],
+  fullTimeline: ['Full edit', '完整全片'],
+  reviewTimeline: ['Review only', '仅复核'],
+  confirmPoints: ['I confirm all point outcomes', '我已确认全部分归属'],
+  confirmStatistics: ['I confirm completed statistics', '我已确认统计完成'],
+  exportLocked: ['Export locked: confirm point outcomes and completed statistics', '导出锁定：须先确认全部分归属与统计完成'],
+  exportReady: ['Ready to export', '可以导出'],
+
   title: ['Courtside — local tennis edit', 'Courtside — 本地网球剪辑'],
   language: ['Interface language', '界面语言'],
   switchLanguage: ['Switch to Chinese', '切换为英文'],
@@ -82,7 +90,7 @@ export const messages = {
   audioSettings: ['AAC · {rate} kHz · {channels} channels', 'AAC · {rate} kHz · {channels} 声道'],
   silentAudio: ['Silent', '静音'],
   invalidExport: ['Enter even dimensions (2–8192), a frame rate (1–240), filename and folder.', '请输入偶数尺寸（2–8192）、帧率（1–240）、文件名和文件夹。'],
-  exportWarning: ['Your edits may no longer align with the scoreboard, statistics or graphic timing. You can export the timeline as it is.', '编辑后的时间线可能与计分板、统计或图形时序不完全一致。仍可按当前状态导出。'],
+  exportWarning: ['Reconcile edits with scores, statistics and graphics before confirming export.', '请先同步剪辑、计分、统计和图层，再确认导出。'],
   'rebuild.presentation-order': ['Timeline order changed', '时间线顺序有更改'],
   'rebuild.graphics-timing': ['Graphic timing changed', '图形时序有更改'],
   'rebuild.clip-evidence': ['Clip boundaries changed', '片段边界有更改'],

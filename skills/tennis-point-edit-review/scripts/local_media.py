@@ -7,7 +7,7 @@ import subprocess
 import time
 from fractions import Fraction
 from pathlib import Path
-from local_model import read, write, duration, overlay_range, validate
+from local_model import read, write, duration, overlay_range, validate, export_blockers
 
 HERE = Path(__file__).resolve().parent
 
@@ -155,6 +155,9 @@ def export_settings(project, options=None):
 
 def export_video(project, directory, progress=lambda value: None, options=None, target=None):
     validate(project, check_files=True)
+    blockers = export_blockers(project)
+    if blockers:
+        raise ValueError('Full export locked: ' + '; '.join(blockers))
     settings = export_settings(project, options)
     audio = settings['audio']
     sample_rate, channels = (audio['sampleRate'], audio['channels']) if audio else (48000, 2)
@@ -182,7 +185,7 @@ def export_video(project, directory, progress=lambda value: None, options=None, 
             args += ['-loop', '1', '-framerate', project['fps'], '-i', image]
         else:
             args += ['-ss', f'{clip["inFrame"]/fps:.9f}', '-i', asset['path']]
-        overlays = [o for o in project.get('overlays', []) if o['clipId'] == clip['id'] and overlay_range(o, clip)[1] > overlay_range(o, clip)[0]]
+        overlays = [o for o in project.get('overlays', []) if o.get('view','both') != 'review' and o['clipId'] == clip['id'] and overlay_range(o, clip)[1] > overlay_range(o, clip)[0]]
         for overlay in overlays:
             if not Path(overlay.get('image', '')).is_file():
                 raise ValueError('Missing rendered graphic: ' + overlay['id'])

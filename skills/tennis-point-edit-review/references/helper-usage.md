@@ -24,7 +24,7 @@
 - `seam_detect.py scan/plan`：仅对已有剪辑的渲染成片扫描剪口候选并重建完整覆盖的粗分段；输入、阈值、决策文件和源帧/代理映射见[成片剪口重建](rendered-video.md)。不判断网球球果，不取代连续原片逐分观察。
 按需选用下列工具；输入示例均为虚构占位数据。业务判读及复核状态见各专题，本页保留调用契约。
 原片概览、可配置CV及PTS检查见[原片检查工具](source-inspection.md)；agent查看原帧、完成判读后登记已审范围。`evidence_audit.display_order`另生成当前有效分的连续显示号码，保留稳定P/R。
-- 构建网页：python scripts/review_io.py build review-data.json review.html。输入形状见[最小样例](../examples/review-data.json)，使用[离线模板](../examples/review-template.html)；按[复核协议](ledger-and-review.md#独立复核时间线与-html)仅填当前待审分，行序匹配复核时间线。每行含 reviewId、pointId、gameNumber、serverId、serveNumber，必要时 setNumber；同一记录含两次发球证据时可用 serveNumbers=[1,2]。局次须为正整数，未知局次/发次留 null；显示边界和无视频交付见[HTML 复核列表](presentation-and-qa.md#html-复核列表)。
+- 外部编辑器的离线审核页（本地模式不制作）：python scripts/review_io.py build review-data.json review.html。输入形状见[最小样例](../examples/review-data.json)，使用[离线模板](../examples/review-template.html)；按[复核协议](ledger-and-review.md#独立复核时间线与-html)仅填当前待审分，行序匹配复核时间线。每行含 reviewId、pointId、gameNumber、serverId、serveNumber，必要时 setNumber；同一记录含两次发球证据时可用 serveNumbers=[1,2]。局次须为正整数，未知局次/发次留 null；显示边界和无视频交付见[HTML 复核列表](presentation-and-qa.md#html-复核列表)。
 - 合并用户结果：python scripts/review_io.py merge ledger.json exported-review.txt ledger-next.json。输出新文件；输入账本需 source、ledgerRevision、players、points。旧结构先显式适配，绝不靠行号猜测。
 - 核对计分：python scripts/score_audit.py score-input.json。输入含config和points。内部仅A/B为两位选手的逻辑键，映射到用户ID；初始points为原始赢分计数，不是字符串15/30/40。
 - 汇总：python scripts/stats_aggregate.py annotated-input.json。含scope、audit（计分核对结果）、points（逐分技术标注）。技术字段参见函数顶部读取，statsIncluded必须显式true；不把缺失当0。
