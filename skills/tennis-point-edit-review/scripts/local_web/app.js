@@ -291,14 +291,15 @@ $("recover-draft").onclick = () => {
   notice("draftDownloaded");
 };
 function exportOptions() {
-  return {width:Number($('export-width').value), height:Number($('export-height').value), fps:$('export-fps').value.trim(), filename:$('export-filename').value.trim()};
+  return {width:Number($('export-width').value), height:Number($('export-height').value), fps:$('export-fps').value === 'project' ? String(project.fps) : $('export-fps').value, filename:$('export-filename').value.trim()};
 }
 function refreshExport() {
   if (!project) return;
+  $('export-fps').options[0].textContent = t('matchTimelineFps', {fps:Number(rate(project).toFixed(3))});
   $('export-video').disabled = false;
   $('export-video').title = t('export');
   const options = exportOptions(), outputRate = rate(options), summary = exportSummary(project, options);
-  const valid = $('export-form').checkValidity() && /^\d+(\.\d+)?(\/\d+)?$/.test(options.fps) && outputRate >= 1 && outputRate <= 240;
+  const valid = $('export-form').checkValidity() && outputRate >= 1 && outputRate <= 240;
   $('export-duration').textContent = valid ? t('durationFrames', {seconds: summary.seconds.toFixed(2), frames: summary.frames}) : '—';
   const audio = exportDefaults?.audio ?? project.audio;
   $('export-audio').textContent = audio ? t('audioSettings', {rate:audio.sampleRate/1000, channels:audio.channels}) : t('silentAudio');
@@ -334,7 +335,7 @@ $('export-video').onclick = async () => {
   try {
     if (!exportDefaults) {
       exportDefaults = await api('/api/export-settings');
-      for (const key of ['width','height','fps','filename','directory']) $('export-' + key).value = exportDefaults[key];
+      for (const key of ['width','height','filename','directory']) $('export-' + key).value = exportDefaults[key];
     }
     exportJob = await api('/api/job');
     if (exportJob.state === 'running') { clearTimeout(exportTimer); exportTimer = setTimeout(poll, 1000); }

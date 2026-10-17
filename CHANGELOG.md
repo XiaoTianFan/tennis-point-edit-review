@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026.10.17-v25.5
+
+- Use a frame-rate preset dropdown with a default Match timeline option showing its readable FPS; retain exact rational rates internally and preserve the timeline.
+
 ## 2026.10.17-v25.4
 
 - Place review progress beside search, without a separate review heading row.

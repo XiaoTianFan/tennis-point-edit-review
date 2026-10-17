@@ -1,6 +1,6 @@
 # 本地编辑与复核工作台
 
-本地模式复用包内 **Courtside / Edit**。agent使用终端与JSON，用户在本机浏览器剪辑和填写集成审核表；不为比赛重写UI，不另建离线HTML或复核工程。网球判读、统计与估速仍遵循各阶段细则。
+本地复用 **Courtside / Edit**：agent用终端/JSON，用户在浏览器剪辑与复核；不重写UI或另建复核工程/离线HTML，判读、统计与估速仍按各阶段细则。
 
 ## 启动与依赖
 
@@ -15,11 +15,11 @@ python "<skill>/scripts/local_editor.py" serve "<work>/edit" --open
 
 `<skill>/<work>/<source>`替换为当前任务路径，参数加引号。缺模块时在工作区独立runtime运行`npm install --prefix "<work>/runtime" --save-exact react react-dom esbuild playwright`，保留锁文件并设置本进程`NODE_PATH`。可用已装Edge/Chrome，计划指定`browserChannel=msedge/chrome`；无浏览器时在runtime执行`npx playwright install chromium`。`doctor`仅证明依赖存在，实际`init`和合成预览才证明可用。
 
-`serve`打印带令牌回环URL并写`session.json`，保持进程运行并把URL交用户。Ctrl+C停止；重启同目录恢复工程与答案并换令牌。更新服务器Python代码后须重启当前会话，再打开新URL；仅刷新网页不会重载后端。不绑定公网、转发端口或上传令牌。没有浏览器控制能力仍可构建工程，再请用户打开会话URL。
+`serve`输出带令牌回环URL并写`session.json`，交用户打开并保持进程运行；Ctrl+C停止。同目录重启保留工程与答案并换令牌。Python代码更新后须重启并打开新URL，刷新网页不重载后端。不绑定公网、转发端口或上传令牌；无浏览器控制能力仍可构建工程。
 
 ## 媒体与时间
 
-`media`继承源显示分辨率、有理fps、音频采样率和声道，生成H.264/AAC CFR媒体及`.media.json`；不改原片。旋转、SAR归一，奇数尺寸补偶数，源参数保留；`--fps/--width`仅用于明确转换。`--start/--duration`为有界片段。SDR颜色保留，最终输出Rec.709；HDR先确定并验收色调映射，不静默转换PQ/HLG。
+`media`按源分辨率、有理fps、音频采样率和声道生成H.264/AAC CFR代理及`.media.json`，不改原片；归一旋转/SAR、补齐偶数尺寸并保留源参数。明确转换用`--fps/--width`，有界片段用`--start/--duration`。SDR保留并输出Rec.709；HDR先验收色调映射，不静默转换PQ/HLG。
 
 计划可写`in/out/duration/start/endSeconds`，初始化只换算一次为整数帧、左闭右开；同一边界不能同时给秒与帧。原片时间=`sourceStartSeconds+frame/fps`；VFR代理可能重采样，估速和触拍必须保留原PTS，不把代理帧当原始精度。
 
@@ -60,7 +60,7 @@ python "<skill>/scripts/review_io.py" merge "<work>/ledger.json" "<work>/edit/re
 python "<skill>/scripts/local_editor.py" update "<work>/edit" "<work>/updated-project.json" --expected-revision 12
 ```
 
-updated-project从当前project副本修改，保留用户剪口、顺序、路径、answers和版本／R/P；不能拿初始plan覆盖。按needsRebuild回查证据、重算计分统计及图层后update，清除已处理项并留历史。纯呈现改动也先验映射和图层，不直接清提示。新增／合并／拆分审核点使用新版计划，按[谱系](coverage-and-exceptions.md)显式迁移确认事实和历史，不能静默移植分归属。
+updated-project从当前副本修改，保留剪口、顺序、路径、answers、版本与R/P，不用初始plan覆盖。按needsRebuild回查证据、重算计分统计及图层，验映射后update，清已处理项并留历史；纯呈现改动同样核验。新增／合并／拆分审核点用新版计划，按[谱系](coverage-and-exceptions.md)迁移确认事实和历史，不静默移植归属。
 
 ## 导出与边界
 
@@ -80,7 +80,7 @@ python "<skill>/scripts/local_editor.py" render "<work>/edit" "<work>/new-export
 
 未获导出要求的agent不加此标志，遵循上述延后条件。UI调用HTTP `/api/render`时发送userRequested=true；程序接口export_video(..., user_requested=True)含义相同，不能为了绕过agent限制自行声称用户要求。context的agentExportBlockers仅向agent列出主动导出尚缺的条件；导出记录保存userRequested与待同步项，不修改审核答案、确认或统计状态。
 
-UI与CLI同路导出H.264/AAC MP4：逐段精准取帧、同源图形、统计淡变、剪口两帧音频淡变、定格静音，再统一换输出fps避免逐段舍入。沿用分辨率／fps／音频；可指定偶数宽高≤8192、fps 1–240、文件名与目录；比例不同时等比补边，时长误差≤半输出帧。CLI有--width/--height/--fps/--filename；UI支持Tk系统目录选择，缺Tk/桌面时填路径。输出不覆盖已有文件，保存project-snapshot.json及含帧数／哈希的export.json。最终验收内容见[画面验收](presentation-and-qa.md#验证与交付)；编码成功不等于听审或整片视觉通过。
+UI/CLI同路输出H.264/AAC MP4：精准取帧、同源图形、统计淡变、剪口两帧音频淡变、定格静音，最后统一换fps避免逐段舍入。默认沿用画幅/fps/音频，可选偶数宽高≤8192、fps 1–240和输出路径；等比补边，时长误差≤半输出帧。UI帧率使用预设下拉，默认“与时间线一致”并显示实际fps；23.976/29.97/59.94仅作显示，内部保留精确有理数，不改时间线。CLI有--width/--height/--fps/--filename；UI用Tk选目录，缺Tk/桌面则填路径。不覆盖已有文件，保留project-snapshot.json及含帧数/哈希的export.json；编码成功仍须[画面与声音验收](presentation-and-qa.md#验证与交付)。
 
 成功输出并保存记录后自动清理本次render-parts、重复编码中间文件和定格临时帧，保留最终MP4、project-snapshot.json及export.json；失败时保留本次诊断文件，不清理其他导出或工作区。
 
