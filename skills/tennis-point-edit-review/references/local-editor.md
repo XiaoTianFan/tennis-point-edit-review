@@ -15,7 +15,7 @@ python "<skill>/scripts/local_editor.py" serve "<work>/edit" --open
 
 `<skill>/<work>/<source>`替换为当前任务路径，参数加引号。缺模块时在工作区独立runtime运行`npm install --prefix "<work>/runtime" --save-exact react react-dom esbuild playwright`，保留锁文件并设置本进程`NODE_PATH`。可用已装Edge/Chrome，计划指定`browserChannel=msedge/chrome`；无浏览器时在runtime执行`npx playwright install chromium`。`doctor`仅证明依赖存在，实际`init`和合成预览才证明可用。
 
-`serve`打印带令牌回环URL并写`session.json`，保持进程运行并把URL交用户。Ctrl+C停止；重启同目录恢复工程与答案并换令牌。不绑定公网、转发端口或上传令牌。没有浏览器控制能力仍可构建工程，再请用户打开会话URL。
+`serve`打印带令牌回环URL并写`session.json`，保持进程运行并把URL交用户。Ctrl+C停止；重启同目录恢复工程与答案并换令牌。更新服务器Python代码后须重启当前会话，再打开新URL；仅刷新网页不会重载后端。不绑定公网、转发端口或上传令牌。没有浏览器控制能力仍可构建工程，再请用户打开会话URL。
 
 ## 媒体与时间
 
@@ -23,7 +23,7 @@ python "<skill>/scripts/local_editor.py" serve "<work>/edit" --open
 
 计划可写`in/out/duration/start/endSeconds`，初始化只换算一次为整数帧、左闭右开；同一边界不能同时给秒与帧。原片时间=`sourceStartSeconds+frame/fps`；VFR代理可能重采样，估速和触拍必须保留原PTS，不把代理帧当原始精度。
 
-暂停／步进使用FFmpeg精确解码帧并叠加正式透明PNG；播放由浏览器视频帧回调实时合成，不预渲染整片。内部跳剪可能短暂停顿；最终编码音画验收须等[导出门禁](#导出与边界)开放。Source播放完整代理及原声、无图层；Edited播放当前视图。
+暂停／步进使用FFmpeg精确解码帧并叠加正式透明PNG；播放由浏览器视频帧回调实时合成，不预渲染整片。内部跳剪可能短暂停顿；编码音画在实际导出后验收，导出要求与agent主动导出条件见[导出与边界](#导出与边界)。Source播放完整代理及原声、无图层；Edited播放当前视图。
 
 ## 剪辑计划
 
@@ -33,11 +33,11 @@ python "<skill>/scripts/local_editor.py" serve "<work>/edit" --open
 |---|---|
 | title/fps/width/height | 缺省由首资产继承；有理fps 1–240，偶数画幅各边≤8192；混合素材先显式统一 |
 | players/assets | 当前两方id/name；稳定asset id及media元数据，核实实际帧率和帧数 |
-| clips | 唯一master数组：稳定id、assetId、inFrame/outFrame、pointId与真实发球元数据；同分多段共P号 |
+| clips | 唯一master数组：稳定id、assetId、inFrame/outFrame、pointId、setNumber/gameNumber与真实发球元数据；同分多段共P号，局盘未知留null |
 | hold | kind=hold、源inFrame、durationFrames，静音统计背景 |
 | review | source/ledgerRevision/rows，稳定R/P、局盘、server、疑点和源定位；AI放initial，不预填人工已审 |
 | overlays | id/clipId/component/props/startFrame/endFrame；anchor=source或clip，裁到可见范围；view=both（默认）/full/review |
-| statistics/approval | 当前账本统计完成状态与用户确认；见导出门禁 |
+| statistics/approval | 当前账本统计完成状态与用户确认记录；仅约束agent主动导出，不锁用户导出 |
 
 理由由agent生成；阶段3仅列补查后必要疑点／问题局，全场定位用clip/P映射。[正式图形](graphics-adapters.md)经`init/update`缓存为整画幅透明PNG与哈希，预览和输出同源；模板不变，改文字须重生成。工作台处理统计页首尾约0.3秒淡变。
 
@@ -45,8 +45,9 @@ python "<skill>/scripts/local_editor.py" serve "<work>/edit" --open
 
 ## 用户操作与agent接续
 
-- 顶栏English/中文仅改UI。拖动面板分隔条调整布局；键盘方向键、Shift大步及Home／双击复位。时间线Ctrl/Cmd+滚轮横移，Alt+滚轮以指针缩放。
+- 顶栏English/中文仅改UI。拖动面板分隔条调整布局；键盘方向键、Shift大步及Home／双击复位。时间线Ctrl/Cmd+滚轮横移，Alt+滚轮以指针缩放；“全片适配”将当前完整／复核视图全部放入视口，滑条按对数从适配放大至1024倍。缩放和窗口大小不改变剪口。
 - 点审核行文字／空白或Enter/空格跳分；答案控件不触发跳转。游标定位到另一待审分时，列表自动滚动露出该行，不改焦点、答案或行序；播放和同分移动不反复拉动列表。所有行常驻，搜索仅高亮；协议见[账本](ledger-and-review.md)。
+- 局次轨按相邻片段已记录的setNumber/gameNumber分组，点击局块或局次下拉菜单跳到该视图中该局首段；游标所在局高亮。复核视图只显示当前保留局段，同分多次发球共局，跨盘不混局；未知显示“局次待核”，不能按片段序号猜局。初始标注的人工作答优先；旧工程可从复核行或同P号唯一已知局次补显示，不写回猜测。阶段2/4更新所有相关clip局盘元数据，不能只给送审子集填写。
 - 下方完整全片／仅复核切换视图。Edited/Source切换播放模式；Space播放，方向键±1帧、Shift±10帧、方括号逐分。拖clip边缘修剪，靠近游标8屏幕像素内吸附并高亮，Shift临时绕过；随缩放换算帧，不能越过合法源范围。入出帧框支持精确修剪；图层条可移动或改长，局部帧与源锚定帧不混用。片段重排仅改变呈现，不自动改比赛事实；复核重排保留隐藏段。
 - 操作写project.json并递增revision，history保存前版，Undo/Redo保留40步。旧revision被拒后重读差异，不盲重试；未提交操作留浏览器草稿，用Recover edits交agent恢复，不覆盖新状态。
 - “交给agent”写agent-context.json与review.json，保留当前clip、帧、模式和视图，用户复制消息回会话；网页不接云模型、不自动发送。`context`可直接读最新状态，不依赖先点击。
@@ -61,19 +62,25 @@ updated-project从当前project副本修改，保留用户剪口、顺序、路�
 
 ## 导出与边界
 
-完整样片及复核片在确认前禁止渲染。UI、HTTP `/api/render`和CLI `render`共用门禁，缺字段默认锁定（含旧工程）：
+用户导出不受分归属或统计确认阻拦：点击“导出视频”即可设置输出；底部确认只记录工作流状态。待同步数据在导出框提示，但不阻止输出。版本冲突、未保存编辑、非法输出参数、重复文件名和并发编码仍按实际问题处理。
 
-- 用户通过底部控件明确确认全部分归属：approval.pointAttribution=true。
-- statistics.status=complete且statistics.ledgerRevision与review.ledgerRevision一致，用户另确认approval.statistics=true。
-- approval.ledgerRevision一致且needsRebuild为空；修剪、判罚或图层更改撤销确认，回填重算后重新确认。
+仅对**agent未获明确要求而自行生成的完整样片／复核片**，在以下条件齐备前延后：
 
-agent不得替用户勾确认。确认前实时合成预览，允许源代理、抽帧与透明图层缓存，不导出QA样片绕过。最终门禁开放后：
+- approval.pointAttribution=true，用户已明确确认全部分归属。
+- statistics.status=complete且statistics.ledgerRevision与review.ledgerRevision一致，用户已确认approval.statistics=true。
+- approval.ledgerRevision一致且needsRebuild为空。事实或呈现更改保留原有确认失效规则；agent不代用户勾确认。
+
+其目的仅是避免冗余临时视频占盘；日常检查使用实时合成、代理、抽帧和透明图层缓存。用户在对话中明确要求导出同样授权agent立即导出当前版本，无需重复确认。CLI使用：
 
 ```sh
-python "<skill>/scripts/local_editor.py" render "<work>/edit" "<work>/new-export"
+python "<skill>/scripts/local_editor.py" render "<work>/edit" "<work>/new-export" --user-requested
 ```
 
+未获导出要求的agent不加此标志，遵循上述延后条件。UI调用HTTP `/api/render`时发送userRequested=true；程序接口export_video(..., user_requested=True)含义相同，不能为了绕过agent限制自行声称用户要求。context的agentExportBlockers仅向agent列出主动导出尚缺的条件；导出记录保存userRequested与待同步项，不修改审核答案、确认或统计状态。
+
 UI与CLI同路导出H.264/AAC MP4：逐段精准取帧、同源图形、统计淡变、剪口两帧音频淡变、定格静音，再统一换输出fps避免逐段舍入。沿用分辨率／fps／音频；可指定偶数宽高≤8192、fps 1–240、文件名与目录；比例不同时等比补边，时长误差≤半输出帧。CLI有--width/--height/--fps/--filename；UI支持Tk系统目录选择，缺Tk/桌面时填路径。输出不覆盖已有文件，保存project-snapshot.json及含帧数／哈希的export.json。最终验收内容见[画面验收](presentation-and-qa.md#验证与交付)；编码成功不等于听审或整片视觉通过。
+
+成功输出并保存记录后自动清理本次render-parts、重复编码中间文件和定格临时帧，保留最终MP4、project-snapshot.json及export.json；失败时保留本次诊断文件，不清理其他导出或工作区。
 
 当前为单视频顺序主轨、原速片段／静帧与七种正式覆盖层，无多机位、任意转场、混音、变速曲线或HDR；需要时显式扩展或用已认可编辑器。移动workspace后更新并核实素材路径；服务器仅服务注册资产，不开放任意文件浏览。
 

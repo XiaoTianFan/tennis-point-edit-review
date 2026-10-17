@@ -103,16 +103,27 @@ test('English and Chinese cover UI keys and preserve substitution values', async
 });
 
 test('cursor anchored zoom preserves the frame under the pointer and clamps extremes', async () => {
-  const {zoomAt}=await geometry;
+  const {zoomAt,MIN_ZOOM,MAX_ZOOM}=await geometry;
   const original={zoom:2,scroll:400,pointer:300};
   const next=zoomAt(original.zoom,-200,original.scroll,original.pointer);
   assert.ok(next.zoom>original.zoom);
   assert.ok(Math.abs((next.scroll+300)/next.zoom - (400+300)/2)<1e-9);
   const back=zoomAt(next.zoom,200,next.scroll,300);
   assert.ok(Math.abs(back.zoom-2)<1e-9); assert.ok(Math.abs(back.scroll-400)<1e-9);
-  assert.equal(zoomAt(8,-10000,40,10).zoom,8);
-  assert.equal(zoomAt(.5,10000,0,400).scroll,0);
-  assert.equal(zoomAt(.5,10000,0,400).zoom,.5);
+  assert.equal(zoomAt(MAX_ZOOM,-10000,40,10).zoom,MAX_ZOOM);
+  assert.equal(zoomAt(MIN_ZOOM,10000,0,400).scroll,0);
+  assert.equal(zoomAt(MIN_ZOOM,10000,0,400).zoom,MIN_ZOOM);
+});
+
+test('fit includes every frame of long timelines; logarithmic zoom reaches frame detail', async () => {
+  const {timelineScale,sliderZoom,zoomSlider,MAX_ZOOM}=await geometry;
+  for (const frames of [60,41614,1000000]) for (const viewport of [280,900,1600]) {
+    const fit=timelineScale(frames,viewport);
+    assert.ok(fit.width<=viewport+1e-6);
+    assert.ok(frames*fit.pixelsPerFrame<=viewport-23.999);
+  }
+  assert.ok(timelineScale(41614,900,MAX_ZOOM).pixelsPerFrame>8);
+  for (const position of [0,100,500,1000]) assert.ok(Math.abs(zoomSlider(sliderZoom(position))-position)<1e-8);
 });
 
 test('pane limits retain usable preview space and wheel units normalize across devices', async () => {
@@ -167,13 +178,35 @@ test('trim cursor snap uses screen distance at multiple zoom levels; shift bypas
     assert.equal(m.snapEdge(Math.ceil(9/px),100,100,px).snapped,false);
   }
 });
-test('export remains locked until both current approvals and complete statistics exist',async()=>{
- const m=await model,p={...project,review:{ledgerRevision:'v2'},needsRebuild:[]};
- assert.equal(m.exportBlockers(p),true);
- p.approval={ledgerRevision:'v2',pointAttribution:true,statistics:true};
- assert.equal(m.exportBlockers(p),true);
- p.statistics={ledgerRevision:'v2',status:'complete'};assert.equal(m.exportBlockers(p),false);
- p.needsRebuild=['score'];assert.equal(m.exportBlockers(p),true);
+test('game navigation spans whole points, preserves set identity and follows review ripple hiding',async()=>{
+ const m=await model,p={...project,review:{rows:[{pointId:'P2'},{pointId:'P4'}]},clips:[
+  {id:'a',pointId:'P1',gameNumber:1,setNumber:1,inFrame:0,outFrame:20},
+  {id:'b',pointId:'P2',inFrame:20,outFrame:30},
+  {id:'c',pointId:'P2',gameNumber:1,setNumber:1,inFrame:30,outFrame:60},
+  {id:'d',pointId:'P3',gameNumber:2,setNumber:1,inFrame:60,outFrame:80},
+  {id:'e',pointId:'P4',gameNumber:1,setNumber:2,inFrame:80,outFrame:100},
+  {id:'f',inFrame:100,outFrame:110}
+ ]};
+ const original=JSON.stringify(p);
+ assert.deepEqual(m.gameSegments(p).map(g=>[g.setNumber,g.gameNumber,g.startFrame,g.endFrame,g.clipId]),[
+  [1,1,0,60,'a'],[1,2,60,80,'d'],[2,1,80,100,'e'],[null,null,100,110,'f']
+ ]);
+ assert.deepEqual(m.gameSegments(p,'review').map(g=>[g.setNumber,g.gameNumber,g.startFrame,g.endFrame,g.clipId]),[
+  [1,1,0,40,'b'],[2,1,40,60,'e']
+ ]);
+ assert.equal(JSON.stringify(p),original);
+ p.clips=[p.clips[0],p.clips[3],p.clips[2]];
+ assert.deepEqual(m.gameSegments(p).map(g=>g.gameNumber),[1,2,1]);
+});
+
+test('unassigned clips do not invent games; explicit initial-labeling corrections and nulls win',async()=>{
+ const m=await model,p={...project,review:{purpose:'initial-labeling',rows:[{pointId:'P1',setNumber:1,gameNumber:2}]},clips:[
+  {id:'a',pointId:'P1',setNumber:1,gameNumber:2,inFrame:0,outFrame:20},
+  {id:'b',pointId:'P2',inFrame:20,outFrame:40}
+ ],answers:{P1:{setNumber:2,gameNumber:3}}};
+ assert.deepEqual(m.gameSegments(p).map(g=>[g.setNumber,g.gameNumber]),[[2,3],[null,null]]);
+ p.answers.P1.gameNumber=null;
+ assert.deepEqual(m.gameSegments(p).map(g=>[g.setNumber,g.gameNumber]),[[null,null]]);
 });
 
 test('cursor point changes reveal only the review scroller; playback and answers preserve scroll', async()=>{

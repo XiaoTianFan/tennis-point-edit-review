@@ -80,4 +80,4 @@ never call later hits dead-ball sends just to fit an early ending or final score
 Missing ending evidence remains unknown. Repair a mistaken seam from exact
 neighboring frames while preserving the full partition. If the owner excludes
 project metadata, read only the named render. Preview live; obey the
-[full export gate](local-editor.md#导出与边界).
+[agent-initiated export policy](local-editor.md#导出与边界); an explicit user export request is always honored.

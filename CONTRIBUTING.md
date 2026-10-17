@@ -13,3 +13,9 @@ Do not expand default user review forms simply because internal evidence has mor
 fields. Do not introduce new metrics that duplicate existing indicators.
 
 Check the actual recording, camera view and render target when verifying an edit.
+
+For local workbench changes run `npm run check:local` and verify the affected
+browser interaction. Cover full/review view mapping, long-timeline fit, known
+and unassigned games, and user-requested exports with confirmations absent.
+Keep the agent's unsolicited-render policy separate from user export controls;
+updating a running server requires a restart, not only a browser reload.

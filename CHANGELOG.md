@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026.10.17-v25.3
+
+- Fit the entire visible timeline to the viewport and zoom logarithmically up to 1024 times, retaining cursor anchoring and independent full/review view positions.
+- Add a game lane and game jump selector from recorded set/game metadata, including review ripple views and explicit unassigned sections.
+- Keep user exports available regardless of outcome/statistics confirmations; retain the restriction only for unsolicited agent renders, with explicit user-requested CLI/API exports and unchanged review state.
+- Prune redundant intermediate videos after a verified successful export, retaining the final MP4 and revision/hash records.
+
 ## 2026.10.17-v25.2
 
 - Show human review completion independently from pending counting or missing result fields; count explicit reviewed rows consistently in local review exports. Preserve adjudication states and export gates.

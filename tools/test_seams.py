@@ -132,7 +132,7 @@ class SeamTests(unittest.TestCase):
             project=Store(work/'initial/edit').get()
             self.assertEqual(len(project['review']['rows']),3)
             self.assertTrue(all(r['candidatePoint'] and r['initial']=={} for r in project['review']['rows']))
-            with self.assertRaisesRegex(ValueError,'Full export locked'):
+            with self.assertRaisesRegex(ValueError,'Agent render deferred'):
                 export_video(project,work/'export')
             self.assertFalse((work/'export').exists())
             with self.assertRaises(ValueError): scan(source, work/'a')

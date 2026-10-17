@@ -1,4 +1,4 @@
-import { $, rate, length, layout, buttonIcon, exportSummary, answer, exportBlockers, reviewStatus } from "./model.js";
+import { $, rate, length, layout, buttonIcon, exportSummary, answer, reviewStatus } from "./model.js";
 import { Review } from "./review.js";
 import { Timeline } from "./timeline.js";
 import { Player } from "./player.js";
@@ -295,10 +295,8 @@ function exportOptions() {
 }
 function refreshExport() {
   if (!project) return;
-  const locked = exportBlockers(project);
-  $('export-video').disabled = locked;
-  $('export-video').title = locked ? t('exportLocked') : t('export');
-  $('export-gate').textContent = locked ? t('exportLocked') : t('exportReady');
+  $('export-video').disabled = false;
+  $('export-video').title = t('export');
   const options = exportOptions(), outputRate = rate(options), summary = exportSummary(project, options);
   const valid = $('export-form').checkValidity() && /^\d+(\.\d+)?(\/\d+)?$/.test(options.fps) && outputRate >= 1 && outputRate <= 240;
   $('export-duration').textContent = valid ? t('durationFrames', {seconds: summary.seconds.toFixed(2), frames: summary.frames}) : '—';
@@ -306,7 +304,7 @@ function refreshExport() {
   $('export-audio').textContent = audio ? t('audioSettings', {rate:audio.sampleRate/1000, channels:audio.channels}) : t('silentAudio');
   $('export-warning').hidden = !project.needsRebuild?.length;
   const running = exportJob.state === 'running';
-  $('start-export').disabled = locked || exportBusy || running || pickerBusy || pending > 0 || drafts().length > 0 || !valid;
+  $('start-export').disabled = exportBusy || running || pickerBusy || pending > 0 || drafts().length > 0 || !valid;
   $('browse-export').disabled = pickerBusy;
   $('export-status').textContent = exportError ? errorText(exportError.message) : pickerBusy ? t('pickerOpen') : exportBusy ? t('exportChecking') : running ? t('exporting', {done:exportJob.completedClips ?? 0, total:exportJob.totalClips}) : pending ? t('exportWaiting') : drafts().length ? t('exportUnsaved') : exportJob.state === 'failed' ? errorText(exportJob.error) : exportJob.state === 'complete' ? t('exportComplete') + ' · ' + t('exportJobRevision', {revision:exportJob.revision}) : !valid ? t('invalidExport') : '';
   $('export-download').hidden = exportJob.state !== 'complete';
@@ -349,7 +347,7 @@ $('start-export').onclick = async () => {
   try {
     await queue;
     if (drafts().length) return;
-    exportJob = await api('/api/render', {revision: project.revision, options:exportOptions(), directory:$('export-directory').value.trim()});
+    exportJob = await api('/api/render', {revision: project.revision, userRequested:true, options:exportOptions(), directory:$('export-directory').value.trim()});
     clearTimeout(exportTimer); exportTimer = setTimeout(poll, 500);
   } catch (e) { exportError = e; }
   finally { exportBusy = false; refreshExport(); }

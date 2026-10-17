@@ -38,7 +38,7 @@ extra 保留实际球果但不计有效分，不能假装 replay。
 “人工无法确定”只用于用户已查看但仍无法确定这一分得分方，不能由代理预填为人工结论，也不同于尚未填写的 pending/partial。选择后清空当前得分方和会隐含得分方的 ACE/双误确认，保留其他已知死球类型及备注；不强迫用户猜选双方之一。再次选定选手、ACE 或双误时退出人工无法归属状态；整分重打也退出此状态并照常不计分。
 导出包含 winnerUndetermined=true、inferenceRequired=true、status=unresolved、reviewConfirmed=true、scoringPlayerId=null、scoringPlayer=null；countsTowardScore 保持原来的计分资格，不能因为得分者未知而置为 false。若已明确为 extra，则保持不计分，inferenceRequired=false。原本未审的空行仍是 pending/partial，不能自动变成人工无法归属。
 completedRows 表示已完成本轮人工复核的行数，可以包含 unresolved；另报 unresolvedRows 和 inferenceRequiredRows，不能宣称这些分已解决。提供不同于“已解决”的待逆推状态与数量，可高亮定位；不得按状态隐藏记录，复制时仍包括所有行。沿用原本的来源/账本版本草稿键，新增字段向后兼容旧草稿。
-本地completedRows按reviewConfirmed计数，含已审partial；卡片另示待核计数/待补字段，status与门禁不变。
+本地completedRows按reviewConfirmed计数，含已审partial；卡片另示待核计数/待补字段，status与agent主动导出条件不变。
 回填时归档原采用得分方，将 scoringPlayerId、winner、adoptedWinner 置空，保留观察证据与旧确认历史；禁止让旧的 AI 预填胜者继续参与计分或统计。已确认的旧判罚与新“无法确定”意见冲突时显式记录冲突，不静默抹掉历史。待归属分不参与需要胜者的统计，已独立核实的技术事实仍可保留。
 之后结合已知终局总分、局分、局末边界、相邻发球轮换、换边证据、已确认逐分结果及赛制，枚举并检验可能计分路径。换边和站位是边界证据，不能单独视作分胜负的硬约束；未知规则、缺分或额外事件不得凭终局假造。只有全部有效约束下该分归属唯一，才采用为“规则约束逆推”，记录所用约束与候选解，和视频确认、人工判定分开。多个解时只采用所有解共同确定的归属，其余仍未知；无解时回查漏分、重复计分、边界和输入约束，不强行配平总分。
 回填助手保留逆推需求并阻断旧得分；agent按上述约束枚举路径、用前向计分核对器逐条检验，再记录唯一归属、共同结论或剩余多解。

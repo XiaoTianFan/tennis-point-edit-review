@@ -2,8 +2,16 @@
   "rules": [
     {
       "id": "R001",
-      "path": "references/helper-usage.md",
-      "text": "判读、计分、统计与复核脚本不连接编辑器、不编辑时间线。路径通过参数传入。Python基础脚本用标准库；逐帧和单应映射需要OpenCV及NumPy。浏览器复核页离线运行，无外部库。编辑/图形适配器的职责与依赖见下节；终端MCP客户端会执行请求中的host操作，不能当成只读计算器。"
+      "checks": [
+        {
+          "path": "references/helper-usage.md",
+          "text": "计算脚本不连接编辑器"
+        },
+        {
+          "path": "references/helper-usage.md",
+          "text": "执行host操作，超时不盲重试，不当只读计算器"
+        }
+      ]
     },
     {
       "id": "R002",
@@ -278,11 +286,11 @@
       "checks": [
         {
           "path": "references/helper-usage.md",
-          "text": "python scripts/review_io.py build review-data.json review.html"
+          "text": "review_io.py build review-data.json review.html"
         },
         {
           "path": "references/helper-usage.md",
-          "text": "[离线模板](../examples/review-template.html)"
+          "text": "[模板](../examples/review-template.html)"
         },
         {
           "path": "references/ledger-and-review.md",
@@ -307,23 +315,23 @@
       "checks": [
         {
           "path": "references/helper-usage.md",
-          "text": "python scripts/score_audit.py score-input.json"
+          "text": "score_audit.py score-input.json"
         },
         {
           "path": "references/helper-usage.md",
-          "text": "普通盘：mode=sets"
+          "text": "普通盘mode=sets"
         },
         {
           "path": "references/helper-usage.md",
-          "text": "纯抢分：mode=tiebreak"
+          "text": "纯抢分mode=tiebreak"
         },
         {
           "path": "references/helper-usage.md",
-          "text": "限时：mode=timed"
+          "text": "限时mode=timed"
         },
         {
           "path": "references/helper-usage.md",
-          "text": "判读、计分、统计与复核脚本不连接编辑器、不编辑时间线。"
+          "text": "计算脚本不连接编辑器"
         }
       ]
     },
@@ -332,15 +340,15 @@
       "checks": [
         {
           "path": "references/helper-usage.md",
-          "text": "python scripts/stats_aggregate.py annotated-input.json"
+          "text": "stats_aggregate.py annotated-input.json"
         },
         {
           "path": "references/helper-usage.md",
-          "text": "含scope、audit（计分核对结果）、points（逐分技术标注）"
+          "text": "输入scope、audit、points"
         },
         {
           "path": "references/helper-usage.md",
-          "text": "build_stats_pages(metrics,speedSummary,diagnostics)生成39行及副文本"
+          "text": "build_stats_pages(metrics,speedSummary,diagnostics)生成五页39行及副文本"
         }
       ]
     },
@@ -349,11 +357,11 @@
       "checks": [
         {
           "path": "references/helper-usage.md",
-          "text": "python scripts/frame_evidence.py VIDEO START_SECONDS END_SECONDS OUTPUT --roi x,y,width,height"
+          "text": "frame_evidence.py VIDEO START END OUTPUT --roi x,y,width,height"
         },
         {
           "path": "references/helper-usage.md",
-          "text": "只选短窗；输出原图和对比，不导入项目。"
+          "text": "短窗源帧与对比，不导入工程"
         },
         {
           "path": "SKILL.md",
@@ -366,15 +374,15 @@
       "checks": [
         {
           "path": "references/helper-usage.md",
-          "text": "scripts/launch_speed.py 导入 reconstruct(distance,duration,height,end_height,drag,lift)"
+          "text": "launch_speed.reconstruct(distance,duration,height,end_height,drag,lift)"
         },
         {
           "path": "references/helper-usage.md",
-          "text": "同组补估必须 method=model_imputed 且有 imputationBasis"
+          "text": "补估method=model_imputed并有imputationBasis"
         },
         {
           "path": "references/helper-usage.md",
-          "text": "最高值只取中心估值。"
+          "text": "最高取中心值"
         },
         {
           "path": "references/statistics.md",
@@ -387,11 +395,11 @@
       "checks": [
         {
           "path": "references/helper-usage.md",
-          "text": "python scripts/serve_overlay.py input.json plan.json"
+          "text": "serve_overlay.py input.json plan.json"
         },
         {
           "path": "references/helper-usage.md",
-          "text": "labelEndFrame与球速endFrame相同"
+          "text": "大小标签共退出点"
         },
         {
           "path": "references/helper-usage.md",
@@ -408,11 +416,11 @@
       "checks": [
         {
           "path": "references/helper-usage.md",
-          "text": "python scripts/serve_speed.py speed-input.json"
+          "text": "serve_speed.py旧几何均速"
         },
         {
           "path": "references/helper-usage.md",
-          "text": "此输出不能直接标为初速。"
+          "text": "不能画作初速"
         },
         {
           "path": "references/statistics.md",
@@ -425,11 +433,11 @@
       "checks": [
         {
           "path": "references/helper-usage.md",
-          "text": "python scripts/template_pack.py COMPONENT --props current-props.json --output template-bundle.json"
+          "text": "COMPONENT --props props.json --output bundle.json"
         },
         {
           "path": "references/helper-usage.md",
-          "text": "源代码、可编辑属性、自然尺寸和1080p比例"
+          "text": "输出正式源码、属性、尺寸及1080p比例"
         },
         {
           "path": "references/visual-templates.md",
@@ -442,22 +450,26 @@
       "checks": [
         {
           "path": "references/helper-usage.md",
-          "text": "[最小样例](../examples/review-data.json)"
+          "text": "[样例](../examples/review-data.json)"
         },
         {
           "path": "references/helper-usage.md",
-          "text": "[规则边界检查](../scripts/check_helpers.py)"
+          "text": "[规则检查](../scripts/check_helpers.py)"
         },
         {
           "path": "references/helper-usage.md",
-          "text": "输入示例均为虚构占位数据。"
+          "text": "示例均为虚构占位"
         }
       ]
     },
     {
       "id": "R032",
-      "path": "references/helper-usage.md",
-      "text": "取证、计算和数据交换后，agent通过当前编辑环境的公开接口完成剪辑、素材管理与导出，并按[画面验收](presentation-and-qa.md#验证与交付)自检。"
+      "checks": [
+        {
+          "path": "references/helper-usage.md",
+          "text": "计算后由agent通过当前编辑器接口应用，并按[画面验收](presentation-and-qa.md#验证与交付)自检"
+        }
+      ]
     },
     {
       "id": "R033",
@@ -552,15 +564,15 @@
       "checks": [
         {
           "path": "references/helper-usage.md",
-          "text": "从scripts/serve_return_stats.py导入aggregate_returns(points, require_complete=True)"
+          "text": "serve_return_stats.aggregate_returns(points,require_complete=True)"
         },
         {
           "path": "references/helper-usage.md",
-          "text": "标注与补核由agent完成，不新增用户表单。"
+          "text": "标注由agent补核，不新增用户表单"
         },
         {
           "path": "references/helper-usage.md",
-          "text": "模板装配仍拒绝最终渲染，促使agent先补核。"
+          "text": "partial数据不能进入最终面板"
         }
       ]
     },
@@ -643,13 +655,45 @@
     },
     {
       "id": "R050",
-      "path": "SKILL.md",
-      "text": "禁止渲染完整样片或复核片"
+      "checks": [
+        {
+          "path": "SKILL.md",
+          "text": "agent主动导出限制"
+        },
+        {
+          "path": "SKILL.md",
+          "text": "用户点击导出或在对话中要求agent导出时，直接执行"
+        },
+        {
+          "path": "SKILL.md",
+          "text": "不以归属／统计确认阻拦"
+        }
+      ]
     },
     {
       "id": "R051",
-      "path": "references/local-editor.md",
-      "text": "修剪、判罚或图层更改撤销确认"
+      "checks": [
+        {
+          "path": "references/local-editor.md",
+          "text": "用户导出不受分归属或统计确认阻拦"
+        },
+        {
+          "path": "references/local-editor.md",
+          "text": "事实或呈现更改保留原有确认失效规则"
+        },
+        {
+          "path": "references/local-editor.md",
+          "text": "CLI使用："
+        },
+        {
+          "path": "references/local-editor.md",
+          "text": "--user-requested"
+        },
+        {
+          "path": "references/local-editor.md",
+          "text": "userRequested=true"
+        }
+      ]
     },
     {
       "id": "R052",

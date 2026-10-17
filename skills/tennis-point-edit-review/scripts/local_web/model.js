@@ -61,9 +61,31 @@ export function snapEdge(delta, edge, cursor, pixelsPerFrame, bypass = false) {
   const snapped = !bypass && Math.abs((edge + delta - cursor) * pixelsPerFrame) <= 8;
   return {delta: snapped ? cursor - edge : delta, snapped};
 }
-export function exportBlockers(p) {
-  const a = p.approval ?? {}, revision = p.review?.ledgerRevision, s = p.statistics ?? {};
-  return a.ledgerRevision !== revision || a.pointAttribution !== true || a.statistics !== true || s.status !== 'complete' || s.ledgerRevision !== revision || !!p.needsRebuild?.length;
+export function gameSegments(p, view = 'full') {
+  const rows = new Map((p.review?.rows ?? []).map(r => [r.pointId, r]));
+  // A fault/let clip may inherit its point's unique recorded game, never a neighbor's.
+  const pointGames = new Map();
+  for (const c of p.clips) {
+    if (!c.pointId || !Number.isInteger(c.gameNumber) || c.gameNumber < 1) continue;
+    const known = {gameNumber:c.gameNumber, setNumber:c.setNumber ?? null};
+    const previous = pointGames.get(c.pointId);
+    if (!pointGames.has(c.pointId)) pointGames.set(c.pointId, known);
+    else if (previous && (previous.gameNumber !== known.gameNumber || previous.setNumber !== known.setNumber)) pointGames.set(c.pointId, null);
+  }
+  const segments = [];
+  for (const c of layout(p, view)) {
+    const row = rows.get(c.pointId), x = p.answers?.[c.pointId];
+    const inherited = pointGames.get(c.pointId);
+    const value = key => p.review?.purpose === 'initial-labeling' && row && x && Object.hasOwn(x, key)
+      ? x[key] : c[key] ?? inherited?.[key] ?? row?.[key] ?? null;
+    const gameNumber = value('gameNumber'), setNumber = value('setNumber');
+    const known = Number.isInteger(gameNumber) && gameNumber > 0;
+    const game = {gameNumber:known ? gameNumber : null, setNumber:known ? setNumber : null};
+    const last = segments.at(-1);
+    if (last && last.gameNumber === game.gameNumber && last.setNumber === game.setNumber) last.endFrame = c.endFrame;
+    else segments.push({...game, clipId:c.id, startFrame:c.startFrame, endFrame:c.endFrame});
+  }
+  return segments;
 }
 export function bounds(o, c) {
   const offset = o.anchor === "source" ? c.inFrame : 0;

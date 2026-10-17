@@ -55,7 +55,7 @@ def layout(project, view='full'):
     return result
 
 def export_blockers(project):
-    """Fail closed for both CLI and HTTP; previews do not use this gate."""
+    """Reasons to defer an unsolicited agent render, never a user export lock."""
     approval = project.get('approval', {})
     revision = project['review']['ledgerRevision']
     reasons = []
@@ -67,6 +67,12 @@ def export_blockers(project):
     if project.get('needsRebuild'):
         reasons.append('pending evidence/score/graphics rebuild')
     return reasons
+
+def check_export_request(project, user_requested=False):
+    if type(user_requested) is not bool:
+        raise ValueError('userRequested must be a boolean')
+    if not user_requested and (reasons := export_blockers(project)):
+        raise ValueError('Agent render deferred: ' + '; '.join(reasons) + '. An explicit user request may export the current edit.')
 
 def overlay_range(overlay, clip):
     if overlay.get('anchor', 'clip') == 'source':
@@ -128,6 +134,9 @@ def validate(project, check_files=False):
         point_id = clip.get('pointId')
         if point_id is not None and (not isinstance(point_id, str) or not point_id.strip()):
             raise ValueError('Invalid clip point ID')
+        for key in ('gameNumber', 'setNumber'):
+            if clip.get(key) is not None:
+                integer(clip[key], key, 1)
     for overlay in keyed(project.get('overlays', []), 'overlay').values():
         if overlay['clipId'] not in clips or overlay['component'] not in COMPONENTS:
             raise ValueError('Unknown overlay target/component')
@@ -202,7 +211,7 @@ def context(project):
         'review': review_payload(project), 'timeline': layout(project), 'assets': project['assets'],
         'overlays': project.get('overlays', []), 'selection': project.get('selection', {}),
         'needsRebuild': project.get('needsRebuild', []), 'events': project.get('events', []),
-        'reviewTimeline': layout(project, 'review'), 'exportBlockers': export_blockers(project),
+        'reviewTimeline': layout(project, 'review'), 'agentExportBlockers': export_blockers(project),
         'approval': project.get('approval', {}), 'statistics': project.get('statistics', {})}
 
 class Conflict(ValueError):

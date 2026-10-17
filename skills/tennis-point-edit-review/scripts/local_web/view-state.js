@@ -1,10 +1,17 @@
 // UI geometry is independent of the match and project schema.
 export const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+export const MIN_ZOOM = 1, MAX_ZOOM = 1024;
+export const sliderZoom = value => 2 ** (clamp(Number(value), 0, 1000) / 100);
+export const zoomSlider = zoom => Math.log2(clamp(zoom, MIN_ZOOM, MAX_ZOOM)) * 100;
+export function timelineScale(frames, viewport, zoom = 1) {
+  const pixelsPerFrame = Math.max(1, viewport - 24) / Math.max(1, frames) * clamp(zoom, MIN_ZOOM, MAX_ZOOM);
+  return {pixelsPerFrame, width: Math.max(viewport, frames * pixelsPerFrame + 24)};
+}
 export function paneLimits(width, height) {
   return {review: [250, Math.max(250, width - 426)], timeline: [170, Math.max(170, height - 385)]};
 }
 export function zoomAt(zoom, delta, scroll, pointer) {
-  const next = clamp(zoom * Math.exp(-delta * 0.002), 0.5, 8);
+  const next = clamp(zoom * Math.exp(-delta * 0.002), MIN_ZOOM, MAX_ZOOM);
   return {zoom: next, scroll: Math.max(0, (scroll + pointer) * next / zoom - pointer)};
 }
 export function wheelPixels(event, pageSize) {

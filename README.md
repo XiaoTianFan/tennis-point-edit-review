@@ -40,7 +40,7 @@ speeds and timing; stage 6 builds panels and speed overlays together; stage 7 ve
 the result. Later exception review covers unresolved points or problem games that still disagree
 with the supplied final score after the agent's own checks.
 
-Current skill revision: **2026.10.17-v25.2**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, optional 3D fitting, quality checks and fallbacks.
+Current skill revision: **2026.10.17-v25.3**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, optional 3D fitting, quality checks and fallbacks.
 
 ChatCut, **Premiere Pro** and a standalone pipeline are primary editing choices.
 The [environment contract](skills/tennis-point-edit-review/references/editing-environments.md)
@@ -57,7 +57,7 @@ checks these before building the timeline.
 
 The standalone [Courtside workbench](skills/tennis-point-edit-review/references/local-editor.md)
 ships inside the skill: a local timeline, source/edited playback, decoded frame stepping,
-cursor-snapping clip trims, overlay timing, full/review ripple-hide views and revisioned JSON handoff. Full FFmpeg export stays locked until the owner confirms all point outcomes and completed statistics.
+cursor-snapping clip trims, fit-to-view logarithmic zoom, game-lane navigation, overlay timing, full/review ripple-hide views and revisioned JSON handoff. User exports are always available; only unsolicited agent renders wait for outcome and statistics confirmation to avoid redundant temporary videos.
 Agents operate it entirely through the bundled CLI; users review in a browser.
 
 ## Preview

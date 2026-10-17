@@ -1,6 +1,6 @@
 import { t } from "./i18n.js";
-import { zoomAt, wheelPixels } from "./view-state.js";
-import { $, el, layout, length, bounds, rate, tc, snapEdge, viewOverlays } from "./model.js";
+import { zoomAt, wheelPixels, clamp, MIN_ZOOM, MAX_ZOOM, sliderZoom, zoomSlider, timelineScale } from "./view-state.js";
+import { $, el, layout, length, bounds, rate, tc, snapEdge, viewOverlays, gameSegments } from "./model.js";
 export class Timeline {
   constructor(url, select, seek, save) {
     this.url = url;
@@ -10,8 +10,13 @@ export class Timeline {
     this.zoom = 1;
     $('zoom').oninput = () => {
       const scroller = $('timeline-scroll'), pointer = scroller.clientWidth / 2;
-      const next = Number($('zoom').value), scroll = (scroller.scrollLeft + pointer) * next / this.zoom - pointer;
+      const next = sliderZoom($('zoom').value), scroll = (scroller.scrollLeft + pointer) * next / this.zoom - pointer;
       this.setZoom(next, scroll);
+    };
+    $('timeline-fit').onclick = () => this.setZoom(1, 0);
+    $('game-jump').onchange = () => {
+      const game = this.games?.find(g => String(g.startFrame) === $('game-jump').value);
+      if (game) this.select(game.clipId);
     };
     $('timeline-panel').addEventListener('wheel', e => {
       if (!this.p || !(e.altKey || e.ctrlKey || e.metaKey)) return;
@@ -41,11 +46,10 @@ export class Timeline {
     document.querySelector('.track-labels').style.transform = `translateY(${-$('timeline-scroll').scrollTop}px)`;
   }
   setZoom(value, scroll) {
-    this.zoom = value;
-    $('zoom').value = value;
+    this.zoom = clamp(value, MIN_ZOOM, MAX_ZOOM);
     if (!this.p) return;
     this.render();
-    $('timeline-scroll').scrollLeft = scroll;
+    $('timeline-scroll').scrollLeft = Math.max(0, scroll);
   }
   setProject(p, view = 'full') {
     this.p = p;
@@ -89,10 +93,27 @@ export class Timeline {
     this.clips = clips;
     this.total = clips.at(-1).endFrame;
     this.fps = rate(this.p);
-    this.px = Math.max(0.25, ($("timeline-scroll").clientWidth - 24) / this.total) * this.zoom;
-    const width = Math.max($("timeline-scroll").clientWidth, this.total * this.px + 24);
+    const {pixelsPerFrame, width} = timelineScale(this.total, $("timeline-scroll").clientWidth, this.zoom);
+    this.px = pixelsPerFrame;
+    $('zoom').value = zoomSlider(this.zoom);
+    const level = this.zoom === 1 ? t('fitAll') : this.zoom.toFixed(this.zoom < 10 ? 1 : 0) + '×';
+    $('zoom').setAttribute('aria-valuetext', level);
+    $('zoom-level').textContent = level;
     $("timeline").style.width = width + "px";
-    for (const id of ["ruler", "video-track", "score-track", "serve-track", "stats-track", "review-track"]) $(id).replaceChildren();
+    for (const id of ["ruler", "game-track", "game-jump", "video-track", "score-track", "serve-track", "stats-track", "review-track"]) $(id).replaceChildren();
+    this.games = gameSegments(this.p, this.view);
+    this.gameButtons = [];
+    for (const [index, game] of this.games.entries()) {
+      const name = game.gameNumber == null ? t('unassignedGame') : game.setNumber == null
+        ? t('gameName', {game:game.gameNumber}) : t('setGameName', {set:game.setNumber, game:game.gameNumber});
+      const block = el('button', name, {type:'button', class:'game-block', 'data-game-index':index, title:name, 'aria-label':t('jumpGame', {name})});
+      block.style.left = game.startFrame * this.px + 'px';
+      block.style.width = (game.endFrame - game.startFrame) * this.px + 'px';
+      block.onclick = () => this.select(game.clipId);
+      $('game-track').append(block);
+      $('game-jump').append(el('option', name, {value:game.startFrame}));
+      this.gameButtons.push(block);
+    }
     const step = Math.max(1, Math.ceil(90 / (this.fps * this.px)));
     for (let second = 0; second < this.total / this.fps; second += step) {
       const tick = el("span", tc(Math.round(second * this.fps), this.fps), { class: "tick" });
@@ -200,6 +221,13 @@ export class Timeline {
     $("playhead").setAttribute("aria-valuenow", frame);
     $("playhead").setAttribute("aria-valuemin", 0);
     $("playhead").setAttribute("aria-valuemax", Math.max(0, this.total - 1));
+    const index = this.games?.findIndex(g => frame >= g.startFrame && frame < g.endFrame) ?? -1;
+    for (const [i, block] of (this.gameButtons ?? []).entries()) {
+      block.classList.toggle('current', i === index);
+      if (i === index) block.setAttribute('aria-current', 'true');
+      else block.removeAttribute('aria-current');
+    }
+    if (index >= 0) $('game-jump').value = String(this.games[index].startFrame);
   }
   overlayDrag(e, o, c, bar, side) {
     e.stopPropagation();

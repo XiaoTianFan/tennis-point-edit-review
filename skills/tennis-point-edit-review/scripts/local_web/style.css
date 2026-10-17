@@ -449,8 +449,14 @@ video,
   background: #181f22;
 }
 .timeline-panel .section-bar {
-  height: 35px;
+  min-height: 35px;
+  height: auto;
+  flex-wrap: wrap;
+  row-gap: 6px;
 }
+#game-jump { max-width: 165px; min-width: 80px; padding: 3px 6px; font-size: 11px; }
+#timeline-fit { padding: 3px 8px; font-size: 11px; }
+#zoom-level { min-width: 42px; text-align: right; font: 10px var(--mono); }
 #timeline-duration {
   font-family: var(--mono);
 }
@@ -489,7 +495,7 @@ video,
   color: var(--muted);
   font-size: 9px;
 }
-.track-labels > div:nth-child(2) {
+.track-labels > .video-label {
   height: 65px;
   padding-top: 24px;
 }
@@ -501,9 +507,11 @@ video,
 }
 #timeline {
   position: relative;
-  min-height: 204px;
+  min-height: 232px;
 }
 #ruler {
+  position: relative;
+  overflow: hidden;
   height: 27px;
   border-bottom: 1px solid var(--line);
   cursor: crosshair;
@@ -525,6 +533,20 @@ video,
 .video-track {
   height: 65px;
 }
+.game-block {
+  position: absolute;
+  height: 26px;
+  top: 0;
+  padding: 3px 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+  font-size: 11px;
+  background: #263333;
+  border-color: #53655e;
+}
+.game-block:nth-child(even) { background: #2b3039; }
+.game-block.current { color: var(--lime); border-color: var(--lime); }
 .clip-block {
   position: absolute;
   top: 5px;
@@ -778,7 +800,7 @@ dialog textarea {
   }
 }
 #serve-track,
-.track-labels > div:nth-child(4) {
+.track-labels > .serve-label {
   height: 40px;
 }
 #serve-track .overlay-block {
@@ -876,6 +898,8 @@ body.resizing-timeline, body.resizing-timeline * { cursor: row-resize !important
 #export-dialog .export-warning { margin: 12px 16px 0; padding: 10px 12px; background: #292b21; border-left: 2px solid var(--lime); font-size: 12px; line-height: 1.5; }
 @media(max-width:440px) { .export-form { grid-template-columns: 1fr; } }
 
-#playhead.snapped{background:#DAF36D;box-shadow:0 0 0 1px #DAF36D} .approval-controls{display:flex;gap:16px;align-items:center;flex-wrap:wrap}.approval-controls label{display:flex;gap:6px;align-items:center}#export-gate{color:var(--muted,#9ba8b8)}
+#playhead.snapped { background: var(--lime); box-shadow: 0 0 0 1px var(--lime); }
+.approval-controls { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.approval-controls label { display: flex; gap: 6px; align-items: center; }
 
 footer{min-height:30px;flex-wrap:wrap;padding-block:5px} .approval-controls{font-size:11px}

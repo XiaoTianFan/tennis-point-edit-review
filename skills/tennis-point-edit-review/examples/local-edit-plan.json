@@ -24,7 +24,9 @@
       "serveNumber": 1,
       "assetId": "source",
       "inSeconds": 0.0,
-      "outSeconds": 3.0
+      "outSeconds": 3.0,
+      "setNumber": 1,
+      "gameNumber": 1
     }
   ],
   "review": {

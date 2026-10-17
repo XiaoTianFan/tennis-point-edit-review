@@ -7,7 +7,7 @@ import subprocess
 import time
 from fractions import Fraction
 from pathlib import Path
-from local_model import read, write, duration, overlay_range, validate, export_blockers
+from local_model import read, write, duration, overlay_range, validate, check_export_request
 
 HERE = Path(__file__).resolve().parent
 
@@ -153,11 +153,9 @@ def export_settings(project, options=None):
     return result
 
 
-def export_video(project, directory, progress=lambda value: None, options=None, target=None):
+def export_video(project, directory, progress=lambda value: None, options=None, target=None, *, user_requested=False):
     validate(project, check_files=True)
-    blockers = export_blockers(project)
-    if blockers:
-        raise ValueError('Full export locked: ' + '; '.join(blockers))
+    check_export_request(project, user_requested)
     settings = export_settings(project, options)
     audio = settings['audio']
     sample_rate, channels = (audio['sampleRate'], audio['channels']) if audio else (48000, 2)
@@ -236,8 +234,22 @@ def export_video(project, directory, progress=lambda value: None, options=None, 
     with target.open('xb') as dest, final_path.open('rb') as src:
         shutil.copyfileobj(src, dest)
     report = {'state': 'complete', 'path': str(target), 'revision': project['revision'], 'frames': expected,
-        'settings': settings, 'timelineFrames': timeline_frames, 'warnings': project.get('needsRebuild', []),
+        'settings': settings, 'timelineFrames': timeline_frames, 'warnings': project.get('needsRebuild', []), 'userRequested': user_requested,
         'sha256': hashlib.sha256(target.read_bytes()).hexdigest(), 'probe': result}
     write(directory / 'export.json', report)
+    # Only prune intermediates created in this new export directory after the final
+    # destination and its records are durable. Never traverse an external target.
+    cleanup_errors = []
+    for intermediate in [parts_directory, final_path, *directory.glob('hold-*.jpg')]:
+        try:
+            if intermediate.is_dir():
+                shutil.rmtree(intermediate)
+            else:
+                intermediate.unlink()
+        except OSError as error:
+            cleanup_errors.append(str(error))
+    if cleanup_errors:
+        report['cleanupWarnings'] = cleanup_errors
+        write(directory / 'export.json', report)
     progress(report)
     return report

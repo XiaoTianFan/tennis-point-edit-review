@@ -15,7 +15,7 @@ from fractions import Fraction
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
-from local_model import SCHEMA, Store, Conflict, context, read, write, validate, export_blockers
+from local_model import SCHEMA, Store, Conflict, context, read, write, validate, check_export_request
 from local_media import prepare_media, frame_image, render_graphics, export_video, export_settings, probe, source_settings
 
 WEB = Path(__file__).resolve().parent / 'local_web'
@@ -155,9 +155,13 @@ def make_server(directory, port=0):
             try:
                 route = unquote(urlparse(self.path).path)
                 public = {'/': 'index.html', '/app.js': 'app.js', '/model.js': 'model.js', '/review.js': 'review.js', '/timeline.js': 'timeline.js', '/player.js': 'player.js', '/style.css': 'style.css', '/i18n.js': 'i18n.js', '/view-state.js': 'view-state.js'}
-                if route in public:
+                if route in public or route == '/favicon.ico':
                     if self.headers.get('Host') != f'127.0.0.1:{self.server.server_port}':
                         self.reply({'error': 'Invalid host'}, 403)
+                        return
+                    if route == '/favicon.ico':
+                        self.send_response(204)
+                        self.end_headers()
                         return
                     self.send_file(WEB / public[route], 'text/javascript; charset=utf-8' if route.endswith('.js') else None)
                     return
@@ -230,10 +234,10 @@ def make_server(directory, port=0):
                         picker_lock.release()
                 elif route == '/api/render':
                     p = store.get()
-                    if export_blockers(p):
-                        raise ValueError('Full export locked: ' + '; '.join(export_blockers(p)))
                     if data['revision'] != p['revision']:
                         raise Conflict('Reload before exporting video')
+                    user_requested = data.get('userRequested', False)
+                    check_export_request(p, user_requested)
                     options = export_settings(p, data.get('options'))
                     destination = Path(data.get('directory') or store.directory / 'exports').expanduser()
                     if not destination.is_absolute():
@@ -249,7 +253,7 @@ def make_server(directory, port=0):
                         job.update(state='running', revision=p['revision'], completedClips=0, totalClips=len(p['clips']))
                     def export():
                         try:
-                            export_video(p, store.directory / 'exports' / f'r{p["revision"]}-{time.time_ns()}', lambda v: job.update(v), options, target)
+                            export_video(p, store.directory / 'exports' / f'r{p["revision"]}-{time.time_ns()}', lambda v: job.update(v), options, target, user_requested=user_requested)
                         except Exception as e:
                             job.update(state='failed', error=str(e))
                     threading.Thread(target=export, daemon=True).start()
@@ -280,6 +284,7 @@ def main():
     update = sub.add_parser('update'); update.add_argument('directory'); update.add_argument('plan'); update.add_argument('--expected-revision', type=int, required=True)
     render = sub.add_parser('render'); render.add_argument('directory'); render.add_argument('output')
     render.add_argument('--fps'); render.add_argument('--width', type=int); render.add_argument('--height', type=int); render.add_argument('--filename', default='edited.mp4')
+    render.add_argument('--user-requested', action='store_true', help='Export at the explicit request of the user, regardless of review/statistics confirmations')
     args = parser.parse_args()
     if args.command == 'doctor':
         result = {'python': __import__('sys').version.split()[0],
@@ -325,7 +330,7 @@ def main():
         result = store.commit(updated, args.expected_revision, {'type': 'agent-reconciliation'})
     else:
         options = {k: getattr(args, k) for k in ('fps', 'width', 'height', 'filename') if getattr(args, k) is not None}
-        result = export_video(Store(args.directory).get(), args.output, options=options)
+        result = export_video(Store(args.directory).get(), args.output, options=options, user_requested=args.user_requested)
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
 if __name__ == '__main__':

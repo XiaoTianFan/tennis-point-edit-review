@@ -60,12 +60,17 @@ class ModelTest(unittest.TestCase):
         write(Path(self.temp.name) / 'project.json', self.p)
         self.store = Store(self.temp.name)
 
-    def test_export_gate_defaults_stale_versions_and_mutations(self):
-        from local_model import export_blockers
+    def test_agent_render_defaults_and_explicit_user_export_are_separate(self):
+        from local_model import export_blockers, check_export_request
         self.assertTrue(export_blockers(self.p))
-        with self.assertRaisesRegex(ValueError,'Full export locked'):
+        with self.assertRaisesRegex(ValueError,'Agent render deferred'):
             export_video(self.p,Path(self.temp.name)/'forbidden')
         self.assertFalse((Path(self.temp.name)/'forbidden').exists())
+        original = copy.deepcopy(self.p)
+        check_export_request(self.p, True)
+        self.assertEqual(self.p, original)
+        self.assertEqual(context(self.p)['agentExportBlockers'], export_blockers(self.p))
+        with self.assertRaisesRegex(ValueError,'boolean'): check_export_request(self.p, 'true')
         approve(self.p); self.assertEqual(export_blockers(self.p),[])
         self.p['statistics']['ledgerRevision']='stale'; self.assertTrue(export_blockers(self.p))
         approve(self.p); write(self.store.path,self.p)
@@ -81,6 +86,14 @@ class ModelTest(unittest.TestCase):
         with self.assertRaises(ValueError): validate(self.p)
         self.p['clips'][0]['outFrame'] = 10
         with self.assertRaises(ValueError): validate(self.p)
+
+    def test_clip_game_metadata_is_optional_and_positive_when_known(self):
+        for value in (None, 1, 7):
+            self.p['clips'][0].update(gameNumber=value, setNumber=value)
+            validate(self.p)
+        for value in (0, -1, True, '2'):
+            self.p['clips'][0]['gameNumber'] = value
+            with self.assertRaises(ValueError): validate(self.p)
 
     def test_review_subset_does_not_require_clear_points_to_be_reviewed(self):
         self.p['review']['rows'] = self.p['review']['rows'][1:]
@@ -138,7 +151,7 @@ class ModelTest(unittest.TestCase):
         self.p['answers']['P002'] = dict(scoringPlayerId='A', deadBallType='net', reviewConfirmed=True)
         self.assertEqual(review_payload(self.p)['rows'][1]['status'], 'partial')
 
-    def test_human_completion_does_not_resolve_counting_or_unlock_export(self):
+    def test_human_completion_does_not_resolve_counting_or_authorize_agent_renders(self):
         from local_model import export_blockers
         self.p['review']['rows'][0]['initial'] = dict(scoringPlayerId='A', deadBallType='net', reviewConfirmed=True)
         self.p['answers']['P002'] = dict(scoringPlayerId='B', deadBallType='out', reviewConfirmed=True)
@@ -194,6 +207,7 @@ class ModelTest(unittest.TestCase):
             c.request(method, path, json.dumps(body) if body is not None else None, headers or {})
             r = c.getresponse(); result = (r.status, r.read(), dict(r.getheaders())); c.close(); return result
         self.assertEqual(request('GET','/api/project')[0],403)
+        self.assertEqual(request('GET','/favicon.ico')[0],204)
         for path in ['/i18n.js', '/view-state.js']:
             status, body, headers = request('GET', path)
             self.assertEqual(status, 200)
@@ -209,14 +223,17 @@ class ModelTest(unittest.TestCase):
         with patch('local_editor.export_video', return_value={'state':'complete'}) as render:
             blocked, body, _ = request('POST','/api/render',{'revision':1},{'X-Session-Token':token})
             self.assertEqual(blocked,400,body); render.assert_not_called()
-            approved = self.store.get(); approve(approved); write(self.store.path,approved)
-            status, body, _ = request('POST','/api/render',{'revision':1,'options':{'filename':'用户选择.mp4','fps':'25','width':640,'height':360}},{'X-Session-Token':token})
+            self.assertEqual(request('POST','/api/render',{'revision':0,'userRequested':True},{'X-Session-Token':token})[0],409)
+            status, body, _ = request('POST','/api/render',{'revision':1,'userRequested':True,'options':{'filename':'用户选择.mp4','fps':'25','width':640,'height':360}},{'X-Session-Token':token})
             self.assertEqual(status,202,body)
             render.assert_called_once()
             args = render.call_args.args
-            self.assertEqual(args[0]['needsRebuild'], [])
+            self.assertTrue(args[0]['needsRebuild'])
+            self.assertNotIn('statistics',args[0])
             self.assertEqual(args[3]['fps'], '25')
             self.assertEqual(args[4].name, '用户选择.mp4')
+            self.assertEqual(render.call_args.kwargs, {'user_requested':True})
+            self.assertEqual(self.store.get().get('approval',{}), {})
         with patch('local_editor.pick_directory', return_value=self.temp.name) as picker:
             status, body, _ = request('POST','/api/pick-directory',{'directory':self.temp.name},{'X-Session-Token':token})
             self.assertEqual(status,200)
@@ -229,6 +246,23 @@ class ModelTest(unittest.TestCase):
 
 @unittest.skipUnless(shutil.which('ffmpeg') and shutil.which('ffprobe'), 'FFmpeg required')
 class MediaTest(unittest.TestCase):
+    def test_user_requested_export_encodes_without_approvals_or_complete_statistics(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            p = sample(tmp)
+            source = Path(p['assets'][0]['path'])
+            run(['ffmpeg','-v','error','-y','-f','lavfi','-i','color=blue:size=320x180:rate=30','-t','4','-c:v','libx264',source])
+            p['needsRebuild'] = ['score-and-statistics']
+            before = copy.deepcopy(p)
+            result = export_video(p, Path(tmp)/'user-export', user_requested=True)
+            self.assertEqual(result['frames'],60)
+            self.assertTrue(result['userRequested'])
+            self.assertEqual(result['warnings'],p['needsRebuild'])
+            self.assertEqual(p,before)
+            self.assertTrue(Path(result['path']).is_file())
+            self.assertFalse((Path(tmp)/'user-export/render-parts').exists())
+            self.assertFalse((Path(tmp)/'user-export/.encoded.mp4').exists())
+            self.assertTrue((Path(tmp)/'user-export/export.json').is_file())
+
     def test_source_defaults_and_fps_override_preserve_evidence_and_duration(self):
         for source_rate, output_rate in [('25','60'), ('30000/1001','24'), ('60','30000/1001')]:
             with self.subTest(rate=source_rate), tempfile.TemporaryDirectory() as tmp:
