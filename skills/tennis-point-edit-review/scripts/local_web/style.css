@@ -164,7 +164,12 @@ h2 {
 }
 #review-progress {
   margin-left: auto;
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-size: 10px;
+  color: var(--muted);
 }
+#search-count:empty { display: none; }
 #review-list {
   overflow: auto;
   padding: 7px;
@@ -177,9 +182,11 @@ h2 {
   align-items: center;
   padding: 4px 8px;
   gap: 8px;
+  flex-shrink: 0;
 }
 .searchbar input {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   border-color: transparent;
   background: #11171999;
   font-size: 12px;
@@ -346,10 +353,9 @@ video,
   font: 10px var(--mono);
 }
 .transport {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   gap: 5px;
   padding: 8px;
   border-top: 1px solid var(--line);
@@ -403,15 +409,13 @@ video,
 .inspector {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 7px 10px;
-  min-height: 44px;
-  border-top: 1px solid var(--line);
-  background: #1b222570;
+  gap: 5px;
+  padding: 0;
+  min-height: 32px;
   flex-wrap: wrap;
 }
 .inspector > span {
-  max-width: 130px;
+  max-width: 80px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -426,14 +430,15 @@ video,
   font-size: 10px;
 }
 .inspector input {
-  width: 76px;
+  width: 60px;
   font: 11px var(--mono);
-  padding: 5px;
+  padding: 4px;
 }
 .inspector button {
   font-size: 10px;
-  padding: 6px 9px;
+  padding: 5px 6px;
 }
+.inspector .icon-button { width: 28px; height: 28px; padding: 4px; }
 #notice {
   position: absolute; z-index: 8; bottom: 12px; left: 50%; transform: translateX(-50%);
   width: max-content; max-width: calc(100% - 32px); padding: 9px 13px;
@@ -453,12 +458,14 @@ video,
   height: auto;
   flex-wrap: wrap;
   row-gap: 6px;
+  column-gap: 8px;
+  padding: 3px 8px;
 }
-#game-jump { max-width: 165px; min-width: 80px; padding: 3px 6px; font-size: 11px; }
+#game-jump { max-width: 132px; min-width: 80px; padding: 3px 6px; font-size: 11px; }
 #timeline-fit { padding: 3px 8px; font-size: 11px; }
 #zoom-level { min-width: 42px; text-align: right; font: 10px var(--mono); }
 #timeline-duration {
-  font-family: var(--mono);
+  font: 10px var(--mono);
 }
 .zoom {
   display: flex;
@@ -468,7 +475,7 @@ video,
   font-size: 11px;
 }
 .zoom input {
-  width: 90px;
+  width: 70px;
   height: 4px;
   padding: 0;
 }
@@ -703,18 +710,11 @@ dialog textarea {
   .workspace {
     grid-template-columns: var(--review-width, 300px) 6px minmax(0, 1fr);
   }
-  .transport {
-    flex-wrap: wrap;
-    gap: 4px;
-  }
   .transport button {
     padding: 6px;
   }
   .transport #timecode {
     font-size: 10px;
-  }
-  .inspector {
-    gap: 5px;
   }
   #project-title {
     max-width: 210px;
@@ -726,9 +726,6 @@ dialog textarea {
     width: 100%;
     height: auto;
     max-height: 100%;
-  }
-  .timeline-panel .muted {
-    display: none;
   }
 }
 @media (max-width: 760px) {
@@ -769,9 +766,6 @@ dialog textarea {
   }
   .track-label-viewport {
     width: 100px;
-  }
-  .transport {
-    justify-content: flex-start;
   }
   footer {
     min-height: 40px;
@@ -874,10 +868,17 @@ dialog textarea {
 body.resizing-review, body.resizing-review * { cursor: col-resize !important; user-select: none !important; }
 body.resizing-timeline, body.resizing-timeline * { cursor: row-resize !important; user-select: none !important; }
 .tick::after { content: ''; position: absolute; top: 16px; left: 0; height: 5px; border-left: 1px solid #46504f; }
-@container preview (max-width: 760px) {
-  .transport { grid-template-columns: 1fr 1fr; }
-  .navigation { grid-row: 2; grid-column: 1 / -1; justify-self: center; }
-  #timecode { grid-row: 1; grid-column: 2; }
+@container preview (max-width: 600px) {
+  .transport { gap: 4px; padding: 6px; }
+  .transport #timecode { font-size: 9px; padding: 0; }
+  .transport .segmented button { padding: 6px 4px; }
+  .navigation { gap: 2px; }
+  .navigation button:not(.play) { width: 24px; height: 30px; padding: 4px; font-size: 0; }
+  .navigation button::after { font: 11px var(--mono); }
+  #prev-point::after { content: "["; }
+  #next-point::after { content: "]"; }
+  #prev-frame::after { content: "−1"; }
+  #next-frame::after { content: "+1"; }
 }
 @media (max-width: 760px) {
   .pane-divider { display: none; }

@@ -96,7 +96,7 @@ export class Review {
     }
   }
   localize() {
-    document.querySelector('[data-i18n="review"]').textContent = t(this.p.review.purpose === 'initial-labeling' ? 'initialLabeling' : 'review');
+    $('review-panel').setAttribute('aria-label', t(this.p.review.purpose === 'initial-labeling' ? 'initialLabeling' : 'review'));
     for (const r of this.p.review.rows) {
       const n = this.nodes.get(r.pointId), x = answer(this.p,r), sid = this.p.review.purpose === 'initial-labeling' ? x.serverId : r.serverId, server = this.p.players.find(p => p.id === sid)?.name ?? t('unassigned');
       n.card.querySelector('.point-heading').setAttribute('aria-label', t('jump', {point: r.pointId}));

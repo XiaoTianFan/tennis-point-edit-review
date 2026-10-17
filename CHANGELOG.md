@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026.10.17-v25.4
+
+- Place review progress beside search, without a separate review heading row.
+- Align full/review toggles at the left of the timeline toolbar and move clip in/out, apply, undo and redo controls into that toolbar.
+- Keep playback navigation on the Edited/Source row; use compact labels in narrow previews while retaining accessible names and tooltips.
+
 ## 2026.10.17-v25.3
 
 - Fit the entire visible timeline to the viewport and zoom logarithmically up to 1024 times, retaining cursor anchoring and independent full/review view positions.
