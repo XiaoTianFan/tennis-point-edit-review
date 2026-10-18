@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026.10.18-v25.6
+
+- Prioritize a same-point let, repeat or second serve when consecutive service attempts start from the same service court; verify the interval before grouping and preserve exception checks.
+- Apply the latest saved editor results and explicit comments when asked to read a review, without a redundant application confirmation; preserve untouched review states and superseded answer history.
+- Honor the user's latest corrected outcome and implement authorized general skill feedback in the relevant requirement section.
+
 ## 2026.10.17-v25.5
 
 - Use a frame-rate preset dropdown with a default Match timeline option showing its readable FPS; retain exact rational rates internally and preserve the timeline.
