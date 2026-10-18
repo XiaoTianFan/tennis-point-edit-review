@@ -5,7 +5,7 @@ description: 网球单打逐分剪辑、计分、必要复核、全量发球初�
 
 # 网球逐分精剪、计分与复核
 
-包版本 **2026.10.18-v25.7**。用于有连续比赛画面的网球单打录像。支持六局、四局、有占先、无占先、限时不限局、纯抢七及纯抢十；采用用户已给规则和下述默认值，只有影响结果且无法从素材核实的真实缺口才追问。不是比赛裁判或雷达测速工具。双打需要额外确认发球与接发顺序，再扩展规则，不能直接套用单打核算器。
+包版本 **2026.10.18-v25.8**。用于有连续比赛画面的网球单打录像。支持六局、四局、有占先、无占先、限时不限局、纯抢七及纯抢十；采用用户已给规则和下述默认值，只有影响结果且无法从素材核实的真实缺口才追问。不是比赛裁判或雷达测速工具。双打需要额外确认发球与接发顺序，再扩展规则，不能直接套用单打核算器。
 
 网球剪辑任务即使用户未手动点选本技能，也应按任务类型检索并加载；未另指定UI技能/模板/风格时，直接复用本包正式模板，禁止随机重设计。优先级为用户当前明确要求、项目已确认风格、本包默认。
 
@@ -47,7 +47,7 @@ description: 网球单打逐分剪辑、计分、必要复核、全量发球初�
 |---|---|---|
 | 1 剪辑与重建 | 连续原片精剪；已剪成片逐帧CV恢复原剪口、全帧无损分段并核验。保存P/源映射，提供可播放定位的时间线和首次标注界面，暂不推进比分 | [判读](references/adjudication.md)、[原片检查](references/source-inspection.md)、[账本](references/ledger-and-review.md#内部账本)、[覆盖与谱系](references/coverage-and-exceptions.md)、[精剪](references/presentation-and-qa.md#剪辑)、[首次标注](references/initial-labeling.md) |
 | 2 判分与基础图层 | 全部分核查赢家、发球者、发次及局界，推进计分并核对终局。全部目标段加入计分板和短时发次标签，有疑点直接继续阶段3 | [判读](references/adjudication.md)、[规则](references/inputs-and-rules.md)、[例外](references/coverage-and-exceptions.md)、[基础图层](references/presentation-and-qa.md#分析期逐分定位与基础图层) |
-| 3 必要人工复核 | 只送补查后疑点；终局仍不符则问题整局逐分送审。本地同工程全片／复核切换和集成列表；外部编辑器复核序列＋HTML。交付前验收播放、定位、保存、恢复与全量答案导出 | [范围及协议](references/ledger-and-review.md#独立复核时间线与-html)、[布局](references/presentation-and-qa.md#局分与逐分复核时间线)、[常驻行验收](references/presentation-and-qa.md#行可见性验收) |
+| 3 必要人工复核 | 先判读、回填并全链复算；只送补查后具体疑点，跨轮移出已采用且无新疑点的分。本地同工程全片／复核切换和集成列表；外部编辑器复核序列＋HTML。交付前验收播放、定位、保存、恢复与全量答案导出 | [范围及协议](references/ledger-and-review.md#独立复核时间线与-html)、[布局](references/presentation-and-qa.md#局分与逐分复核时间线)、[常驻行验收](references/presentation-and-qa.md#行可见性验收) |
 | 4 回填再核算 | 按P与版本合并，保留确认历史；重算整局及后续计分、图层，未解矛盾回阶段3。用户未知先清除旧采用赢家再按约束逆推 | [回填及逆推](references/ledger-and-review.md)、[依赖重算](references/workflow.md#更正后的依赖) |
 | 5 技术统计与全量估速 | 从事件备齐五页数据，独立UE/FE和UE动作；逐盘估算全部真实发球，含主剪删除的一发。核验分母、覆盖和显示时序，不以抽样代替全量 | [统计](references/statistics.md)、[UE/FE](references/error-classification.md)、[初速](references/serve-speed-model.md)、[取证](references/serve-speed-audit.md)、[时序](references/serve-speed-overlay.md) |
 | 6 统计与速度图层 | 用阶段5同版本数据实时合成五页默认各8秒面板及逐发球速，检查同步退出；数据缺口回阶段5 | [模板](references/visual-templates.md)、[合成](references/presentation-and-qa.md#阶段6统计面板与逐发球速图层)、[速度标签](references/serve-speed-overlay.md) |

@@ -96,7 +96,7 @@
     {
       "id": "R014",
       "path": "references/coverage-and-exceptions.md",
-      "text": "**阶段2：自主判分并建立计分链。** 同时记录画面球果、采用判罚、规则进位、现场记法及依据。逐分推进小分、局分、盘分，核对换发球、换边和局末最后有效一分。最终结果只是约束，不能为凑比分擅改球果。冲突时回查整局及邻接边界；仍无法与用户指定终场局分/盘分核对一致，将问题整局逐分送审，不只询问末分。"
+      "text": "**阶段2：自主判分并建立计分链。** 同时记录画面球果、采用判罚、规则进位、现场记法及依据。逐分推进小分、局分、盘分，核对换发球、换边和局末最后有效一分。最终结果只是约束，不能为凑比分擅改球果。冲突时由agent回查整局各分及邻界、重算全链；仍不符时按[必要复核范围](ledger-and-review.md#独立复核时间线与-html)发布具体疑点，不因计分矛盾自动送审整局，也不只猜末分。"
     },
     {
       "id": "R015",
@@ -128,7 +128,7 @@
         },
         {
           "path": "references/ledger-and-review.md",
-          "text": "用户已剪成片保留该分全部源片段和边界，仅临时隐藏其他分"
+          "text": "用户已剪成片保留送审分全部源片段和边界，仅隐藏其他分"
         },
         {
           "path": "references/presentation-and-qa.md",
@@ -496,7 +496,7 @@
       "checks": [
         {
           "path": "references/presentation-and-qa.md",
-          "text": "交付该局所有分各自的紧凑片段和必要邻接分。"
+          "text": "仅交付未解疑点及必要邻接证据的紧凑片段。"
         },
         {
           "path": "references/presentation-and-qa.md",
@@ -726,6 +726,23 @@
         {
           "path": "references/serve-speed-model.md",
           "text": "默认不进视频/均值"
+        }
+      ]
+    },
+    {
+      "id": "R054",
+      "checks": [
+        {
+          "path": "references/ledger-and-review.md",
+          "text": "首轮由agent先完成全场判读；后续轮先应用最新明确答案和批注，再整局回查、全链复算。"
+        },
+        {
+          "path": "references/ledger-and-review.md",
+          "text": "已采用且无新疑点的分移出复核，完整时间线保留。"
+        },
+        {
+          "path": "references/ledger-and-review.md",
+          "text": "重开已确认分须有具体新冲突，只询问未解字段，不重复索取清晰答案。"
         }
       ]
     }

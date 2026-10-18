@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026.10.18-v25.8
+
+- Distinguish agent whole-game rechecking from the necessary human-review subset; a score conflict does not automatically send an entire game or match for review.
+- Archive each superseded round and its complete answers, then remove adopted clear points from the next subset. Reopen a confirmed point only for a concrete new conflict, asking only for the unresolved fields. Same-round row persistence is unchanged.
+
 ## 2026.10.18-v25.7
 
 - Require per-serve source expansion, contact/camera review, applicable endpoint/3D execution and pre-impact extension before final N/A; pending work is not a failed measurement.

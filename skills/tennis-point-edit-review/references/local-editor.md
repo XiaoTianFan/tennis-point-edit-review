@@ -39,7 +39,7 @@ python "<skill>/scripts/local_editor.py" serve "<work>/edit" --open
 | overlays | id/clipId/component/props/startFrame/endFrame；anchor=source或clip，裁到可见范围；view=both（默认）/full/review |
 | statistics/approval | 当前账本统计完成状态与用户确认记录；仅约束agent主动导出，不锁用户导出 |
 
-理由由agent生成；阶段3仅列补查后必要疑点／问题局，全场定位用clip/P映射。[正式图形](graphics-adapters.md)经`init/update`缓存为整画幅透明PNG与哈希，预览和输出同源；模板不变，改文字须重生成。工作台处理统计页首尾约0.3秒淡变。
+理由由agent生成；阶段3仅列补查后具体疑点；问题局由agent先核查，全场定位用clip/P映射。[正式图形](graphics-adapters.md)经`init/update`缓存为整画幅透明PNG与哈希，预览和输出同源；模板不变，改文字须重生成。工作台处理统计页首尾约0.3秒淡变。
 
 完整／复核视图共用一个clips数组：完整视图保留全部段；复核按rows中的P号保留其全部源段，其余暂时波纹隐藏，不复制、重剪或删除master。已剪成片不再删除失败发球、等待或尾段。计分板在两视图均可见；复核R/P、常显发球与说明仅review显示，短发次标签仅full显示。切换保留源帧锚点、各自缩放和滚动，不改答案；无复核片段时禁用review。说明放计分板上方避让。阶段5数据、阶段6图层、阶段7输出顺序见[阶段衔接](workflow.md)。
 

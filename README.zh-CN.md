@@ -16,7 +16,7 @@
 
 默认在阶段完成后报告产物、自检、当前与下一阶段，并询问是否继续；阶段2有复核需求时直接完成阶段3的复核时间线与HTML，同批交付后等待复核意见。明确要求一口气完成时连续执行。阶段1交完整精剪时间线，暂不计分，账本留作内部log；阶段2由agent逐分判读核算并加基础图层。复核/回填可多轮往返；阶段5备齐数据，阶段6统一制作面板和球速图层。
 
-保留死球落点及必要反应；主剪和复核都逐分剪辑。人工复核仅收自查后仍未知的分，或仍无法与指定终局核对一致的问题整局。HTML默认不带视频，“所有行常驻”仅指复核子集；人工无法归属与尚未审核分开。UE/FE先看压力，再统计UE内移动/站定次数，不当作失误概率。
+保留死球落点及必要反应；主剪和复核都逐分剪辑。人工复核仅收agent判读、回填与全链复算后仍未解的具体疑点；下一轮移出已采用且无新疑点的分，保留旧版和答案。HTML默认不带视频，“所有行常驻”仅指复核子集；人工无法归属与尚未审核分开。UE/FE先看压力，再统计UE内移动/站定次数，不当作失误概率。
 
 ChatCut、**Premiere Pro**、本地独立流水线均为一级候选；编辑层和图形层分别选择。[Pr分支](skills/tennis-point-edit-review/references/premiere-pro.md)明确区分旧版CEP/ExtendScript与新版UXP，包含新机器配置和终端执行指南，正常执行不依赖Computer Use或鼠标点击。[图形契约](skills/tennis-point-edit-review/references/graphics-adapters.md)说明原生可编辑图形与渲染覆盖层的选择。agent先检查host版本与模板支持的属性，再构建时间线。
 
@@ -52,7 +52,7 @@ python tools/validate.py
 npm run check:adapters
 ```
 
-工作流与编辑器指南在 `references/`，正式模板在 `examples/`，计算与取证工具在 `scripts/`。当前版本 **2026.10.18-v25.7**；估速方法详见[中英文说明](docs/serve-speed-explained.md)。
+工作流与编辑器指南在 `references/`，正式模板在 `examples/`，计算与取证工具在 `scripts/`。当前版本 **2026.10.18-v25.8**；估速方法详见[中英文说明](docs/serve-speed-explained.md)。
 
 账户保存版本没有可以直接交给 Git 的目录地址。建议以本仓库作可版本管理的维护源。也支持先修改账户版本，再由 agent 完整取回、差异比较、合并、验证和提交；不会自动同步，更不会自动公开到 GitHub。详见[双向同步流程](docs/synchronization.md)。
 
