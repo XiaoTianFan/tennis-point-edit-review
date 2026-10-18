@@ -14,6 +14,7 @@ illustration. No match footage, player identities or measured serve speeds are i
 
 - Cuts individual points while keeping the first dead ball and necessary reactions.
 - Separates visual outcome, adopted ruling, rules-based score and onsite notation.
+- Prioritizes the last effective point for game attribution while independently verifying the point-by-point chain; unresolved material questions remain on a usable review timeline.
 - Provides full/review timeline toggles with one integrated local answer list; external editors use offline HTML.
 - Derives five statistics pages from point and shot events, including FH/BH outcomes,
   independent UE/FE classification, and movement counts **within UE**.
@@ -40,7 +41,7 @@ speeds and timing; stage 6 builds panels and speed overlays together; stage 7 ve
 the result. Later exception review covers unresolved points or problem games that still disagree
 with the supplied final score after the agent's own checks.
 
-Current skill revision: **2026.10.18-v25.10**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, required recovery attempts, complete 3D screening and evidence-only/N/A labels.
+Current skill revision: **2026.10.18-v25.11**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, required recovery attempts, complete 3D screening and evidence-only/N/A labels.
 
 ChatCut, **Premiere Pro** and a standalone pipeline are primary editing choices.
 The [environment contract](skills/tennis-point-edit-review/references/editing-environments.md)

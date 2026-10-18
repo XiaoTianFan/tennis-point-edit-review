@@ -1,7 +1,7 @@
 # Stage-based workflow maintenance
 
-Revisions v23–v23.8 clarify agent-owned work, concrete stage delivery, necessary
-interactive review, visual adjudication and the distinction between main-cut and review labels.
+Maintain agent-owned evidence work, concrete stage delivery, necessary interactive
+review, and separate game attribution from point-by-point score verification.
 This is repository maintenance context, not additional match instructions.
 
 The skill entry now groups each stage's work, required reading and completion
@@ -93,7 +93,12 @@ expected behavior to that agent.
 | A few clipped endings or uncertain serves | Inspect source gaps and continuous context; adopt clear decisions. Only unresolved material questions and necessary related points enter review. |
 | Stage 2 finishes without review needs | Skip stages 3–4, report the result and ask whether to enter the next applicable stage; do not create an empty review file. |
 | Review is necessary | Continue from stage 2 directly into stage 3 without a proceed prompt; build, verify and deliver its review sequence and interactive HTML, or the local workbench’s full/review toggle and integrated list (no offline HTML). A questions list without the required interactive file is incomplete; waiting for answers does not block building it. Every selected row stays visible; unrelated points are not added by default. |
-| Scoring still disagrees with the supplied final game/set score after source checks | Include each problem game's points individually, with necessary adjacent evidence. Preserve known answers; repeat stages 3–4 as needed without fabricating a matching score. |
+| A known last effective point determines the game winner, but interior point counting is unresolved | Retain the known game attribution and keep the point chain pending. The agent checks grouping, omitted intervals and score paths, then publishes only concrete unresolved questions on a usable review timeline. A known game winner cannot clear the review or authorize a scoring exception. |
+| The last effective point is unknown | Use chronological point evidence and rule constraints to infer game attribution; adopt only unique or common conclusions with explicit provenance. |
+| Scoring still disagrees with the supplied final game/set score after source checks | Recheck the related whole game and boundaries as agent work, preserve known answers, and send only the unresolved material points with necessary adjacent evidence. Repeat stages 3–4 without fabricating a matching score. |
+| A tiebreak correction closes that game but ordinary-game point paths remain open | Update the tiebreak and preserve it, keep the ordinary questions visible in the revised review timeline, and report the current stage and next action. Do not present an empty review as overall completion. |
+| A reviewed unknown has only one compatible rule path | Adopt that result as rule inference, retain the original human-unknown evidence, and rebuild its dependent scores. Do not label it a visual or human confirmation. |
+| All point paths and game attribution are checked | State that no review questions remain and identify the next applicable stage. At every match-work handoff, report current scope, remaining items and the user's/agent's next actions. |
 | Statistics and speed data are ready | Stage 6 renders both five-page panels and per-serve speed overlays from stage 5's shared data and timing; neither requires its own stage or fixed rendering order. |
 | A long rally, before speed estimation | Serve label starts before service and exits no later than three seconds after the confirmed post-contact display start, or at an earlier boundary. It does not fill the rally. |
 | Resume with reviewed answers or completed statistics | Read current state and the affected stage references; preserve IDs, answers and completed work. Recompute dependencies or build the remaining panels/labels as appropriate. |
@@ -136,6 +141,6 @@ package retains the same runtime helpers, review UI and seven JSX templates;
 instruction text is approximately 6.7% shorter. Account readback and fresh-agent
 behavior are separate verification steps.
 
-Full movie export is forbidden until the owner confirms all point outcomes and completed statistics for the current ledger revision. Before then, preview source media and canonical overlays live. Supplied rendered edits keep all source frames and exact edit boundaries; reviewing hides other clips temporarily, without shortening retained clips.
+Only unsolicited agent movie renders wait for owner-confirmed point outcomes and completed statistics at the current ledger revision. Explicit user exports remain available; ordinary review uses live source media and canonical overlays. Supplied rendered edits keep all source frames and exact edit boundaries; reviewing hides other clips temporarily, without shortening retained clips.
 
 Cursor navigation into another review point reveals its row inside the review list. Playback, answer updates and moves within the same point retain the user's list position and focus.

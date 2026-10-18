@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026.10.18-v25.11
+
+- Keep last-effective-point priority for game attribution while requiring separate point-by-point score verification before confirming completion or advancing dependent work.
+- Require agent-owned source rechecking and constraint inference; retain a usable revised review timeline for unresolved material points instead of hiding them once a game winner is known.
+- Clarify that last-point priority does not authorize onsite scoring exceptions. Require a concrete current-stage, remaining-issues and next-action handoff in each match-work reply.
+
 ## 2026.10.18-v25.10
 
 - Remove the redundant player scrubber and source seconds/proxy-FPS row, including bindings, styles and unused UI strings. Keep timeline seeking, playback navigation and the timecode.
