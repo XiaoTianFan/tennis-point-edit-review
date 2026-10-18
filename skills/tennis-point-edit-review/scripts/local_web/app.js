@@ -212,7 +212,6 @@ $('timeline-full').onclick = () => switchTimeline('full');
 $('timeline-review').onclick = () => switchTimeline('review');
 for (const [id,field] of [['confirm-points','pointAttribution'],['confirm-statistics','statistics']]) $(id).onchange = () => save({type:'approval',field,confirmed:$(id).checked});
 $("speed").onchange = () => player.video.playbackRate = Number($("speed").value);
-$("source-position").oninput = () => player.seek(Number($("source-position").value));
 $("apply-trim").onclick = () => {
   const i = Number($("clip-in").value), o = Number($("clip-out").value), c = project.clips.find((c2) => c2.id === selectedClip);
   if (!Number.isInteger(i) || !Number.isInteger(o)) {

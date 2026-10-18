@@ -388,24 +388,6 @@ video,
   white-space: nowrap;
   padding: 0 6px;
 }
-.source-scrub {
-  height: 25px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0 12px;
-  background: #151b1e;
-}
-.source-scrub input {
-  flex: 1;
-  min-width: 0;
-  height: 3px;
-  padding: 0;
-}
-.source-scrub span {
-  font: 10px var(--mono);
-  color: var(--muted);
-}
 .inspector {
   display: flex;
   align-items: center;
@@ -763,9 +745,6 @@ dialog textarea {
   #canvas {
     height: auto;
     width: 100%;
-  }
-  .source-scrub span {
-    font-size: 8px;
   }
   .track-label-viewport {
     width: 100px;

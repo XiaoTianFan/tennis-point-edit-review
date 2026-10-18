@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026.10.18-v25.10
+
+- Remove the redundant player scrubber and source seconds/proxy-FPS row, including bindings, styles and unused UI strings. Keep timeline seeking, playback navigation and the timecode.
+
 ## 2026.10.18-v25.9
 
 - Add video bitrate presets and original-source matching while retaining CRF 18 as the default; record the selected target in export settings.

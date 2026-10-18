@@ -177,10 +177,6 @@ export class Player {
     $("edited").classList.toggle("active", this.mode === "edited");
     $("source").classList.toggle("active", this.mode === "source");
     $("timecode").textContent = tc(this.frame, this.fps) + " / " + tc(this.mode === "source" ? this.asset.frames : this.total, this.fps);
-    $("source-position").max = (this.mode === "source" ? this.asset.frames : this.total) - 1;
-    $("source-position").value = this.frame;
-    const original = (this.asset.sourceStartSeconds ?? 0) + this.sourceFrame() / this.fps;
-    $("source-time").textContent = t("sourceTime", {seconds: original.toFixed(3), fps: this.p.fps});
     $("frame-status").textContent = this.playing ? t("playing") : this.frameImage.hidden ? t("decoding") : t("decodedFrame", {frame: this.sourceFrame()});
     const navigated = this.navigationPending === true;
     this.navigationPending = false;
