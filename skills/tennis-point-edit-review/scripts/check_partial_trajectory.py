@@ -38,4 +38,29 @@ class PartialChecks(unittest.TestCase):
         self.obs[2,0]=self.obs[1,0]
         with self.assertRaises(ValueError):fit_partial(self.obs,self.camera,**self.options)
 
+    def screening_case(self):
+        self.setup_case()
+        checks={k:True for k in ('ballIdentityVerified','contactBracketVerified','preImpactSegmentVerified','cameraCalibrationReviewed','metricDepthConstraintReviewed','initialStateStabilityReviewed')}
+        variants=[]
+        for side,sign in [('low',-1),('high',1)]:
+            camera=self.camera.copy();camera[0]+=sign*.1*camera[2]
+            for family,extra in [('geometry',{'camera':camera.tolist()}),('drag',{'options':{'drag':.02+sign*.001}}),('lift',{'options':{'lift_vector':[sign*.0001,0,0]}})]:
+                variants.append(dict(family=family,side=side,basis='Known synthetic fixture',**extra))
+        return dict(observations=self.obs.tolist(),camera=self.camera.tolist(),options=self.options,contactBracketSeconds=[-.001,.001],cutoffBasis='Synthetic collision after track',centroidError={'pixels':.05,'basis':'Noise-free synthetic positions; not a video accuracy claim'},variants=variants,visualChecks=checks)
+
+    def test_screen_runs_solver_and_does_not_override_source_review(self):
+        from serve_recovery import screen
+        case=self.screening_case();r=screen(case)
+        self.assertTrue(r['quality']['accepted']);self.assertTrue(r['candidate']['qualityAccepted'])
+        self.assertAlmostEqual(r['candidate']['launchSpeedKphEstimate'],np.linalg.norm(self.state[3:])*3.6,delta=.15)
+        case['visualChecks']['ballIdentityVerified']=False
+        self.assertFalse(screen(case)['quality']['accepted'])
+
+    def test_screen_rejects_unjustified_or_unchanged_sensitivity(self):
+        from serve_recovery import screen
+        case=self.screening_case();case['variants'][0]['camera']=case['camera']
+        with self.assertRaises(ValueError):screen(case)
+        case=self.screening_case();case.pop('cutoffBasis')
+        with self.assertRaises(ValueError):screen(case)
+
 if __name__=='__main__':unittest.main()

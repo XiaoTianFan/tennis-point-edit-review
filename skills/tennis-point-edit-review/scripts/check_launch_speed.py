@@ -17,7 +17,9 @@ class LaunchChecks(unittest.TestCase):
  def test_imputation_must_be_disclosed(self):
   r=dict(setNumber=1,serveId='a',serverId='A',serveNumber=1,launchSpeedKphEstimate=70,method='model_imputed')
   with self.assertRaises(ValueError):aggregate_serves([r])
-  r['imputationBasis']='same-set same-player first serves';self.assertEqual(aggregate_serves([r])[0]['imputedCount'],1)
+  r['imputationBasis']='same-set same-player first serves'
+  with self.assertRaises(ValueError):aggregate_serves([r])
+  self.assertEqual(aggregate_serves([r],allow_imputed=True)[0]['imputedCount'],1)
  def test_duplicate_and_missing_estimates(self):
   r=dict(setNumber=1,serveId='a',serverId='A',serveNumber=1,launchSpeedKphEstimate=70,method='flight_model')
   with self.assertRaises(ValueError):aggregate_serves([r,r])

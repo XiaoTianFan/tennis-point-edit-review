@@ -47,7 +47,7 @@ def reconstruct(distance, duration, height, end_height=0., *, drag=.020, lift=0.
     return {'launchSpeedKphEstimate':3.6*math.hypot(*v),'initialVelocityMS':v,'model':'gravity + quadratic drag + stated signed lift',
             'parameters':{'dragPerM':drag,'liftPerM':lift,'gravityMS2':gravity},'endpointResidualM':math.hypot(*err)}
 
-def aggregate_serves(records):
+def aggregate_serves(records, *, allow_imputed=False):
     """Each included physical serve gets one vote; never select an error bound."""
     groups=defaultdict(list);seen=set()
     for r in records:
@@ -58,7 +58,7 @@ def aggregate_serves(records):
         value=r.get('launchSpeedKphEstimate')
         if isinstance(value,bool) or not isinstance(value,(int,float)) or not math.isfinite(value) or value<=0:raise ValueError('Complete per-serve estimates required; obtain evidence or explicitly labelled model imputation first')
         if type(r['serveNumber']) is not int or r['serveNumber'] not in (1,2):raise ValueError('Unresolved serve number')
-        if r.get('method')=='model_imputed' and not r.get('imputationBasis'):raise ValueError('Imputation requires disclosed supporting population')
+        if r.get('method')=='model_imputed' and (not allow_imputed or not r.get('imputationBasis')):raise ValueError('Population filling requires explicit opt-in and disclosed support')
         groups[(r['setNumber'],r['serverId'])].append(r)
     out=[]
     for (set_number,player),rr in sorted(groups.items()):

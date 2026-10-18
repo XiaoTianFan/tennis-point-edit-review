@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026.10.18-v25.7
+
+- Require per-serve source expansion, contact/camera review, applicable endpoint/3D execution and pre-impact extension before final N/A; pending work is not a failed measurement.
+- Add a reusable 3D screening runner with multi-start fits, holdouts and localisation-error stress alongside timing, geometry, drag and lift.
+- Default to individual evidence or N/A below the serve label; exclude missing values and population filling from speed aggregates, with explicit opt-in retained for requested imputation. Guard post-contact timing with exact native CFR frames.
+- Consolidate duplicated speed instructions; preserve the seven JSX templates.
+
 ## 2026.10.18-v25.6
 
 - Prioritize a same-point let, repeat or second serve when consecutive service attempts start from the same service court; verify the interval before grouping and preserve exception checks.

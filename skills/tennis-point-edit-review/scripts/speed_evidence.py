@@ -86,11 +86,32 @@ def impute_same_group(target,records):
                 'estimator':'Arithmetic mean of independently supported contacts, not recursively imputed',
                 'caveat':'Population fallback, not this serve measured; missingness may be biased. Support envelope is not individual uncertainty.'}}
 
+def unavailable_reason(audit):
+    """Require completed evidence recovery and route decisions before displaying N/A."""
+    for name in ('sourceSearch','contactReview','geometryReview','preImpactExtension'):
+        step=audit.get(name,{})
+        if step.get('status') not in ('complete','unavailable','not_applicable') or not step.get('reason'):
+            raise ValueError('Unfinished recovery step: '+name)
+    methods={}
+    for item in audit.get('methods',[]):
+        key=item.get('method')
+        if key in methods:raise ValueError('Duplicate recovery method')
+        methods[key]=item
+    reasons=[]
+    for name in ('endpoint_physics','partial_trajectory_model'):
+        item=methods.get(name,{})
+        if item.get('status') not in ('rejected','unavailable','not_applicable') or not item.get('reason'):
+            raise ValueError('Resolve applicable method before N/A: '+name)
+        if item['status']=='rejected' and (item.get('attempted') is not True or not item.get('resultRef')):
+            raise ValueError('A rejected method needs an executed result reference')
+        reasons.append(item['reason'])
+    return '; '.join(reasons)
+
 def assess_partial_quality(candidate,holdouts,variants,visual_checks,policy=None):
     """Acceptance screening, NOT absolute accuracy validation. Caller supplies perturbations.
 
     Pass visual_checks.frameHeight for automatic scaling of the 1080p pixel thresholds.
-    Required sensitivity families: timing, geometry, drag, lift. They cannot be
+    Required sensitivity families: timing, geometry, drag, lift, centroid. They cannot be
     replaced by merely rerunning identical observations with the same assumptions.
     """
     pixel_scale=finite(visual_checks.get('frameHeight',1080))/1080
@@ -111,9 +132,10 @@ def assess_partial_quality(candidate,holdouts,variants,visual_checks,policy=None
     for h in holdouts:
         if h.get('converged') is not True or h.get('fitAtParameterBoundary') is not False or finite(h['heldOutRmsPixels'])>p['maxHeldOutRmsPixels'] or abs(finite(h['launchSpeedKphEstimate'])/speed-1)>p['maxHeldOutSpeedFraction']:
             reasons.append('unstable held-out prediction')
-    if not {'timing','geometry','drag','lift'}<={v.get('family') for v in variants}:
+    families=('timing','geometry','drag','lift','centroid')
+    if not set(families)<={v.get('family') for v in variants}:
         reasons.append('missing sensitivity families')
-    required_sides={(family,side) for family in ('timing','geometry','drag','lift') for side in ('low','high')}
+    required_sides={(family,side) for family in families for side in ('low','high')}
     if not required_sides<={(v.get('family'),v.get('side')) for v in variants}:
         reasons.append('missing low/high sensitivity checks')
     values=[speed]

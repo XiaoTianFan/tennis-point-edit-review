@@ -33,7 +33,8 @@ class Checks(unittest.TestCase):
             with self.assertRaises(ValueError):build_plan([record(**changes)],30)
     def test_imputation_explicit_no_upper_bound_used(self):
         r=record(method='model_imputed',imputationBasis='same set/player/type',intervalKph=[50,100])
-        p=build_plan([r],30)[0];self.assertEqual((p['qualifier'],p['speed']),('补估','74'))
+        with self.assertRaises(ValueError):build_plan([r],30)
+        p=build_plan([r],30,allow_imputed=True)[0];self.assertEqual((p['qualifier'],p['speed']),('补估','74'))
         r.pop('imputationBasis')
         with self.assertRaises(ValueError):build_plan([r],30)
     def test_point_ends_before_first_renderable_frame(self):
@@ -56,6 +57,38 @@ class Checks(unittest.TestCase):
         self.assertTrue(p['outcomeAfterOverlayWindow']);self.assertEqual(len(p['labelStates']),1)
         for changes in [dict(serveNumber=1,doubleFaultConfirmedUs=13000000),dict(doubleFaultConfirmedUs=11000000)]:
             with self.assertRaises(ValueError):build_plan([record(**changes)],30)
+
+    def unavailable(self):
+        audit={k:dict(status='complete',reason='Synthetic source review') for k in ('sourceSearch','contactReview','geometryReview','preImpactExtension')}
+        audit['methods']=[dict(method='endpoint_physics',status='unavailable',reason='First collision is occluded'),
+                          dict(method='partial_trajectory_model',status='rejected',reason='Sensitivity too wide',attempted=True,resultRef='synthetic-result')]
+        return record(method='unestimated',launchSpeedKphEstimate=None,included=False,unavailableAudit=audit)
+
+    def test_na_preserves_label_window_and_excludes_numeric_speed(self):
+        from launch_speed import aggregate_serves
+        r=self.unavailable();p=build_plan([r],30)[0]
+        self.assertEqual((p['qualifier'],p['speed'],p['unit']),('','N/A',''))
+        self.assertFalse(p['speedAvailable']);self.assertEqual(p['endFrame'],p['labelEndFrame'])
+        self.assertEqual(aggregate_serves([r]),[])
+        r['included']=True
+        with self.assertRaises(ValueError):build_plan([r],30)
+
+    def test_untried_or_accepted_route_cannot_be_labelled_na(self):
+        for status in ('pending','accepted'):
+            r=self.unavailable();r['unavailableAudit']['methods'][0]['status']=status
+            with self.assertRaises(ValueError):build_plan([r],30)
+        r=self.unavailable();r['unavailableAudit']['methods'][1].pop('resultRef')
+        with self.assertRaises(ValueError):build_plan([r],30)
+
+    def test_native_frame_guard_survives_fractional_microsecond_rounding(self):
+        from fractions import Fraction
+        fps=Fraction(60000,1001)
+        for frame in range(102,130):
+            r=record(confirmedPostContactUs=round(Fraction(frame)/fps*1000000),confirmedPostContactSourceFrame=frame)
+            r['clip'].update(sourceInUs=round(Fraction(100)/fps*1000000),sourceInFrame=100,sourceFps=str(fps))
+            self.assertEqual(build_plan([r],str(fps))[0]['startFrame'],100+frame-100+1)
+        r['clip'].pop('sourceFps')
+        with self.assertRaises(ValueError):build_plan([r],str(fps))
 
 if __name__=='__main__':unittest.main()
 

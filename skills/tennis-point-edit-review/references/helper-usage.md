@@ -48,15 +48,11 @@ build_stats_pages(metrics,speedSummary,diagnostics)生成五页39行及副文本
 
 ## 发球初速与时序
 
-[取证流程](serve-speed-audit.md)：serve_event_audit.audit_attempts核发次/触拍资格；speed_evidence.estimate_endpoint算物理敏感性；partial_trajectory.fit_partial与alternating_holdouts拟合/检验3D候选；assess_partial_quality判采用资格。impute_same_group只用同盘/人/发次的独立合格样本，不循环补估；supportEnvelope不当目标误差区间。
+[取证恢复](serve-speed-audit.md)规定原帧、几何、逐发路线尝试与N/A资格。serve_event_audit核发次；speed_evidence.estimate_endpoint反推端点并扰动；serve_recovery.py INPUT.json NEW_OUTPUT.json完整执行3D多初值/留出/五族敏感性；impute_same_group仅显式补估/诊断。launch_speed.aggregate_serves(records)按合格中心值逐发等权，默认拒绝纳入model_imputed，显式allow_imputed=True才允许请求的补估统计。audit_speed_quality保留最高候选/补估影响诊断；build_speed_case.py为合成示例，不是实测。
 
-launch_speed.reconstruct(distance,duration,height,end_height,drag,lift)用米、秒及明确假设；[模型](serve-speed-model.md)区分初速、均速、区间与补估。aggregate_serves(records)逐发含setNumber、serveId、serverId、serveNumber、launchSpeedKphEstimate、method；补估method=model_imputed并有imputationBasis。最高取中心值。serve_speed.py旧几何均速及fastestMeasuredValidServe/firstServeMeanKph/secondServeMeanKph不能画作初速。
+serve_overlay.py INPUT.json PLAN.json：fps为有理数；records含setNumber/pointId/唯一serveId/serveNumber(1或2)、eventType(serve或let)、contactVerified=true、confirmedPostContactUs(原帧出球较晚边界)、launchSpeedKphEstimate、method、statsIncluded。clip含startFrame/durationFrames/sourceInUs(整数微秒)/playbackRate；可加pointEndFrame/nextServeStartFrame。CFR同时提供confirmedPostContactSourceFrame及clip.sourceInFrame/sourceFps，用精确源帧保护微秒取整；VFR依真实PTS，非恒速先分段。doubleFaultConfirmedUs/letConfirmedUs仅事件确证后切字，互斥、不重计时；挥空不输入助手。
 
-audit_speed_quality(records)检查fitAtParameterBoundary、ballIdentityVerified、flightSegmentVerified、fastestCandidateReviewed及补估影响；flag不是自动判无效，不增加用户表单。build_speed_case.py生成匿名合成样例，不能当实测。
-
-serve_overlay.py input.json plan.json：fps为有理数；records每条含setNumber、pointId、唯一serveId、serveNumber=1/2、eventType=serve/let、contactVerified=true、confirmedPostContactUs、launchSpeedKphEstimate、method、statsIncluded；补估需imputationBasis。clip含startFrame、durationFrames、sourceInUs、playbackRate，可加pointEndFrame、nextServeStartFrame。源时间为整数微秒、成片为整数帧。
-
-confirmedPostContactUs须是原帧已证实出球的较晚边界；输出向后取整，3秒上限及更早退出按[标签时序](serve-speed-overlay.md)。大小标签共退出点。doubleFaultConfirmedUs/letConfirmedUs仅在相应事件证实后切字，不重启计时，二者互斥；确认过晚只记outcomeAfterOverlayWindow。let/重发独立serveId，真实挥空无速度；非恒速先分段映射，触拍已裁掉不能移借下一发。
+最终无解记录另需method=unestimated、速度null、included=false及完整unavailableAudit，输出speedAvailable=false、speed=N/A、qualifier/unit为空；数值/均值不使用N/A。默认无补估标签，JSON的allowImputed=true（API的allow_imputed=True）只对应用户明确要求。应用后按[标签时序](serve-speed-overlay.md)验收实际合成帧。
 
 ## 自检
 

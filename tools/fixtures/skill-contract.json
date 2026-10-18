@@ -115,7 +115,7 @@
         },
         {
           "path": "references/serve-speed-overlay.md",
-          "text": "大标签与下方球速共用完全相同的结束帧。"
+          "text": "与下条同帧退出"
         }
       ]
     },
@@ -186,7 +186,7 @@
         },
         {
           "path": "references/statistics.md",
-          "text": "每发采用一个中心估值进入池中"
+          "text": "速度池仅含合格中心值，每发等权"
         },
         {
           "path": "references/statistics.md",
@@ -240,23 +240,23 @@
       "checks": [
         {
           "path": "references/serve-speed-overlay.md",
-          "text": "每次显示该真实发球自己的中心估值，格式“约 N km/h”。同组模型补估用“补估”"
+          "text": "每发显示自己的中心值“约 N km/h”"
         },
         {
           "path": "references/serve-speed-overlay.md",
-          "text": "起点必须在实际触拍、球已出拍之后。"
+          "text": "速度/N/A均在已确认出球的源帧之后出现"
         },
         {
           "path": "references/serve-speed-overlay.md",
-          "text": "共用结束帧=min(球速开始帧+最多3秒、片段结束帧、该分结束帧、下一次发球开始帧)。"
+          "text": "共同结束帧取：下条起点+最多3秒、片段结束、该分结束、下一真实发球开始中最早者"
         },
         {
           "path": "references/serve-speed-overlay.md",
-          "text": "双误判定不会重启3秒"
+          "text": "不换下条、不重计时"
         },
         {
           "path": "references/serve-speed-overlay.md",
-          "text": "复核时间线的局次、发球方和R/P编号是持续定位信息，不能套用主剪3秒退出"
+          "text": "复核R/P、局次与发球者是常驻定位信息，不套主剪3秒限制"
         }
       ]
     },
@@ -277,7 +277,7 @@
         },
         {
           "path": "references/serve-speed-overlay.md",
-          "text": "真实合成帧抽查出现前一帧、第一可见帧、最后可见帧、退出后一帧"
+          "text": "检查出现前一帧/首帧/末帧/退出后一帧的实际合成"
         }
       ]
     },
@@ -373,16 +373,16 @@
       "id": "R026",
       "checks": [
         {
-          "path": "references/helper-usage.md",
-          "text": "launch_speed.reconstruct(distance,duration,height,end_height,drag,lift)"
+          "path": "scripts/launch_speed.py",
+          "text": "def reconstruct(distance, duration, height, end_height=0., *, drag=.020, lift=0., gravity=9.81):"
         },
         {
-          "path": "references/helper-usage.md",
-          "text": "补估method=model_imputed并有imputationBasis"
+          "path": "references/serve-speed-model.md",
+          "text": "明确要求才以“补估”和allow_imputed开关另列"
         },
         {
-          "path": "references/helper-usage.md",
-          "text": "最高取中心值"
+          "path": "references/serve-speed-model.md",
+          "text": "不取区间上界"
         },
         {
           "path": "references/statistics.md",
@@ -395,19 +395,19 @@
       "checks": [
         {
           "path": "references/helper-usage.md",
-          "text": "serve_overlay.py input.json plan.json"
-        },
-        {
-          "path": "references/helper-usage.md",
-          "text": "大小标签共退出点"
-        },
-        {
-          "path": "references/helper-usage.md",
-          "text": "不重启计时"
+          "text": "serve_overlay.py INPUT.json PLAN.json"
         },
         {
           "path": "references/serve-speed-overlay.md",
-          "text": "将计划应用到当前编辑器，按上述时点检查真实合成帧。"
+          "text": "与下条同帧退出"
+        },
+        {
+          "path": "references/helper-usage.md",
+          "text": "互斥、不重计时"
+        },
+        {
+          "path": "references/serve-speed-overlay.md",
+          "text": "执行层应用到当前编辑器"
         }
       ]
     },
@@ -415,16 +415,8 @@
       "id": "R028",
       "checks": [
         {
-          "path": "references/helper-usage.md",
-          "text": "serve_speed.py旧几何均速"
-        },
-        {
-          "path": "references/helper-usage.md",
-          "text": "不能画作初速"
-        },
-        {
           "path": "references/statistics.md",
-          "text": "旧 scripts/serve_speed.py 仅输出几何飞行均速诊断量"
+          "text": "旧serve_speed.py几何均速不能当初速"
         }
       ]
     },
@@ -699,6 +691,43 @@
       "id": "R052",
       "path": "references/rendered-video.md",
       "text": "each clip end equals the next start"
+    },
+    {
+      "id": "R053",
+      "checks": [
+        {
+          "path": "references/serve-speed-audit.md",
+          "text": "未执行是pending，不得写成拟合失败或N/A"
+        },
+        {
+          "path": "references/serve-speed-audit.md",
+          "text": "全画幅搜索后用随轨迹扩展的原尺寸ROI"
+        },
+        {
+          "path": "references/serve-speed-audit.md",
+          "text": "执行碰撞前3D部分轨迹"
+        },
+        {
+          "path": "references/serve-speed-audit.md",
+          "text": "短段或敏感性失败先补查更长"
+        },
+        {
+          "path": "references/serve-speed-audit.md",
+          "text": "timing/geometry/drag/lift/centroid五族都需低/高方向"
+        },
+        {
+          "path": "references/serve-speed-audit.md",
+          "text": "rejected还须attempted=true、resultRef"
+        },
+        {
+          "path": "references/serve-speed-overlay.md",
+          "text": "显示纯“N/A”，无“约”、数字、km/h"
+        },
+        {
+          "path": "references/serve-speed-model.md",
+          "text": "默认不进视频/均值"
+        }
+      ]
     }
   ],
   "files": [
@@ -803,11 +832,11 @@
     },
     {
       "path": "scripts/check_launch_speed.py",
-      "sha256": "5f125b9ab31090928ea9dd7b39d904f51a6c90c01ca78b7316d37e1bd4068800"
+      "sha256": "5472c9bf109a092e6bd58715b09403cad7db989bf408d670694af400f1f8d3f9"
     },
     {
       "path": "scripts/check_serve_overlay.py",
-      "sha256": "eb795c2d201b05eadc09c555c16541b0bcd2c59f916c4ba7370f8d50d59f48a1"
+      "sha256": "5509349ef191d192c7c921b41e2359b562d4a99cc5636fd3a65a1d33ceb85584"
     },
     {
       "path": "scripts/check_serve_return.py",
@@ -968,6 +997,9 @@
     },
     {
       "path": "scripts/seam_cv.py"
+    },
+    {
+      "path": "scripts/serve_recovery.py"
     }
   ]
 }

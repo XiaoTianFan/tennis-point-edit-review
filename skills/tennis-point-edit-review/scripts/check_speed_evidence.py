@@ -90,7 +90,7 @@ class QualityChecks(unittest.TestCase):
     def base(self):
         c=dict(launchSpeedKphEstimate=100,observationCount=20,spanSeconds=.3,rmsPixels=1.,fitAtParameterBoundary=False,converged=True)
         h=[dict(launchSpeedKphEstimate=100,heldOutRmsPixels=1.,fitAtParameterBoundary=False,converged=True) for _ in range(2)]
-        variants=[dict(launchSpeedKphEstimate=v,family=f,side=s,fitAtParameterBoundary=False,converged=True) for f in ('timing','geometry','drag','lift') for s,v in [('low',95),('high',105)]]
+        variants=[dict(launchSpeedKphEstimate=v,family=f,side=s,fitAtParameterBoundary=False,converged=True) for f in ('timing','geometry','drag','lift','centroid') for s,v in [('low',95),('high',105)]]
         visual={k:True for k in ('ballIdentityVerified','contactBracketVerified','preImpactSegmentVerified','cameraCalibrationReviewed','metricDepthConstraintReviewed','initialStateStabilityReviewed')}
         return c,h,variants,visual
     def test_stable_candidate_can_pass(self):self.assertTrue(assess_partial_quality(*self.base())['accepted'])
@@ -127,6 +127,9 @@ class QualityChecks(unittest.TestCase):
         scaled=assess_partial_quality(c,h,v,w)
         self.assertEqual(scaled['accepted'],baseline['accepted'])
         self.assertEqual(scaled['policy']['maxRmsPixels'],5)
+    def test_centroid_uncertainty_cannot_be_skipped(self):
+        c,h,v,w=self.base()
+        self.assertFalse(assess_partial_quality(c,h,[x for x in v if x['family']!='centroid'],w)['accepted'])
 
 class LetOverlayChecks(unittest.TestCase):
     def record(self,**changes):

@@ -1,57 +1,39 @@
-# 发球估速取证与可复用工具
+# 发球估速取证与执行契约
 
-阶段5先读[模型与方法选择](serve-speed-model.md)，由agent逐发核实触拍、首次碰撞与几何依据，再用下列工具计算并检验敏感性。
+阶段5按[方法选择](serve-speed-model.md)执行。工具可用不等于本发已尝试；未执行是pending，不得写成拟合失败或N/A。由agent补查，不增用户逐发表。
 
-## 每次复核的顺序
+## 默认恢复路径
 
-1. 冻结已确认逐分归属，建立完整尝试清单，包含剪掉的一发失误、擦网、放弃抛球和真正挥空。分是否纳入统计与某次速度是否纳入均值是两个字段。
-2. 逐点运行 `serve_event_audit.audit_attempts` 核对发次；它接收 agent 已判读的事件。放弃抛球/练习挥拍不耗机会；实际尝试发球却挥空算失误但无出球速度；let 保持当前发次。一次合法发球或二次失误后，本分发球序列关闭。
-3. 在原始连续帧中确认同一颗活球。差分、HSV、局部区域和运动连续性只产生候选；排除衣服、球拍、旧球、掉球及邻场球。移动镜头先配准；VFR 使用逐帧时间戳。
-4. 记录触拍和首次落地/首次碰网的时间夹逼；向前后追查球路，区分经过网带投影与实际碰撞，保留原帧及候选接受、拒绝理由。
-5. 只拟合第一次碰撞前的飞行段。分别检查时间、距离、高度、镜头标定、阻力和旋转假设；运行端点反推或三维部分轨迹候选及质量检查。
-6. 无合格观测解时，才使用同盘、同选手、同发次的独立证据补估；没有支持样本就留下真实缺口，不捏造帧、触拍或数值。
-7. 所有中心估值最高的候选回查原帧；输出覆盖率、补估比例、均值变化与敏感性范围。此工作由 agent 完成，不增加用户逐发审核。
-8. 更新估速记录后重算速度统计及相关标签映射；检查发生改动的合成帧。单纯速度修正不重写已确认球果或无关剪口。
+1. 冻结已确认球果/剪口，列全真实发球及排除事件；逐点用`serve_event_audit.audit_attempts`核发次。事件字段见助手；二发起录先定initial_serve=2，合法发球/双误后关闭本分。
+2. 回看连续原帧，夹逼球拍接近、拍球相遇与出球分离，防止把随挥时刻当触拍。保留PTS，CFR另记原帧号/精确帧率；旧定位、粗抽帧及拟合时刻须复核。
+3. 全画幅搜索后用随轨迹扩展的原尺寸ROI、多候选时序关联和静态旧球排除。差分/HSV只产候选；浅色背景、拖影或网格漏检时尝试局部亮度/运动对比，不只放松颜色阈值。人工核同球身份；遮挡/插值/神经网络推断不计真实可见观测。
+4. 按本片场地、网柱、站位建立[米制几何](serve-speed-model.md#物理与米制几何)，检查控制点与镜头变化，不以只有地面H为B前置已齐。校准前置能从素材补齐就执行，不能把未标定当球不可估。
+5. 先审首次碰撞。可信落地或网面端点走A；缺端点则检查并补齐B前置，执行碰撞前3D部分轨迹。记录不适用/缺前置的具体源证据；不得按serveId硬排除或用通用拒绝文案代替逐发检查。
+6. 短段或敏感性失败先补查更长、仍在首次碰撞前的可见段，处理ROI/灰白背景/人体干扰；贴边时回查触拍、控制点和高度先验。不得跨碰撞/用户剪口、造球点或放宽质量门槛追求全数。已覆盖可访问证据且无适用的未执行路线，才登记unestimated并显示N/A；均值不作默认降级。
+7. 回查中心最高候选，存覆盖、拒因与缺测偏差；回填同版记录/统计/面板/标签，核显示边界，不改已确认球果。
 
-## 最小证据记录
+## 端点与部分轨迹
 
-每次保留 set、server、pointId、serveId、serveNumber、eventType、speedApplicable、included、contactVerified、ballIdentityVerified、flightSegmentVerified、原始时间夹逼、几何输入及来源、方法、中心估值、敏感性范围与候选质量结果。补估另存 imputationBasis；最高值另存 fastestCandidateReviewed。所有 verified 字段代表已完成的画面检查，不由数值拟合自动填 true。
+`speed_evidence.estimate_endpoint`的完整输入见[真实助手生成的匿名案例](../examples/serve-speed-case.json)：实际触拍、首次碰撞均须原帧verified及时间夹逼；距离/高度/阻力/升力各给value/range/basis。let只用first_net_impact，禁止跨更早碰撞。合成例非实测基准。
 
-`serve_event_audit.audit_attempts(events, initial_serve=1)` 的 kind 为 serve、serve_miss、aborted_toss、toss_catch 或 practice_swing。serve 的 outcome 为 in、fault、let。输入必须是同一分的有序事件，eventId 唯一；若录像从二发开始，必须先确定 initial_serve=2。输出实际触球、发次、是否计失误、是否双误及速度适用性。统计口径纳入范围仍须按比赛账本设定，不能仅因实际触球就把赛后练习纳入比赛。
+`partial_trajectory.fit_partial`用真实`[sourceSeconds,x,y]`、米制camera、contact_seconds、初态`[x,y,z,vx,vy,vz]`、bounds及priors。collision_lower_seconds可取已查仍在空中的安全截止或首碰撞最早边界；禁止把任意窗口末端称碰撞证据。
 
-## 端点反推输入
+## 一次运行完整B筛查
 
-`speed_evidence.estimate_endpoint(evidence)` 接受如下结构；数字仅为合成示例：
+`python scripts/serve_recovery.py INPUT.json NEW_OUTPUT.json`接收：
 
-```json
-{
-  "eventType": "let",
-  "ballIdentityVerified": true,
-  "crossesEarlierCollision": false,
-  "contact": {"kind":"racket_contact","verified":true,"estimateSeconds":10.00,"bracketSeconds":[9.99,10.01],"note":"合成触拍夹逼"},
-  "endpoint": {"kind":"first_net_impact","verified":true,"estimateSeconds":10.70,"bracketSeconds":[10.69,10.71],"note":"合成首次碰网夹逼"},
-  "horizontalDistanceMetres": {"value":12,"range":[11,13],"basis":"合成场地几何"},
-  "contactHeightMetres": {"value":2.7,"range":[2.45,2.95],"basis":"合成触拍高度"},
-  "endpointHeightMetres": {"value":0.94,"range":[0.89,0.99],"basis":"合成网面接触高度"},
-  "dragPerM": {"value":0.020,"range":[0.012,0.028],"basis":"建模先验，非实测"},
-  "liftPerM": {"value":0,"range":[-0.004,0.004],"basis":"未知旋转的示例扰动"}
-}
-```
+- observations、camera、options：传给fit_partial；options必须给collision_lower_seconds，另给cutoffBasis。
+- contactBracketSeconds：原帧夹逼，包围options.contact_seconds，所有观测在夹逼后。
+- variants：至少geometry/drag/lift各low/high，每项含family、side、basis及可选camera、options覆盖；几何扰动实际相机/米制深度，不能仅改无关项。
+- centroidError={pixels,basis}：据原片球的像素大小/拖影给定位误差；不固定套每片1像素。visualChecks：frameHeight及下述原帧检查；policy仅有独立依据时修改。
 
-正常球终点可为 first_bounce；let 必须为 first_net_impact，不能使用碰网后的落地点反推原始初速。脚本拒绝未确认事件、估计时刻不在夹逼区间、跨更早碰撞、不合理范围和非有限数。它返回中心值及输入区间角点求解的敏感性包络；这不是统计置信区间，也不保证非线性内部不存在更极端值。根据曲率补充中间取样，必要时扩大区间。
+助手执行基准、两组速度初值、两组交错帧留出、触拍低/高端、所给几何/阻力/升力，以及定位误差的正负相关曲率和固定种子位置噪声扰动。不会自动标定、判球或把verified置true。输出candidate、multistarts、holdouts、variants、variantFailures、quality，只有quality.accepted才能登记qualityAccepted=true。
 
-## 单机位三维部分轨迹
+`assess_partial_quality`默认至少12观测、0.18秒，1080p残差≤2.5px/留出≤3.5px（按frameHeight缩放）、留出速度差≤12%、敏感性跨度≤35%，所有拟合收敛且不贴边。timing/geometry/drag/lift/centroid五族都需低/高方向；多初值还须稳定。visualChecks须由agent实际核实ballIdentityVerified、contactBracketVerified、preImpactSegmentVerified、cameraCalibrationReviewed、metricDepthConstraintReviewed、initialStateStabilityReviewed。低残差不证明深度/速度正确；阈值非雷达误差保证。
 
-可选依赖 NumPy、SciPy。`partial_trajectory.fit_partial` 接受按源时间递增的 `[seconds, pixelX, pixelY]`、已校准的 3×4 camera 矩阵、触拍时刻、六维初态猜测/上下界、独立测量先验、阻力和升力向量。世界坐标必须以米为单位、z 向上，像素需与镜头畸变处理、裁切和标定一致；摄像机移动必须分段重新标定或采用相应模型。
+## 证据账本与最终N/A
 
-初态为 `[x,y,z,vx,vy,vz]`；priors 为 `{index,mean,sigma}`。固定相机、时间及物理参数后拟合初态，不同时放开所有相机、深度、触拍时间、阻力、旋转参数以追求低残差。collision_lower_seconds 设置首次碰撞最早边界；其后的观测不得进入拟合。短段或深度不受约束时保留多个起点的候选，发现不同速度同样贴合像素即视为不可辨识。
+每发保留set/server/pointId/serveId/serveNumber、事件资格、源时刻/原帧、触拍夹逼、真实观测、几何/假设来源、方法尝试及结果、采用理由、中心值/范围和最高候选复查。分/发球机会统计与速度池纳入分开。
 
-输出 qualityAccepted 默认 false。先用 `alternating_holdouts` 在交错帧训练、预测另半帧，再独立改变 timing、geometry、drag、lift 四族假设，每族检查正负方向与有依据的边界（variant 使用 family 和 side=low/high）。把候选、两份留出结果、扰动结果和画面检查送入 `speed_evidence.assess_partial_quality`。visual_checks 须确认 ballIdentityVerified、contactBracketVerified、preImpactSegmentVerified、cameraCalibrationReviewed、metricDepthConstraintReviewed、initialStateStabilityReviewed。只有返回 accepted 才可登记 qualityAccepted=true；小残差但贴参数边界、留出不稳或缺乏深度约束均不能通过。`visual_checks.frameHeight`传入实际源画面高度以自动缩放像素残差阈值；时间使用原片PTS秒数，帧率改变不改变物理时长。最低观测数量是证据要求，不因低帧率自动放宽；默认阈值仍是未由雷达标定的工程筛查起点。
+无解用method=unestimated、launchSpeedKphEstimate=null、included=false，保留真实发球统计及原因。`unavailableAudit`含sourceSearch/contactReview/geometryReview/preImpactExtension，每项status=complete/unavailable/not_applicable及reason；methods含endpoint_physics、partial_trajectory_model，每项status=rejected/unavailable/not_applicable及reason。rejected还须attempted=true、resultRef；未补齐前置与不可取得前置须区分，不能以“脚本没做”冒称素材不可用。`unavailable_reason`拒绝pending、已accepted或无执行记录的rejected。仅此最终状态允许[下方N/A](serve-speed-overlay.md)，不显示失败候选或组均值。
 
-## 补估及复现
-
-`speed_evidence.impute_same_group(target, records)` 只使用同盘、同选手、同发次（有 conditionGroup 时也相同）的独立已确认真实发球。支持样本须已确认触拍、球身份与首次碰撞前飞行段；部分轨迹还须通过质量检查。排除 let、未纳入比赛的球、目标自身、挥空及其他补估。输出算术均值与支持事件 ID，绝不循环补估。supportEnvelope 仅描述支持样本，不能冒充目标球的误差区间。
-
-`python scripts/build_speed_case.py examples/serve-speed-case.json` 以真实求解器生成匿名合成案例，演示把球在画面中经过网带的时刻错当碰网会缩短飞行时间、抬高反推速度。案例用于回归，不能充当真实测速基准或自动证明事件判读正确。
-
-从 scripts 目录运行 `python -B -m unittest discover -p check_*.py`。没有可选依赖时三维测试可能跳过，必须单独报告；不能把跳过当已验证。

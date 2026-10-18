@@ -49,7 +49,7 @@ class Checks(unittest.TestCase):
 
     def test_serve_language_keeps_timing(self):
         for r in (record(doubleFaultConfirmedUs=13000000),record(eventType='let',letConfirmedUs=13000000),record(method='model_imputed',imputationBasis='synthetic')):
-            zh=build_plan([r],30)[0];en=build_plan([r],30,'en')[0]
+            zh=build_plan([r],30,allow_imputed=True)[0];en=build_plan([r],30,'en',allow_imputed=True)[0]
             self.assertNotRegex(json.dumps(en,ensure_ascii=False),'[\u3400-\u9fff]')
             for key in zh:
                 if key not in ('qualifier','labelStates'):self.assertEqual(zh[key],en[key])
