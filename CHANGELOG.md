@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026.10.18-v25.9
+
+- Add video bitrate presets and original-source matching while retaining CRF 18 as the default; record the selected target in export settings.
+- Report continuous duration-weighted encoding percentages across compositing and final output, reaching 100% only after verification and saving.
+- Show source-clip trim handles only under the playhead or pointer; preserve edge snapping and half-open clip boundaries.
+
 ## 2026.10.18-v25.8
 
 - Distinguish agent whole-game rechecking from the necessary human-review subset; a score conflict does not automatically send an entire game or match for review.

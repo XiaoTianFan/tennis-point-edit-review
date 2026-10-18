@@ -4,6 +4,7 @@ import json
 import math
 import re
 import subprocess
+import tempfile
 import time
 from fractions import Fraction
 from pathlib import Path
@@ -19,6 +20,48 @@ def run(args):
 
 def probe(path):
     return json.loads(run(['ffprobe', '-v', 'error', '-show_streams', '-show_format', '-of', 'json', path]))
+
+
+def run_progress(args, fps, progress):
+    """Read encoded video time without buffering stderr or counting clips."""
+    with tempfile.TemporaryFile(mode='w+t', encoding='utf-8') as errors:
+        with subprocess.Popen([str(a) for a in [args[0], '-progress', 'pipe:1', '-nostats', *args[1:]]],
+                stdout=subprocess.PIPE, stderr=errors, text=True, encoding='utf-8', errors='replace') as process:
+            batch = {}
+            for line in process.stdout:
+                key, sep, value = line.strip().partition('=')
+                if sep: batch[key] = value
+                if key == 'progress':
+                    if batch.get('frame', '').isdigit():
+                        progress(float(Fraction(int(batch['frame'])) / Fraction(str(fps))))
+                    elif batch.get('out_time_us', '').lstrip('-').isdigit():
+                        progress(max(0, int(batch['out_time_us']) / 1e6))
+                    batch = {}
+            if process.wait():
+                errors.seek(0)
+                raise ValueError(errors.read()[-3000:] or 'Video encoding failed')
+
+
+def original_bitrate(project):
+    """Duration-weighted original VIDEO bitrate; never substitute proxy/container rate."""
+    assets = {a['id']: a for a in project['assets']}
+    weights = {}
+    for clip in project['clips']:
+        key = clip['assetId']
+        weights[key] = weights.get(key, 0) + duration(clip)
+    total = 0
+    for key, weight in weights.items():
+        asset = assets[key]
+        info = asset.get('sourceProbe')
+        if not info and asset.get('originalPath'):
+            try: info = probe(asset['originalPath'])
+            except (ValueError, OSError): return None
+        video = next((s for s in (info or {}).get('streams', []) if s.get('codec_type') == 'video'), {})
+        try: bitrate = int(video.get('bit_rate', 0))
+        except (TypeError, ValueError): return None
+        if bitrate <= 0: return None
+        total += weight * bitrate
+    return round(total / sum(weights.values())) if weights else None
 
 def source_settings(info):
     video = next(s for s in info['streams'] if s['codec_type'] == 'video')
@@ -136,6 +179,17 @@ def export_settings(project, options=None):
     if not 1 <= rate <= 240:
         raise ValueError('Output fps must be between 1 and 240')
     result['fps'] = str(rate)
+    choice = options.get('bitrate', 'quality')
+    source_rate = original_bitrate(project)
+    if choice == 'quality': target_rate = None
+    elif choice == 'source':
+        if source_rate is None: raise ValueError('Original video bitrate unavailable')
+        target_rate = source_rate
+    else:
+        if isinstance(choice, bool) or not re.fullmatch(r'\d+', str(choice)) or not 100_000 <= int(choice) <= 500_000_000:
+            raise ValueError('Use a video bitrate from 100000 to 500000000 bits/s')
+        target_rate = int(choice)
+    result.update(bitrate=str(choice), videoBitrate=target_rate, sourceVideoBitrate=source_rate)
     filename = options.get('filename', 'edited.mp4')
     if not isinstance(filename, str) or not filename.strip():
         raise ValueError('Output filename is required')
@@ -171,11 +225,23 @@ def export_video(project, directory, progress=lambda value: None, options=None, 
     write(directory / 'project-snapshot.json', project)
     assets = {a['id']: a for a in project['assets']}
     fps = float(Fraction(str(project['fps'])))
+    timeline_frames = sum(duration(c) for c in project['clips'])
+    seconds = Fraction(timeline_frames) / Fraction(str(project['fps']))
+    expected = max(1, math.floor(seconds * Fraction(settings['fps']) + Fraction(1, 2)))
+    final_seconds = float(Fraction(expected) / Fraction(settings['fps']))
+    work_seconds = float(seconds) + final_seconds
+    percent = 0
+    def report_progress(stage, elapsed):
+        nonlocal percent
+        percent = max(percent, min(99, max(0, elapsed) / work_seconds * 100))
+        progress(dict(state='running', stage=stage, progressPercent=percent, durationSeconds=final_seconds))
+    report_progress('compositing', 0)
+    completed_seconds = 0
     parts = []
     for index, clip in enumerate(project['clips']):
         asset = assets[clip['assetId']]
         n = duration(clip)
-        seconds = n / fps
+        clip_seconds = n / fps
         args = ['ffmpeg', '-v', 'error', '-nostdin', '-n']
         hold = clip.get('kind') == 'hold'
         if hold:
@@ -201,30 +267,32 @@ def export_video(project, directory, progress=lambda value: None, options=None, 
                 extra = f',fade=t=in:st={start/fps}:d={fade}:alpha=1,fade=t=out:st={(end-1)/fps-fade}:d={fade}:alpha=1' if fade else ''
             filters.append(f'[{i+1}:v]format=rgba{extra}[o{i}]')
             filters.append(f"[v{i}][o{i}]overlay=0:0:enable='gte(n,{start})*lt(n,{end})':shortest=1[v{i+1}]")
-        filters.append(f'[{audio_index}:a]atrim=duration={seconds},asetpts=PTS-STARTPTS,aresample={sample_rate},apad,afade=t=in:d={min(2/fps, seconds/2)},afade=t=out:st={max(0, seconds-2/fps)}:d={min(2/fps, seconds/2)}[audio]')
+        filters.append(f'[{audio_index}:a]atrim=duration={clip_seconds},asetpts=PTS-STARTPTS,aresample={sample_rate},apad,afade=t=in:d={min(2/fps, clip_seconds/2)},afade=t=out:st={max(0, clip_seconds-2/fps)}:d={min(2/fps, clip_seconds/2)}[audio]')
         part = parts_directory / f'part-{index:04}.mp4'
         args += ['-filter_complex', ';'.join(filters), '-map', f'[v{len(overlays)}]', '-map', '[audio]',
-            '-frames:v', n, '-t', f'{seconds:.9f}', '-r', project['fps'], '-c:v', 'libx264',
+            '-frames:v', n, '-t', f'{clip_seconds:.9f}', '-r', project['fps'], '-c:v', 'libx264',
             '-preset', 'veryfast', '-crf', '18', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-ar', sample_rate, '-ac', channels, part]
-        run(args)
+        run_progress(args, project['fps'], lambda t: report_progress('compositing', completed_seconds + min(t, clip_seconds)))
         parts.append(part)
-        progress({'state': 'running', 'completedClips': index+1, 'totalClips': len(project['clips'])})
+        completed_seconds += clip_seconds
+        report_progress('compositing', completed_seconds)
     listing = parts_directory / 'parts.txt'
     listing.write_text(''.join(f"file '{part.name}'\nduration {duration(clip)/fps:.9f}\n" for part, clip in zip(parts, project['clips'])), encoding='utf-8')
     # Normalize the final timestamps and codec parameters across video and JPEG holds.
     # Explicit segment durations keep AAC packet padding out of the timeline clock.
-    timeline_frames = sum(duration(c) for c in project['clips'])
-    seconds = Fraction(timeline_frames) / Fraction(str(project['fps']))
     # Convert once after concatenation: no per-clip rounding drift or evidence reindexing.
-    expected = max(1, math.floor(seconds * Fraction(settings['fps']) + Fraction(1, 2)))
     w, h = settings['width'], settings['height']
     final_path = directory / '.encoded.mp4'
-    run(['ffmpeg', '-v', 'error', '-nostdin', '-n', '-f', 'concat', '-safe', '1', '-i', listing,
+    report_progress('encoding', float(seconds))
+    encoding = ['-b:v', str(settings['videoBitrate'])] if settings['videoBitrate'] else ['-crf', '18']
+    run_progress(['ffmpeg', '-v', 'error', '-nostdin', '-n', '-f', 'concat', '-safe', '1', '-i', listing,
          '-vf', f'setpts=N/({project["fps"]}*TB),fps={settings["fps"]},scale={w}:{h}:force_original_aspect_ratio=decrease:flags=lanczos,pad={w}:{h}:(ow-iw)/2:(oh-ih)/2,setsar=1,tpad=stop_mode=clone:stop_duration=1',
          '-af', f'aresample={sample_rate}:async=1:first_pts=0,apad',
          '-frames:v', expected, '-t', f'{float(Fraction(expected)/Fraction(settings["fps"])):.9f}', '-r', settings['fps'],
-         '-c:v', 'libx264', '-crf', '18', '-preset', 'veryfast', '-pix_fmt', 'yuv420p',
-         '-c:a', 'aac', '-ar', sample_rate, '-ac', channels, '-movflags', '+faststart', final_path])
+         '-c:v', 'libx264', *encoding, '-preset', 'veryfast', '-pix_fmt', 'yuv420p',
+         '-c:a', 'aac', '-ar', sample_rate, '-ac', channels, '-movflags', '+faststart', final_path],
+         settings['fps'], lambda t: report_progress('encoding', float(seconds) + min(t, final_seconds)))
+    report_progress('finalizing', work_seconds)
     result = probe(final_path)
     video = next(s for s in result['streams'] if s['codec_type'] == 'video')
     if int(video['nb_frames']) != expected:
@@ -233,7 +301,8 @@ def export_video(project, directory, progress=lambda value: None, options=None, 
     import shutil
     with target.open('xb') as dest, final_path.open('rb') as src:
         shutil.copyfileobj(src, dest)
-    report = {'state': 'complete', 'path': str(target), 'revision': project['revision'], 'frames': expected,
+    report = {'state': 'complete', 'progressPercent': 100, 'stage': 'complete', 'durationSeconds': final_seconds,
+        'path': str(target), 'revision': project['revision'], 'frames': expected,
         'settings': settings, 'timelineFrames': timeline_frames, 'warnings': project.get('needsRebuild', []), 'userRequested': user_requested,
         'sha256': hashlib.sha256(target.read_bytes()).hexdigest(), 'probe': result}
     write(directory / 'export.json', report)

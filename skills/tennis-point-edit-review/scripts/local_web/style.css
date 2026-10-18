@@ -603,6 +603,9 @@ video,
 .trim-handle.end {
   right: 0;
 }
+.clip-block .trim-handle { visibility: hidden; pointer-events: none; }
+.clip-block:hover .trim-handle,
+.clip-block.under-playhead .trim-handle { visibility: visible; pointer-events: auto; }
 .overlay-block {
   position: absolute;
   top: 4px;
@@ -858,6 +861,12 @@ dialog textarea {
 #export-dialog .section-bar button { margin-left: auto; }
 .export-status { margin: 12px 16px 0; font-size: 12px; color: var(--muted); }
 .export-status:empty { display: none; }
+.export-hint { grid-column: 1/-1; margin: 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+.export-progress { display: flex; align-items: center; gap: 12px; margin: 16px 16px 0; }
+.export-progress progress { flex: 1; width: 0; height: 8px; border: 0; border-radius: 4px; overflow: hidden; accent-color: var(--lime); }
+.export-progress progress::-webkit-progress-bar { background: var(--line); }
+.export-progress progress::-webkit-progress-value { background: var(--lime); }
+.export-progress span { min-width: 48px; text-align: right; font: 12px var(--mono); }
 .pane-divider { position: relative; z-index: 10; background: #12191c; touch-action: none; }
 .pane-divider::after { content: ''; position: absolute; background: #46514c; }
 .pane-divider.vertical { cursor: col-resize; }

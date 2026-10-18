@@ -291,11 +291,14 @@ $("recover-draft").onclick = () => {
   notice("draftDownloaded");
 };
 function exportOptions() {
-  return {width:Number($('export-width').value), height:Number($('export-height').value), fps:$('export-fps').value === 'project' ? String(project.fps) : $('export-fps').value, filename:$('export-filename').value.trim()};
+  return {width:Number($('export-width').value), height:Number($('export-height').value), fps:$('export-fps').value === 'project' ? String(project.fps) : $('export-fps').value, bitrate:$('export-bitrate').value, filename:$('export-filename').value.trim()};
 }
 function refreshExport() {
   if (!project) return;
   $('export-fps').options[0].textContent = t('matchTimelineFps', {fps:Number(rate(project).toFixed(3))});
+  const sourceBitrate = exportDefaults?.sourceVideoBitrate, sourceOption = $('export-bitrate').options[1];
+  sourceOption.disabled = !sourceBitrate;
+  sourceOption.textContent = sourceBitrate ? t('bitrateSourceValue', {mbps:Number((sourceBitrate/1e6).toFixed(2))}) : t('bitrateSourceUnavailable');
   $('export-video').disabled = false;
   $('export-video').title = t('export');
   const options = exportOptions(), outputRate = rate(options), summary = exportSummary(project, options);
@@ -305,9 +308,13 @@ function refreshExport() {
   $('export-audio').textContent = audio ? t('audioSettings', {rate:audio.sampleRate/1000, channels:audio.channels}) : t('silentAudio');
   $('export-warning').hidden = !project.needsRebuild?.length;
   const running = exportJob.state === 'running';
+  const percent = Math.max(0, Math.min(100, Number(exportJob.progressPercent) || 0));
+  $('export-progress-row').hidden = !['running','complete','failed'].includes(exportJob.state);
+  $('export-progress').value = percent;
+  $('export-percent').textContent = percent.toFixed(1) + '%';
   $('start-export').disabled = exportBusy || running || pickerBusy || pending > 0 || drafts().length > 0 || !valid;
   $('browse-export').disabled = pickerBusy;
-  $('export-status').textContent = exportError ? errorText(exportError.message) : pickerBusy ? t('pickerOpen') : exportBusy ? t('exportChecking') : running ? t('exporting', {done:exportJob.completedClips ?? 0, total:exportJob.totalClips}) : pending ? t('exportWaiting') : drafts().length ? t('exportUnsaved') : exportJob.state === 'failed' ? errorText(exportJob.error) : exportJob.state === 'complete' ? t('exportComplete') + ' · ' + t('exportJobRevision', {revision:exportJob.revision}) : !valid ? t('invalidExport') : '';
+  $('export-status').textContent = exportError ? errorText(exportError.message) : pickerBusy ? t('pickerOpen') : exportBusy ? t('exportChecking') : running ? t('exportStage.' + (exportJob.stage ?? 'compositing')) : pending ? t('exportWaiting') : drafts().length ? t('exportUnsaved') : exportJob.state === 'failed' ? errorText(exportJob.error) : exportJob.state === 'complete' ? t('exportComplete') + ' · ' + t('exportJobRevision', {revision:exportJob.revision}) : !valid ? t('invalidExport') : '';
   $('export-download').hidden = exportJob.state !== 'complete';
   $('export-download').href = url('/api/export');
   $('export-download').download = exportJob.settings?.filename ?? 'edited.mp4';
@@ -359,7 +366,7 @@ async function poll() {
     exportError = null;
     refreshExport();
     if (exportJob.state === 'running') {
-      if (!$('export-dialog').open) notice('exporting', {done:exportJob.completedClips ?? 0, total:exportJob.totalClips});
+      if (!$('export-dialog').open) notice('exporting', {percent:(exportJob.progressPercent ?? 0).toFixed(1)});
       clearTimeout(exportTimer); exportTimer = setTimeout(poll, 1000);
     } else if (exportJob.state === 'complete') notice('exportComplete');
     else notice(exportJob.error ? new Error(exportJob.error) : 'exportStopped');

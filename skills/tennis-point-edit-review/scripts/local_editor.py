@@ -250,7 +250,7 @@ def make_server(directory, port=0):
                         if job.get('state') == 'running':
                             raise Conflict('Export already running')
                         job.clear()
-                        job.update(state='running', revision=p['revision'], completedClips=0, totalClips=len(p['clips']))
+                        job.update(state='running', revision=p['revision'], progressPercent=0, stage='compositing', settings=options)
                     def export():
                         try:
                             export_video(p, store.directory / 'exports' / f'r{p["revision"]}-{time.time_ns()}', lambda v: job.update(v), options, target, user_requested=user_requested)
@@ -284,6 +284,7 @@ def main():
     update = sub.add_parser('update'); update.add_argument('directory'); update.add_argument('plan'); update.add_argument('--expected-revision', type=int, required=True)
     render = sub.add_parser('render'); render.add_argument('directory'); render.add_argument('output')
     render.add_argument('--fps'); render.add_argument('--width', type=int); render.add_argument('--height', type=int); render.add_argument('--filename', default='edited.mp4')
+    render.add_argument('--bitrate', default='quality', help='quality (CRF 18), source, or target video bits/s')
     render.add_argument('--user-requested', action='store_true', help='Export at the explicit request of the user, regardless of review/statistics confirmations')
     args = parser.parse_args()
     if args.command == 'doctor':
@@ -329,7 +330,7 @@ def main():
         render_graphics(updated, store.directory)
         result = store.commit(updated, args.expected_revision, {'type': 'agent-reconciliation'})
     else:
-        options = {k: getattr(args, k) for k in ('fps', 'width', 'height', 'filename') if getattr(args, k) is not None}
+        options = {k: getattr(args, k) for k in ('fps', 'width', 'height', 'filename', 'bitrate') if getattr(args, k) is not None}
         result = export_video(Store(args.directory).get(), args.output, options=options, user_requested=args.user_requested)
     print(json.dumps(result, ensure_ascii=False, indent=2))
 

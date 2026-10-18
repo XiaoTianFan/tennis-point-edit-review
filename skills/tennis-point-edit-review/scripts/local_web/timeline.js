@@ -120,6 +120,7 @@ export class Timeline {
       tick.style.left = second * this.fps * this.px + "px";
       $("ruler").append(tick);
     }
+    this.clipBlocks = new Map();
     for (const c of clips) {
       const block = el("div", null, { class: "clip-block", "data-clip": c.id, draggable: "true", tabindex: "0", role: "button", "aria-label": t("clipName", {name: c.pointId ?? c.label ?? c.id}) });
       block.style.left = c.startFrame * this.px + "px";
@@ -156,6 +157,7 @@ export class Timeline {
         block.append(handle);
       }
       $("video-track").append(block);
+      this.clipBlocks.set(c.id, block);
     }
     for (const o of overlays) {
       const c = clips.find((v) => v.id === o.clipId), [a, b] = bounds(o, c);
@@ -217,6 +219,13 @@ export class Timeline {
   }
   setFrame(frame) {
     this.frame = frame;
+    const clip = this.clips?.find(c => frame >= c.startFrame && frame < c.endFrame);
+    const block = this.clipBlocks?.get(clip?.id);
+    if (block !== this.currentClipBlock) {
+      this.currentClipBlock?.classList.remove('under-playhead');
+      block?.classList.add('under-playhead');
+      this.currentClipBlock = block;
+    }
     $("playhead").style.left = frame * this.px + "px";
     $("playhead").setAttribute("aria-valuenow", frame);
     $("playhead").setAttribute("aria-valuemin", 0);

@@ -16,7 +16,7 @@ SCRIPTS = Path(__file__).resolve().parents[1] / 'skills/tennis-point-edit-review
 sys.path.insert(0, str(SCRIPTS))
 from local_model import SCHEMA, Store, Conflict, write, validate, layout, review_payload, overlay_range, context
 from local_editor import make_server, initialize
-from local_media import export_video, export_settings, prepare_media, probe, run, source_settings
+from local_media import export_video, export_settings, prepare_media, probe, run, run_progress, source_settings
 
 
 class OutputLanguageTests(unittest.TestCase):
@@ -179,6 +179,28 @@ class ModelTest(unittest.TestCase):
         for opts in [{'filename':'../bad'}, {'filename':'CON.mp4'}, {'width':321}, {'fps':'0'}, {'fps':'241'}]:
             with self.assertRaises(ValueError): export_settings(self.p, opts)
 
+    def test_bitrate_modes_use_original_video_and_duration_weights(self):
+        self.p['assets'][0]['sourceProbe'] = {'streams':[{'codec_type':'video','bit_rate':'10000000'}, {'codec_type':'audio','bit_rate':'128000'}], 'format':{'bit_rate':'10128000'}}
+        self.p['assets'].append(dict(id='other', sourceProbe={'streams':[{'codec_type':'video','bit_rate':'40000000'}]}))
+        self.p['clips'][1].update(assetId='other',outFrame=120)
+        before=copy.deepcopy(self.p)
+        default=export_settings(self.p)
+        self.assertEqual((default['bitrate'],default['videoBitrate'],default['sourceVideoBitrate']),('quality',None,30000000))
+        self.assertEqual(export_settings(self.p,{'bitrate':'source'})['videoBitrate'],30000000)
+        self.assertEqual(export_settings(self.p,{'bitrate':'8000000'})['videoBitrate'],8000000)
+        self.assertEqual(self.p,before)
+        for value in [True,None,'bad','8M',0,99999,500000001]:
+            with self.subTest(value=value), self.assertRaises(ValueError):export_settings(self.p,{'bitrate':value})
+
+    def test_source_bitrate_never_falls_back_to_proxy_or_audio_container(self):
+        asset=self.p['assets'][0];asset.update(bit_rate=9000000,sourceProbe={'streams':[{'codec_type':'video','bit_rate':'N/A'}], 'format':{'bit_rate':'12000000'}})
+        self.assertIsNone(export_settings(self.p)['sourceVideoBitrate'])
+        with self.assertRaisesRegex(ValueError,'Original video bitrate unavailable'):export_settings(self.p,{'bitrate':'source'})
+        asset.pop('sourceProbe');asset['originalPath']='original.mp4'
+        with patch('local_media.probe', return_value={'streams':[{'codec_type':'video','bit_rate':'38000000'}]}) as inspection:
+            self.assertEqual(export_settings(self.p,{'bitrate':'source'})['videoBitrate'],38000000)
+            inspection.assert_called_once_with('original.mp4')
+
     def test_cli_reconciliation_preserves_answers_and_rejects_mapping_changes(self):
         current = self.store.apply(0, dict(type='review', pointId='P001', answer=dict(scoringPlayerId='B', deadBallType='net', reviewConfirmed=True)))
         plan = Path(self.temp.name) / 'update.json'
@@ -246,6 +268,35 @@ class ModelTest(unittest.TestCase):
 
 @unittest.skipUnless(shutil.which('ffmpeg') and shutil.which('ffprobe'), 'FFmpeg required')
 class MediaTest(unittest.TestCase):
+    def test_time_weighted_progress_and_target_bitrate_during_actual_encoding(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            p=sample(tmp);source=Path(p['assets'][0]['path'])
+            run(['ffmpeg','-v','error','-y','-f','lavfi','-i','testsrc2=size=320x180:rate=30','-t','4','-c:v','libx264',source])
+            p['clips'][0].update(inFrame=0,outFrame=15)
+            p['clips'][1].update(inFrame=30,outFrame=75)
+            events=[]
+            with patch('local_media.run_progress',wraps=run_progress) as encoder:
+                result=export_video(p,Path(tmp)/'encoded',events.append,options={'bitrate':'4000000','fps':'24000/1001'},user_requested=True)
+            final_args=encoder.call_args_list[-1].args[0]
+            self.assertEqual(final_args[final_args.index('-b:v')+1],'4000000')
+            self.assertNotIn('-crf',final_args)
+            self.assertEqual(result['settings']['videoBitrate'],4000000)
+            self.assertEqual(result['frames'],48)
+            percentages=[e['progressPercent'] for e in events]
+            self.assertEqual(percentages,sorted(percentages))
+            self.assertEqual(percentages[0],0);self.assertEqual(percentages[-1],100)
+            self.assertTrue(all(x<100 for x in percentages[:-1]))
+            first_clip_percent=.5/(2+48/(24000/1001))*100
+            self.assertTrue(any(abs(e['progressPercent']-first_clip_percent)<1e-6 for e in events if e.get('stage')=='compositing'))
+            self.assertEqual({e['stage'] for e in events},{'compositing','encoding','finalizing','complete'})
+
+    def test_progress_encoder_reports_errors_without_completion(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            events=[]
+            with self.assertRaises(ValueError):
+                run_progress(['ffmpeg','-v','error','-nostdin','-i',str(Path(tmp)/'missing.mp4'),str(Path(tmp)/'out.mp4')],'30',events.append)
+            self.assertEqual(events,[])
+
     def test_user_requested_export_encodes_without_approvals_or_complete_statistics(self):
         with tempfile.TemporaryDirectory() as tmp:
             p = sample(tmp)
@@ -327,7 +378,8 @@ class MediaTest(unittest.TestCase):
             p['assets'][0].update(meta)
             p['clips'].append(dict(id='hold',kind='hold',assetId='src',inFrame=89,durationFrames=30))
             approve(p)
-            result = export_video(p, Path(tmp) / 'render')
+            result = export_video(p, Path(tmp) / 'render',options={'bitrate':'source'})
+            self.assertEqual(result['settings']['videoBitrate'],int(next(s for s in meta['sourceProbe']['streams'] if s['codec_type']=='video')['bit_rate']))
             self.assertEqual(result['frames'],90)
             info = probe(result['path'])
             video = next(s for s in info['streams'] if s['codec_type']=='video')

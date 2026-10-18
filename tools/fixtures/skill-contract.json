@@ -745,6 +745,31 @@
           "text": "重开已确认分须有具体新冲突，只询问未解字段，不重复索取清晰答案。"
         }
       ]
+    },
+    {
+      "id": "R055",
+      "checks": [
+        {
+          "path": "references/local-editor.md",
+          "text": "码率下拉默认quality（CRF 18）"
+        },
+        {
+          "path": "references/local-editor.md",
+          "text": "不以代理或含音频的容器码率代替"
+        },
+        {
+          "path": "references/local-editor.md",
+          "text": "不按片段数平分"
+        },
+        {
+          "path": "references/local-editor.md",
+          "text": "保存完成才到100%"
+        },
+        {
+          "path": "references/local-editor.md",
+          "text": "仅在播放头所在片段或鼠标悬停片段显示修剪手柄"
+        }
+      ]
     }
   ],
   "files": [
@@ -761,7 +786,7 @@
     },
     {
       "path": "examples/review-data.json",
-      "sha256": "dc3a292787c638855de81303df4453eda5ec52b05838136c1136120c1350ca29"
+      "sha256": "d8cb37f600cbd2755c33ece5ff31b0c1a64f4896906f80cbc16d06ed14fb967b"
     },
     {
       "path": "examples/review-id.jsx",
@@ -789,7 +814,7 @@
     },
     {
       "path": "examples/stats-pages.json",
-      "sha256": "2bb3680cff3fb0121057359f28926ec2f98c2755b8f88222046f15b6faea2108"
+      "sha256": "76040c1a99451a04d502ee039381907e716b33d337526c3bd88d89ff7a810063"
     },
     {
       "path": "examples/stats-panel.jsx",
