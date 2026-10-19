@@ -80,6 +80,8 @@ updated-project从当前副本修改，保留剪口、顺序、路径、answers�
 python "<skill>/scripts/local_editor.py" render "<work>/edit" "<work>/new-export" --user-requested
 ```
 
+导出范围默认为`full`，始终使用完整master。CLI选段用`--scope selected --clip-id clip-a --clip-id clip-c`；HTTP options用`scope=selected`和`clipIds`数组。所选id须非空、唯一且存在；按master顺序拼接视频／定格段，沿用对应图层的原始局部或源帧锚点及原有计分，不重新推导比赛事实。码率source仅按本次输出段加权。完整project-snapshot保留工程，export.json额外记录scope、clipIds、master与导出范围映射以及fullTimelineFrames；不改master、答案或确认。
+
 未获导出要求的agent不加此标志，遵循上述延后条件。UI调用HTTP `/api/render`时发送userRequested=true；程序接口export_video(..., user_requested=True)含义相同，不能为了绕过agent限制自行声称用户要求。context的agentExportBlockers仅向agent列出主动导出尚缺的条件；导出记录保存userRequested与待同步项，不修改审核答案、确认或统计状态。
 
 UI/CLI同路输出H.264/AAC MP4：精准取帧、同源图形、统计淡变、剪口两帧音频淡变、定格静音，最后统一换fps避免逐段舍入。默认沿用画幅/fps/音频，可选偶数宽高≤8192、fps 1–240和输出路径；等比补边，时长误差≤半输出帧。UI帧率使用预设下拉，默认“与时间线一致”并显示实际fps；23.976/29.97/59.94仅作显示，内部保留精确有理数，不改时间线。码率下拉默认quality（CRF 18），可选4/8/12/20/35/50/80 Mbps及source（匹配原片视频流平均码率，多源按保留时长加权）；原片码率未知时禁选source，不以代理或含音频的容器码率代替。Mbps为重编码目标平均视频码率，非严格恒定值；不改代理或时间线。CLI有--width/--height/--fps/--filename/--bitrate（quality/source/整数bits每秒）；UI用Tk选目录，缺Tk/桌面则填路径。不覆盖已有文件，保留project-snapshot.json及含帧数/哈希的export.json；编码成功仍须[画面与声音验收](presentation-and-qa.md#验证与交付)。

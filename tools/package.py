@@ -28,9 +28,9 @@ def read_package(root=SKILL):
 def with_archive(files):
     files={k:v.replace('\r\n','\n') for k,v in files.items() if k!=ARCHIVE}
     version=json.loads(files['references/package-version.json'])['version']
-    archive={'schema':'tennis-recovery/v2','version':version,'files':{
-        k:{'encoding':'zlib+base64','data':base64.b64encode(zlib.compress(v.encode('utf-8'),9)).decode('ascii'),'sha256':sha(v)}
-        for k,v in sorted(files.items())}}
+    payload=json.dumps({k:{'text':v,'sha256':sha(v)} for k,v in sorted(files.items())},ensure_ascii=False,separators=(',',':'))
+    archive={'schema':'tennis-recovery/v3','version':version,'payload':{
+        'encoding':'zlib+base64','data':base64.b64encode(zlib.compress(payload.encode('utf-8'),9)).decode('ascii'),'sha256':sha(payload)}}
     files[ARCHIVE]=json.dumps(archive,ensure_ascii=True,separators=(',',':'))+'\n'
     if sum(len(v.encode()) for v in files.values())>=1000000:raise ValueError('Package exceeds 1 MB')
     return files
@@ -38,9 +38,9 @@ def load_snapshot(path):
     data=json.loads(Path(path).read_text(encoding='utf-8-sig'))
     recovered=[]
     if 'packageFiles' in data:data=data['packageFiles']
-    elif isinstance(data.get('files'),dict) and all(isinstance(v,dict) and ('text' in v or v.get('encoding')=='zlib+base64') for v in data['files'].values()):
+    elif data.get('schema')=='tennis-recovery/v3' or isinstance(data.get('files'),dict) and all(isinstance(v,dict) and ('text' in v or v.get('encoding')=='zlib+base64') for v in data['files'].values()):
         data={ARCHIVE:json.dumps(data,ensure_ascii=True,separators=(',',':'))+'\n',
-              **{k:_archive.archive_text(v) for k,v in data['files'].items()}}
+              **{k:_archive.archive_text(v) for k,v in _archive.archive_files(data).items()}}
     if not isinstance(data,dict) or not all(isinstance(v,str) for v in data.values()):
         raise ValueError('Expected a complete packageFiles mapping or recovery archive')
     data={safe_name(k):v.replace('\r\n','\n') for k,v in data.items()}
@@ -48,7 +48,7 @@ def load_snapshot(path):
         raise ValueError('Incomplete package snapshot')
     if ARCHIVE in data:
         arc=json.loads(data[ARCHIVE])
-        for name,entry in arc['files'].items():
+        for name,entry in _archive.archive_files(arc).items():
             safe_name(name)
             text=_archive.archive_text(entry)
             if name not in data:raise ValueError('Incomplete export: '+name)

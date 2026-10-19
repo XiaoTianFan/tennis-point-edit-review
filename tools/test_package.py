@@ -5,7 +5,7 @@ m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 class PackageTests(unittest.TestCase):
     def test_distribution_excludes_development_records(self):
         files=m.read_package()
-        archive=json.loads(files[m.ARCHIVE])['files']
+        archive=m._archive.archive_files(json.loads(files[m.ARCHIVE]))
         self.assertEqual(set(archive),set(files)-{m.ARCHIVE})
         for names in (files,archive):
             self.assertFalse(any('/history/' in name for name in names))
@@ -33,15 +33,26 @@ class PackageTests(unittest.TestCase):
             p=Path(d)/'old.json';p.write_text(json.dumps(archive),encoding='utf-8')
             loaded,_=m.load_snapshot(p)
         self.assertEqual(loaded['SKILL.md'],'旧版中文')
-        self.assertEqual(json.loads(loaded[m.ARCHIVE])['schema'],'tennis-recovery/v2')
+        self.assertEqual(json.loads(loaded[m.ARCHIVE])['schema'],'tennis-recovery/v3')
     def test_compressed_archive_roundtrip_and_tampering(self):
         text='中文 / café / alpha\n'*200
         files=m.with_archive({'SKILL.md':text,'references/package-version.json':'{"version":"test"}'})
-        arc=json.loads(files[m.ARCHIVE]);record=arc['files']['SKILL.md']
+        arc=json.loads(files[m.ARCHIVE]);record=m._archive.archive_files(arc)['SKILL.md']
         self.assertEqual(m._archive.archive_text(record),text)
-        self.assertLess(len(record['data']),len(text.encode()))
+        self.assertLess(len(arc['payload']['data']),len(text.encode()))
         record['sha256']='0'*64
         with self.assertRaises(ValueError):m._archive.archive_text(record)
+        arc['payload']['sha256']='0'*64
+        with self.assertRaises(ValueError):m._archive.archive_files(arc)
+
+    def test_v2_compressed_archive_import_remains_supported(self):
+        values={'SKILL.md':'旧版压缩中文','references/package-version.json':'{"version":"legacy"}'}
+        archive={'schema':'tennis-recovery/v2','version':'legacy','files':{
+            k:dict(encoding='zlib+base64',data=base64.b64encode(zlib.compress(v.encode())).decode(),sha256=m.sha(v)) for k,v in values.items()}}
+        with tempfile.TemporaryDirectory() as d:
+            p=Path(d)/'old.json';p.write_text(json.dumps(archive),encoding='utf-8')
+            loaded,_=m.load_snapshot(p)
+        self.assertEqual(loaded['SKILL.md'],values['SKILL.md'])
     def test_compressed_archive_rejects_bomb_and_trailing_payload(self):
         for payload in (zlib.compress(b'x'*1000001),zlib.compress(b'x')+b'junk'):
             record={'encoding':'zlib+base64','data':base64.b64encode(payload).decode(),'sha256':hashlib.sha256(b'x').hexdigest()}

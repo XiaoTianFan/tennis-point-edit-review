@@ -164,11 +164,28 @@ def render_graphics(project, directory):
     project['graphicsManifest'] = str(manifest)
     return project
 
+def export_clips(project, scope='full', clip_ids=None):
+    """Validate an explicit export scope and retain master order, including holds."""
+    if scope not in ('full', 'selected'):
+        raise ValueError('Export scope must be full or selected')
+    if scope == 'full':
+        return list(project['clips'])
+    if not isinstance(clip_ids, list) or not clip_ids or any(not isinstance(x, str) for x in clip_ids):
+        raise ValueError('Select at least one clip to export')
+    ids = set(clip_ids)
+    if len(ids) != len(clip_ids) or ids - {c['id'] for c in project['clips']}:
+        raise ValueError('Export selection contains duplicate or unknown clips')
+    return [c for c in project['clips'] if c['id'] in ids]
+
+
 def export_settings(project, options=None):
     options = options or {}
     if not isinstance(options, dict):
         raise ValueError('Export options must be an object')
+    scope = options.get('scope', 'full')
+    clips = export_clips(project, scope, options.get('clipIds'))
     result = {k: options.get(k, project[k]) for k in ('width', 'height', 'fps')}
+    result.update(scope=scope, clipIds=[c['id'] for c in clips])
     for key in ('width', 'height'):
         if type(result[key]) is not int or not 2 <= result[key] <= 8192 or result[key] % 2:
             raise ValueError('Use even output dimensions from 2 to 8192')
@@ -180,7 +197,7 @@ def export_settings(project, options=None):
         raise ValueError('Output fps must be between 1 and 240')
     result['fps'] = str(rate)
     choice = options.get('bitrate', 'quality')
-    source_rate = original_bitrate(project)
+    source_rate = original_bitrate({**project, 'clips': clips})
     if choice == 'quality': target_rate = None
     elif choice == 'source':
         if source_rate is None: raise ValueError('Original video bitrate unavailable')
@@ -223,6 +240,17 @@ def export_video(project, directory, progress=lambda value: None, options=None, 
     parts_directory = directory / 'render-parts'
     parts_directory.mkdir()
     write(directory / 'project-snapshot.json', project)
+    # The snapshot remains the complete edit. Only this render's clip sequence changes.
+    selected = set(settings['clipIds'])
+    ranges, master_frame, output_frame = [], 0, 0
+    for clip in project['clips']:
+        n = duration(clip)
+        if clip['id'] in selected:
+            ranges.append(dict(clipId=clip['id'], masterStartFrame=master_frame, masterEndFrame=master_frame+n,
+                exportStartFrame=output_frame, exportEndFrame=output_frame+n))
+            output_frame += n
+        master_frame += n
+    project = {**project, 'clips': export_clips(project, settings['scope'], settings['clipIds'])}
     assets = {a['id']: a for a in project['assets']}
     fps = float(Fraction(str(project['fps'])))
     timeline_frames = sum(duration(c) for c in project['clips'])
@@ -303,7 +331,8 @@ def export_video(project, directory, progress=lambda value: None, options=None, 
         shutil.copyfileobj(src, dest)
     report = {'state': 'complete', 'progressPercent': 100, 'stage': 'complete', 'durationSeconds': final_seconds,
         'path': str(target), 'revision': project['revision'], 'frames': expected,
-        'settings': settings, 'timelineFrames': timeline_frames, 'warnings': project.get('needsRebuild', []), 'userRequested': user_requested,
+        'settings': settings, 'timelineFrames': timeline_frames, 'fullTimelineFrames': master_frame, 'ranges': ranges,
+        'warnings': project.get('needsRebuild', []), 'userRequested': user_requested,
         'sha256': hashlib.sha256(target.read_bytes()).hexdigest(), 'probe': result}
     write(directory / 'export.json', report)
     # Only prune intermediates created in this new export directory after the final

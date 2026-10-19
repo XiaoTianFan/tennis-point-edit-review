@@ -201,6 +201,22 @@ class ModelTest(unittest.TestCase):
             self.assertEqual(export_settings(self.p,{'bitrate':'source'})['videoBitrate'],38000000)
             inspection.assert_called_once_with('original.mp4')
 
+    def test_export_scope_validates_selection_and_uses_master_order_and_bitrate(self):
+        p = self.p
+        p['assets'][0]['sourceProbe'] = {'streams':[{'codec_type':'video','bit_rate':'10000000'}]}
+        p['assets'].append(dict(id='other', sourceProbe={'streams':[{'codec_type':'video','bit_rate':'40000000'}]}))
+        p['clips'][1]['assetId'] = 'other'
+        before = copy.deepcopy(p)
+        selected = export_settings(p, dict(scope='selected',clipIds=['second','first'],bitrate='source'))
+        self.assertEqual(selected['clipIds'], ['first','second'])
+        self.assertEqual(export_settings(p, dict(scope='selected',clipIds=['second'],bitrate='source'))['videoBitrate'],40000000)
+        self.assertEqual(export_settings(p, dict(scope='full',clipIds=['second']))['clipIds'], ['first','second'])
+        for options in [dict(scope='review'),dict(scope='selected'),dict(scope='selected',clipIds=[]),
+                        dict(scope='selected',clipIds='first'),dict(scope='selected',clipIds=['missing']),
+                        dict(scope='selected',clipIds=['first','first']),dict(scope='selected',clipIds=[{}])]:
+            with self.subTest(options=options), self.assertRaises(ValueError): export_settings(p,options)
+        self.assertEqual(p,before)
+
     def test_cli_reconciliation_preserves_answers_and_rejects_mapping_changes(self):
         current = self.store.apply(0, dict(type='review', pointId='P001', answer=dict(scoringPlayerId='B', deadBallType='net', reviewConfirmed=True)))
         plan = Path(self.temp.name) / 'update.json'
@@ -246,13 +262,18 @@ class ModelTest(unittest.TestCase):
             blocked, body, _ = request('POST','/api/render',{'revision':1},{'X-Session-Token':token})
             self.assertEqual(blocked,400,body); render.assert_not_called()
             self.assertEqual(request('POST','/api/render',{'revision':0,'userRequested':True},{'X-Session-Token':token})[0],409)
-            status, body, _ = request('POST','/api/render',{'revision':1,'userRequested':True,'options':{'filename':'用户选择.mp4','fps':'25','width':640,'height':360}},{'X-Session-Token':token})
+            self.assertEqual(request('POST','/api/render',{'revision':1,'userRequested':True,'options':{'scope':'selected','clipIds':[]}},{'X-Session-Token':token})[0],400)
+            preview = request('GET','/api/export-settings?scope=selected&clipId=first',headers={'X-Session-Token':token})
+            self.assertEqual(preview[0],200)
+            self.assertEqual(json.loads(preview[1])['clipIds'],['first'])
+            status, body, _ = request('POST','/api/render',{'revision':1,'userRequested':True,'options':{'scope':'selected','clipIds':['first'],'filename':'用户选择.mp4','fps':'25','width':640,'height':360}},{'X-Session-Token':token})
             self.assertEqual(status,202,body)
             render.assert_called_once()
             args = render.call_args.args
             self.assertTrue(args[0]['needsRebuild'])
             self.assertNotIn('statistics',args[0])
             self.assertEqual(args[3]['fps'], '25')
+            self.assertEqual((args[3]['scope'],args[3]['clipIds']), ('selected',['first']))
             self.assertEqual(args[4].name, '用户选择.mp4')
             self.assertEqual(render.call_args.kwargs, {'user_requested':True})
             self.assertEqual(self.store.get().get('approval',{}), {})
@@ -268,6 +289,41 @@ class ModelTest(unittest.TestCase):
 
 @unittest.skipUnless(shutil.which('ffmpeg') and shutil.which('ffprobe'), 'FFmpeg required')
 class MediaTest(unittest.TestCase):
+    def test_selected_export_joins_nonadjacent_video_and_hold_with_original_overlay_timing(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            p = sample(tmp)
+            source = Path(p['assets'][0]['path'])
+            run(['ffmpeg','-v','error','-y','-f','lavfi','-i','testsrc2=size=320x180:rate=30',
+                 '-f','lavfi','-i','sine=frequency=440:sample_rate=48000','-t','4','-c:v','libx264','-c:a','aac',source])
+            p['assets'][0].update(hasAudio=True,audio=dict(sampleRate=48000,channels=1))
+            p['clips'].append(dict(id='hold',kind='hold',assetId='src',inFrame=100,durationFrames=15))
+            graphic=Path(tmp)/'red.png'
+            run(['ffmpeg','-v','error','-f','lavfi','-i','color=red:size=320x180,format=rgba','-frames:v','1',graphic])
+            p['overlays']=[dict(id='label',clipId='first',component='serveLabel',anchor='source',startFrame=15,endFrame=25,image=str(graphic))]
+            before=copy.deepcopy(p)
+            result=export_video(p,Path(tmp)/'selected',options=dict(scope='selected',clipIds=['hold','first'],fps='60'),user_requested=True)
+            self.assertEqual(result['settings']['clipIds'],['first','hold'])
+            self.assertEqual((result['timelineFrames'],result['fullTimelineFrames'],result['frames']),(45,75,90))
+            self.assertEqual(result['ranges'],[
+                dict(clipId='first',masterStartFrame=0,masterEndFrame=30,exportStartFrame=0,exportEndFrame=30),
+                dict(clipId='hold',masterStartFrame=60,masterEndFrame=75,exportStartFrame=30,exportEndFrame=45)])
+            self.assertEqual(json.loads((Path(tmp)/'selected/project-snapshot.json').read_text(encoding='utf-8')),before)
+            self.assertEqual(p,before)
+            def pixels(file,frame):
+                return subprocess.check_output(['ffmpeg','-v','error','-i',str(file),'-vf',f'select=eq(n\\,{frame}),scale=4:4',
+                    '-frames:v','1','-f','rawvideo','-pix_fmt','rgb24','-'])
+            for output_frame, source_frame in [(0,10),(60,100),(89,100)]:
+                actual,expected=pixels(result['path'],output_frame),pixels(source,source_frame)
+                self.assertLess(sum(abs(x-y) for x,y in zip(actual,expected))/len(actual),12)
+            red=pixels(result['path'],10)
+            self.assertGreater(red[0],220);self.assertLess(red[1],25)
+            audio=subprocess.check_output(['ffmpeg','-v','error','-i',result['path'],'-f','f32le','-ac','1','-ar','48000','-'])
+            import array
+            samples=array.array('f',audio)
+            rms=lambda start,end: (sum(x*x for x in samples[start:end])/(end-start))**.5
+            self.assertGreater(rms(10000,20000),.03)
+            self.assertLess(rms(58000,68000),.001)
+
     def test_time_weighted_progress_and_target_bitrate_during_actual_encoding(self):
         with tempfile.TemporaryDirectory() as tmp:
             p=sample(tmp);source=Path(p['assets'][0]['path'])

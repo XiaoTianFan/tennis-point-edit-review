@@ -22,11 +22,18 @@ def archive_text(record):
         raise ValueError('Archive checksum mismatch')
     return text
 
+def archive_files(backup):
+    """v3 compresses the complete file map together; v1/v2 stay readable."""
+    files=json.loads(archive_text(backup['payload'])) if backup.get('schema')=='tennis-recovery/v3' else backup['files']
+    if not isinstance(files,dict) or not all(isinstance(k,str) and isinstance(v,dict) for k,v in files.items()):
+        raise ValueError('Invalid archive file map')
+    return files
+
 def verify(root,repair=False):
     root=Path(root).resolve()
     backup=json.loads((root/'references/canonical-package.json').read_text(encoding='ascii'))
     changes=[]
-    for name,record in backup['files'].items():
+    for name,record in archive_files(backup).items():
         text=archive_text(record);path=(root/name).resolve()
         if not path.is_relative_to(root):raise ValueError('Unsafe archive path')
         actual=path.read_text(encoding='utf8') if path.exists() else None

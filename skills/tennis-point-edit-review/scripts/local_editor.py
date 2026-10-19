@@ -176,7 +176,9 @@ def make_server(directory, port=0):
                 elif route == '/api/job':
                     self.reply(job.copy())
                 elif route == '/api/export-settings':
-                    self.reply({**export_settings(p), 'directory': str(store.directory / 'exports')})
+                    query = parse_qs(urlparse(self.path).query)
+                    options = dict(scope=query.get('scope', ['full'])[0], clipIds=query.get('clipId', []))
+                    self.reply({**export_settings(p, options), 'directory': str(store.directory / 'exports')})
                 elif route == '/api/export':
                     if job.get('state') != 'complete':
                         raise ValueError('No completed export')
@@ -285,6 +287,8 @@ def main():
     render = sub.add_parser('render'); render.add_argument('directory'); render.add_argument('output')
     render.add_argument('--fps'); render.add_argument('--width', type=int); render.add_argument('--height', type=int); render.add_argument('--filename', default='edited.mp4')
     render.add_argument('--bitrate', default='quality', help='quality (CRF 18), source, or target video bits/s')
+    render.add_argument('--scope', choices=('full', 'selected'), default='full')
+    render.add_argument('--clip-id', action='append', default=[], help='Clip to include in selected scope; repeat as needed, exported in master order')
     render.add_argument('--user-requested', action='store_true', help='Export at the explicit request of the user, regardless of review/statistics confirmations')
     args = parser.parse_args()
     if args.command == 'doctor':
@@ -330,7 +334,8 @@ def main():
         render_graphics(updated, store.directory)
         result = store.commit(updated, args.expected_revision, {'type': 'agent-reconciliation'})
     else:
-        options = {k: getattr(args, k) for k in ('fps', 'width', 'height', 'filename', 'bitrate') if getattr(args, k) is not None}
+        options = {k: getattr(args, k) for k in ('fps', 'width', 'height', 'filename', 'bitrate', 'scope') if getattr(args, k) is not None}
+        options['clipIds'] = args.clip_id
         result = export_video(Store(args.directory).get(), args.output, options=options, user_requested=args.user_requested)
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
