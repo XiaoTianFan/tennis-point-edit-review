@@ -41,7 +41,7 @@ speeds and timing; stage 6 builds panels and speed overlays together; stage 7 ve
 the result. Later exception review covers unresolved points or problem games that still disagree
 with the supplied final score after the agent's own checks.
 
-Current skill revision: **2026.10.18-v25.11**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, required recovery attempts, complete 3D screening and evidence-only/N/A labels.
+Current skill revision: **2026.10.19-v25.12**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, required recovery attempts, complete 3D screening and evidence-only/N/A labels.
 
 ChatCut, **Premiere Pro** and a standalone pipeline are primary editing choices.
 The [environment contract](skills/tennis-point-edit-review/references/editing-environments.md)
@@ -58,7 +58,7 @@ checks these before building the timeline.
 
 The standalone [Courtside workbench](skills/tennis-point-edit-review/references/local-editor.md)
 ships inside the skill: a local timeline, source/edited playback, decoded frame stepping,
-cursor-snapping clip trims, fit-to-view logarithmic zoom, game-lane navigation, overlay timing, full/review ripple-hide views and revisioned JSON handoff. User exports are always available; only unsolicited agent renders wait for outcome and statistics confirmation to avoid redundant temporary videos.
+cursor-snapping clip trims, Ctrl/⌘ multi-selection, Shift range selection, fit-to-view logarithmic zoom, game-lane navigation, overlay timing, full/review ripple-hide views and revisioned JSON handoff. Export the full master timeline or join selected clips in master order; review/playhead focus stays independent of the export selection. User exports are always available; only unsolicited agent renders wait for outcome and statistics confirmation to avoid redundant temporary videos.
 Agents operate it entirely through the bundled CLI; users review in a browser.
 
 ## Preview

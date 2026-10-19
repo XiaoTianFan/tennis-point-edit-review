@@ -41,10 +41,38 @@ export const rate = (p) => {
   return a / b;
 };
 export const length = (c) => c.kind === "hold" ? c.durationFrames : c.outFrame - c.inFrame;
+export class ClipSelection {
+  constructor() { this.ids = new Set(); this.anchor = null; this.explicit = false; }
+  focus(id) {
+    if (!this.explicit) { this.ids = new Set([id]); this.anchor = id; }
+  }
+  reconcile(clips) {
+    const valid = new Set(clips.map(c => c.id));
+    this.ids = new Set([...this.ids].filter(id => valid.has(id)));
+    if (!valid.has(this.anchor)) this.anchor = null;
+  }
+  pick(order, id, {ctrlKey = false, metaKey = false, shiftKey = false} = {}, focused) {
+    if (!order.includes(id)) return;
+    const additive = ctrlKey || metaKey;
+    if (shiftKey) {
+      const anchor = order.includes(this.anchor) ? this.anchor : order.includes(focused) ? focused : id;
+      const a = order.indexOf(anchor), b = order.indexOf(id);
+      this.ids = new Set([...(additive ? this.ids : []), ...order.slice(Math.min(a,b), Math.max(a,b)+1)]);
+      this.anchor = anchor;
+    } else {
+      if (additive) { if (this.ids.has(id)) this.ids.delete(id); else this.ids.add(id); }
+      else this.ids = new Set([id]);
+      this.anchor = id;
+    }
+    this.explicit = true;
+  }
+}
 export function exportSummary(p, options = {}) {
-  const seconds = p.clips.reduce((sum, clip) => sum + length(clip), 0) / rate(p);
+  const ids = new Set(options.clipIds ?? []);
+  const clips = p.clips.filter(c => options.scope !== 'selected' || ids.has(c.id));
+  const seconds = clips.reduce((sum, clip) => sum + length(clip), 0) / rate(p);
   const fps = String(options.fps ?? p.fps), outputRate = rate({fps});
-  const frames = Math.max(1, Math.round(seconds * outputRate));
+  const frames = clips.length ? Math.max(1, Math.round(seconds * outputRate)) : 0;
   return {width:options.width ?? p.width, height:options.height ?? p.height, fps, frames, seconds:frames / outputRate, reasons:[...(p.needsRebuild ?? [])]};
 }
 export function layout(p, view = 'full') {

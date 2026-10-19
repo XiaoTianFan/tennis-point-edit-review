@@ -1,4 +1,4 @@
-import { $, rate, length, layout, buttonIcon, exportSummary, answer, reviewStatus } from "./model.js";
+import { $, rate, length, layout, buttonIcon, exportSummary, answer, reviewStatus, ClipSelection } from "./model.js";
 import { Review } from "./review.js";
 import { Timeline } from "./timeline.js";
 import { Player } from "./player.js";
@@ -19,6 +19,8 @@ let project, selectedClip, selectedOverlay, queue = Promise.resolve(), pending =
 let noticeState, noticeTimer, handoffValues;
 let exportJob = {state: "idle"}, exportBusy = false, exportError = null, exportTimer;
 let exportDefaults, pickerBusy = false;
+let settingsBusy = false, settingsRequest = 0, settingsKey;
+const clipSelection = new ClipSelection();
 let timelineView = 'full', loaded = false;
 const viewPositions = {};
 const visibleLayout = () => layout(project, timelineView);
@@ -52,7 +54,7 @@ $('language').onclick = () => {
   try { localStorage.setItem('courtside-language', getLocale()); } catch { /* Language still changes in this session. */ }
   document.documentElement.lang = getLocale() === 'zh' ? 'zh-CN' : 'en';
   translate(); renderNotice(); handoffText();
-  if (project) { review.localize(); timeline.render(); player.paint(); inspector(true); projectStatus(); refreshExport(); }
+  if (project) { review.localize(); timeline.render(); player.paint(); inspector(true); projectStatus(); selectionChanged(); }
 };
 const draftKey = () => "courtside-draft:" + (project.projectId ?? [project.review.source, project.review.ledgerRevision, project.title].join(":"));
 function drafts() {
@@ -82,7 +84,14 @@ const review = new Review((pid) => {
   if (c) select(c.id);
   else notice("noClip");
 }, save);
-const timeline = new Timeline(url, select, (frame) => {
+const timeline = new Timeline(url, (id, overlayId, event) => {
+  if (event) {
+    clipSelection.pick(visibleLayout().map(c => c.id), id, event, selectedClip);
+    try { sessionStorage.setItem('courtside-selection:' + project.projectId, JSON.stringify({ids:[...clipSelection.ids], anchor:clipSelection.anchor})); } catch { /* Selection still works in this page. */ }
+    selectionChanged();
+  }
+  select(id, overlayId);
+}, (frame) => {
   if (player.mode !== "edited") player.switchMode("edited");
   player.seek(frame);
 }, save);
@@ -94,14 +103,22 @@ const player = new Player(url, (frame, clip, mode, linked, navigated) => {
     selectedOverlay = null;
     inspector();
   }
-  timeline.highlight(selectedClip, selectedOverlay);
+  if (!clipSelection.explicit && !clipSelection.ids.has(clip.id)) { clipSelection.focus(clip.id); selectionChanged(); }
+  timeline.highlight(selectedClip, selectedOverlay, clipSelection.ids);
   const row = linked && project.review.rows.find((r) => r.pointId === clip.pointId);
   const x = row ? answer(project,row) : {}, sid = project.review.purpose === 'initial-labeling' ? x.serverId : row?.serverId;
   $("viewer-context").textContent = row ? t("viewerMeta", {review: row.reviewId, point: row.pointId, game: x.gameNumber ?? row.gameNumber ?? "?", server: project.players.find((p) => p.id === sid)?.name ?? t('unassigned'), serve: x.serveNumber ?? clip.serveNumber ?? row.serveNumber ?? "?"}) : linked && clip.pointId ? clip.pointId : mode === "source" ? t("sourceOutside") : clip.label ?? t("statistics");
 }, notice);
 function setProject(p) {
   project = p;
-  if (!loaded) { timelineView = p.selection?.timelineView === 'review' && p.review.rows.length ? 'review' : 'full'; loaded = true; }
+  if (!loaded) {
+    timelineView = p.selection?.timelineView === 'review' && p.review.rows.length ? 'review' : 'full'; loaded = true;
+    try {
+      const saved = JSON.parse(sessionStorage.getItem('courtside-selection:' + p.projectId) ?? 'null');
+      if (saved && Array.isArray(saved.ids) && saved.ids.every(id => typeof id === 'string')) Object.assign(clipSelection, {ids:new Set(saved.ids), anchor:saved.anchor, explicit:true});
+    } catch { /* A missing selection does not affect the edit. */ }
+  }
+  clipSelection.reconcile(p.clips);
   if (timelineView === 'review' && !layout(p,'review').length) timelineView = 'full';
   player.timelineView = timelineView;
   if (!p.overlays.some(o => o.id === selectedOverlay)) selectedOverlay = null;
@@ -129,6 +146,7 @@ function setProject(p) {
   $('confirm-points').disabled = !!p.needsRebuild?.length || p.review.rows.some(r => !['resolved','replay'].includes(reviewStatus(r,answer(p,r))));
   $('confirm-statistics').disabled = !!p.needsRebuild?.length || p.statistics?.status !== 'complete' || p.statistics?.ledgerRevision !== p.review.ledgerRevision;
   refreshExport();
+  selectionChanged();
   $("undo").disabled = !p.undo?.length;
   $("redo").disabled = !p.redo?.length;
 }
@@ -165,7 +183,7 @@ function select(id, overlayId = null) {
   player.mode = "edited";
   player.seek(c.startFrame + (overlayId ? Math.max(0, project.overlays.find((o) => o.id === overlayId).startFrame - (project.overlays.find((o) => o.id === overlayId).anchor === "source" ? c.inFrame : 0)) : 0));
   inspector();
-  timeline.highlight(id, overlayId);
+  timeline.highlight(id, overlayId, clipSelection.ids);
   timeline.reveal(player.frame);
 }
 function inspector(labelsOnly = false) {
@@ -289,8 +307,30 @@ $("recover-draft").onclick = () => {
   setTimeout(() => URL.revokeObjectURL(a.href), 1e3);
   notice("draftDownloaded");
 };
+function selectionChanged() {
+  timeline.highlight(selectedClip, selectedOverlay, clipSelection.ids);
+  $('selection-count').textContent = t('selectedCount', {count:clipSelection.ids.size});
+  refreshExport();
+  if ($('export-dialog').open) checkExportScope();
+}
 function exportOptions() {
-  return {width:Number($('export-width').value), height:Number($('export-height').value), fps:$('export-fps').value === 'project' ? String(project.fps) : $('export-fps').value, bitrate:$('export-bitrate').value, filename:$('export-filename').value.trim()};
+  return {scope:$('export-scope').value, clipIds:project.clips.filter(c => clipSelection.ids.has(c.id)).map(c => c.id), width:Number($('export-width').value), height:Number($('export-height').value), fps:$('export-fps').value === 'project' ? String(project.fps) : $('export-fps').value, bitrate:$('export-bitrate').value, filename:$('export-filename').value.trim()};
+}
+async function checkExportScope() {
+  const {scope, clipIds} = exportOptions(), key = JSON.stringify([project.revision, scope, scope === 'selected' ? clipIds : []]);
+  if (key === settingsKey) return;
+  const request = ++settingsRequest;
+  settingsKey = key; settingsBusy = true; exportError = null; refreshExport();
+  if (scope === 'selected' && !clipIds.length) { settingsBusy = false; refreshExport(); return; }
+  const query = new URLSearchParams({scope});
+  if (scope === 'selected') for (const id of clipIds) query.append('clipId', id);
+  try {
+    const result = await api('/api/export-settings?' + query);
+    if (request !== settingsRequest) return;
+    if (!exportDefaults) for (const k of ['width','height','filename','directory']) $('export-' + k).value = result[k];
+    exportDefaults = result;
+  } catch(e) { if (request === settingsRequest) { settingsKey = null; exportError = e; } }
+  finally { if (request === settingsRequest) { settingsBusy = false; refreshExport(); } }
 }
 function refreshExport() {
   if (!project) return;
@@ -300,8 +340,10 @@ function refreshExport() {
   sourceOption.textContent = sourceBitrate ? t('bitrateSourceValue', {mbps:Number((sourceBitrate/1e6).toFixed(2))}) : t('bitrateSourceUnavailable');
   $('export-video').disabled = false;
   $('export-video').title = t('export');
+  $('export-scope').options[1].textContent = t('exportSelected', {count:clipSelection.ids.size});
   const options = exportOptions(), outputRate = rate(options), summary = exportSummary(project, options);
-  const valid = $('export-form').checkValidity() && outputRate >= 1 && outputRate <= 240;
+  const empty = options.scope === 'selected' && !clipSelection.ids.size;
+  const valid = !empty && $('export-form').checkValidity() && outputRate >= 1 && outputRate <= 240;
   $('export-duration').textContent = valid ? t('durationFrames', {seconds: summary.seconds.toFixed(2), frames: summary.frames}) : '—';
   const audio = exportDefaults?.audio ?? project.audio;
   $('export-audio').textContent = audio ? t('audioSettings', {rate:audio.sampleRate/1000, channels:audio.channels}) : t('silentAudio');
@@ -311,15 +353,16 @@ function refreshExport() {
   $('export-progress-row').hidden = !['running','complete','failed'].includes(exportJob.state);
   $('export-progress').value = percent;
   $('export-percent').textContent = percent.toFixed(1) + '%';
-  $('start-export').disabled = exportBusy || running || pickerBusy || pending > 0 || drafts().length > 0 || !valid;
+  $('start-export').disabled = exportBusy || settingsBusy || !!exportError || running || pickerBusy || pending > 0 || drafts().length > 0 || !valid;
   $('browse-export').disabled = pickerBusy;
-  $('export-status').textContent = exportError ? errorText(exportError.message) : pickerBusy ? t('pickerOpen') : exportBusy ? t('exportChecking') : running ? t('exportStage.' + (exportJob.stage ?? 'compositing')) : pending ? t('exportWaiting') : drafts().length ? t('exportUnsaved') : exportJob.state === 'failed' ? errorText(exportJob.error) : exportJob.state === 'complete' ? t('exportComplete') + ' · ' + t('exportJobRevision', {revision:exportJob.revision}) : !valid ? t('invalidExport') : '';
+  $('export-status').textContent = exportError ? errorText(exportError.message) : empty ? t('selectExportClips') : pickerBusy ? t('pickerOpen') : exportBusy || settingsBusy ? t('exportChecking') : running ? t('exportStage.' + (exportJob.stage ?? 'compositing')) : pending ? t('exportWaiting') : drafts().length ? t('exportUnsaved') : exportJob.state === 'failed' ? errorText(exportJob.error) : exportJob.state === 'complete' ? t('exportComplete') + ' · ' + t('exportJobRevision', {revision:exportJob.revision}) : !valid ? t('invalidExport') : '';
   $('export-download').hidden = exportJob.state !== 'complete';
   $('export-download').href = url('/api/export');
   $('export-download').download = exportJob.settings?.filename ?? 'edited.mp4';
 }
 $('export-form').onsubmit = e => { e.preventDefault(); if (!$('start-export').disabled) $('start-export').click(); };
 $('export-form').oninput = e => { if (['export-width','export-height'].includes(e.target.id)) $('export-size').value = 'custom'; exportError = null; refreshExport(); };
+$('export-scope').onchange = () => checkExportScope();
 $('export-size').onchange = () => {
   const value = $('export-size').value;
   if (value !== 'custom') {
@@ -339,10 +382,7 @@ $('export-video').onclick = async () => {
   exportBusy = true; exportError = null;
   refreshExport(); $('export-dialog').showModal();
   try {
-    if (!exportDefaults) {
-      exportDefaults = await api('/api/export-settings');
-      for (const key of ['width','height','filename','directory']) $('export-' + key).value = exportDefaults[key];
-    }
+    await checkExportScope();
     exportJob = await api('/api/job');
     if (exportJob.state === 'running') { clearTimeout(exportTimer); exportTimer = setTimeout(poll, 1000); }
   } catch (e) { exportError = e; }

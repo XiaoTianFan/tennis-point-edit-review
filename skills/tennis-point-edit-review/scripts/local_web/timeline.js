@@ -127,9 +127,13 @@ export class Timeline {
       block.style.width = length(c) * this.px + "px";
       const img = el("img", null, { src: this.url(`/api/frame?asset=${c.assetId}&frame=${c.inFrame}`), alt: "", loading: "lazy" });
       block.append(img, el("span", c.pointId ?? c.label ?? c.id, { class: "clip-caption" }));
-      block.onclick = () => this.select(c.id);
+      block.onpointerdown = e => {
+        block.draggable = !(e.ctrlKey || e.metaKey || e.shiftKey);
+        if (!block.draggable) e.preventDefault();
+      };
+      block.onclick = e => { if (!this.trimming) this.select(c.id, null, e); };
       block.onkeydown = (e) => {
-        if (e.key === "Enter") this.select(c.id);
+        if (e.key === "Enter") { e.preventDefault(); this.select(c.id, null, e); }
       };
       block.ondragstart = (e) => {
         if (this.trimming) {
@@ -152,8 +156,11 @@ export class Timeline {
       };
       for (const side of ["start", "end"]) {
         const handle = el("span", "", { class: "trim-handle " + side, role: "separator", "aria-label": t(side === "start" ? "trimStart" : "trimEnd", {id: c.id}) });
-        handle.onpointerdown = (e) => this.trim(e, c, side, block);
-        handle.onclick = (e) => e.stopPropagation();
+        handle.onpointerdown = (e) => {
+          if (e.ctrlKey || e.metaKey || e.shiftKey) { e.preventDefault(); return; }
+          this.trim(e, c, side, block);
+        };
+        handle.onclick = (e) => { e.stopPropagation(); if (e.ctrlKey || e.metaKey || e.shiftKey) this.select(c.id, null, e); };
         block.append(handle);
       }
       $("video-track").append(block);
@@ -211,8 +218,9 @@ export class Timeline {
       document.removeEventListener("pointermove", move);
       document.removeEventListener("pointerup", end);
       setTimeout(() => this.trimming = false, 0);
-      if (changed) this.save(changed);
-      else this.render();
+      const different = changed && (c.kind === 'hold' ? changed.durationFrames !== baseDuration : changed.inFrame !== baseIn || changed.outFrame !== baseOut);
+      if (different) this.save(changed);
+      else this.select(c.id, null, event);
     };
     document.addEventListener("pointermove", move);
     document.addEventListener("pointerup", end, { once: true });
@@ -268,9 +276,16 @@ export class Timeline {
     document.addEventListener("pointermove", move);
     document.addEventListener("pointerup", end, { once: true });
   }
-  highlight(clipId, overlayId) {
+  highlight(clipId, overlayId, clipIds = this.selectedIds ?? new Set()) {
     this.selectedClip = clipId; this.selectedOverlay = overlayId;
-    for (const e of document.querySelectorAll(".clip-block")) e.classList.toggle("selected", e.dataset.clip === clipId);
+    this.selectedIds = clipIds;
+    for (const e of document.querySelectorAll(".clip-block")) {
+      e.classList.toggle("selected", clipIds.has(e.dataset.clip));
+      e.classList.toggle("focused", e.dataset.clip === clipId);
+      e.setAttribute('aria-pressed', String(clipIds.has(e.dataset.clip)));
+      if (e.dataset.clip === clipId) e.setAttribute('aria-current', 'true');
+      else e.removeAttribute('aria-current');
+    }
     for (const e of document.querySelectorAll(".overlay-block")) e.classList.toggle("selected", e.dataset.overlayId === overlayId);
   }
 }

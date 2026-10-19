@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026.10.19-v25.12
+
+- Add Ctrl/⌘ toggle and anchored Shift range selection, separate from last-click/playhead review focus; preserve selection across views and tab reloads without editing match state.
+- Always offer full-master or selected-clips export. Validate stable IDs, concatenate in master order, retain overlays/audio/holds, and record export range provenance. Remove the redundant bitrate explanation from the dialog.
+- Compress the complete recovery file map as a verified v3 payload to stay below the 1 MB package limit; keep legacy v1/v2 imports, all workflow rules and the seven JSX templates.
+
 ## 2026.10.18-v25.11
 
 - Keep last-effective-point priority for game attribution while requiring separate point-by-point score verification before confirming completion or advancing dependent work.

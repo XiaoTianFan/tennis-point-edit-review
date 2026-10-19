@@ -51,6 +51,8 @@ python "<skill>/scripts/local_editor.py" serve "<work>/edit" --open
 
 - 顶栏English/中文仅改UI。拖动面板分隔条调整布局；键盘方向键、Shift大步及Home／双击复位。时间线Ctrl/Cmd+滚轮横移，Alt+滚轮以指针缩放；“全片适配”将当前完整／复核视图全部放入视口，滑条按对数从适配放大至1024倍。缩放和窗口大小不改变剪口。
 - 点审核行文字／空白或Enter/空格跳分；答案控件不触发跳转。游标定位到另一待审分时，列表自动滚动露出该行，不改焦点、答案或行序；播放和同分移动不反复拉动列表。所有行常驻，搜索仅高亮；协议见[账本](ledger-and-review.md)。
+- 时间线普通点击单选，Ctrl/⌘点击增减片段，Shift点击选择锚点至点击段的闭区间，Ctrl/⌘+Shift追加区间；区间按当前视图可见顺序，锚点为上次普通／Ctrl点击，连续Shift保留锚点。同P号多段分别选取；最后点击段始终跳转并聚焦对应审核行，包括Ctrl取消选中的段。修剪手柄上的修饰点击也按选择处理，不写剪口。
+- 当前聚焦段随播放头变化，以底部亮线标记；导出选择以黄绿边框标记并显示数量。首次手动选择前，单选跟随游标；手动选择后播放、逐分／局导航和审核行跳转仅改变聚焦，不改导出集合。普通点击重置为单选，Ctrl可清空；切视图保留隐藏段的选择，重排后导出采用新master顺序，删除段从集合移除。选择保存在本浏览器标签会话，刷新保留，不写工程revision、审核事实或确认。
 - 局次轨按相邻片段已记录的setNumber/gameNumber分组，点击局块或局次下拉菜单跳到该视图中该局首段；游标所在局高亮。复核视图只显示当前保留局段，同分多次发球共局，跨盘不混局；未知显示“局次待核”，不能按片段序号猜局。初始标注的人工作答优先；旧工程可从复核行或同P号唯一已知局次补显示，不写回猜测。阶段2/4更新所有相关clip局盘元数据，不能只给送审子集填写。
 - 下方完整全片／仅复核切换视图。Edited/Source切换播放模式；Space播放，方向键±1帧、Shift±10帧、方括号逐分。源视频轨仅在播放头所在片段或鼠标悬停片段显示修剪手柄，选中本身不常驻手柄。拖clip边缘修剪，靠近游标8屏幕像素内吸附并高亮，Shift临时绕过；随缩放换算帧，不能越过合法源范围。入出帧框支持精确修剪；图层条可移动或改长，局部帧与源锚定帧不混用。片段重排仅改变呈现，不自动改比赛事实；复核重排保留隐藏段。
 - 操作写project.json并递增revision，history保存前版，Undo/Redo保留40步。旧revision被拒后重读差异，不盲重试；未提交操作留浏览器草稿，用Recover edits交agent恢复，不覆盖新状态。
@@ -80,7 +82,7 @@ updated-project从当前副本修改，保留剪口、顺序、路径、answers�
 python "<skill>/scripts/local_editor.py" render "<work>/edit" "<work>/new-export" --user-requested
 ```
 
-导出范围默认为`full`，始终使用完整master。CLI选段用`--scope selected --clip-id clip-a --clip-id clip-c`；HTTP options用`scope=selected`和`clipIds`数组。所选id须非空、唯一且存在；按master顺序拼接视频／定格段，沿用对应图层的原始局部或源帧锚点及原有计分，不重新推导比赛事实。码率source仅按本次输出段加权。完整project-snapshot保留工程，export.json额外记录scope、clipIds、master与导出范围映射以及fullTimelineFrames；不改master、答案或确认。
+导出框始终提供“完整时间线”和“所选片段·拼接”，默认`full`，始终使用完整master，不受当前复核视图过滤。所选范围显示全master的选择数量和实际总时长，空选择提示并禁用开始导出，可随时改回完整范围。CLI选段用`--scope selected --clip-id clip-a --clip-id clip-c`；HTTP options用`scope=selected`和`clipIds`数组。所选id须非空、唯一且存在；按master顺序拼接视频／定格段，沿用对应图层的原始局部或源帧锚点及原有计分，不重新推导比赛事实。码率source仅按本次输出段加权。完整project-snapshot保留工程，export.json额外记录scope、clipIds、master与导出范围映射以及fullTimelineFrames；范围映射均以时间线fps计帧，输出fps换算仅在拼接末尾进行。不改master、答案或确认。码率原理保留在本文，不另在导出框放说明段落。
 
 未获导出要求的agent不加此标志，遵循上述延后条件。UI调用HTTP `/api/render`时发送userRequested=true；程序接口export_video(..., user_requested=True)含义相同，不能为了绕过agent限制自行声称用户要求。context的agentExportBlockers仅向agent列出主动导出尚缺的条件；导出记录保存userRequested与待同步项，不修改审核答案、确认或统计状态。
 

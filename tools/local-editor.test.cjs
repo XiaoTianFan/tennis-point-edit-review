@@ -10,6 +10,41 @@ const geometry = loadUi('view-state.js');
 const project = { players: [{id:'A'}, {id:'B'}], fps:'30000/1001', answers:{} };
 const row = { pointId:'P001', serverId:'A' };
 
+test('clip selection separates implicit cursor focus from explicit toggle and anchored ranges', async () => {
+  const {ClipSelection}=await model, s=new ClipSelection(), order=['a','b','c','d','e'];
+  s.focus('a');assert.deepEqual([...s.ids],['a']);
+  s.focus('b');assert.deepEqual([...s.ids],['b']);
+  s.pick(order,'b');s.pick(order,'e',{ctrlKey:true});
+  assert.deepEqual([...s.ids],['b','e']);
+  s.focus('c');assert.deepEqual([...s.ids],['b','e']);
+  s.pick(order,'e',{ctrlKey:true});assert.deepEqual([...s.ids],['b']);
+  s.pick(order,'c',{shiftKey:true});assert.deepEqual([...s.ids],['c','d','e']);
+  s.pick(order,'d',{shiftKey:true});assert.deepEqual([...s.ids],['d','e']);
+  s.pick(order,'a',{ctrlKey:true,shiftKey:true});assert.deepEqual([...s.ids].sort(),order);
+  s.pick(order,'c');s.pick(order,'c',{metaKey:true});assert.equal(s.ids.size,0);
+  s.focus('a');assert.equal(s.ids.size,0);
+  s.pick(order,'missing');assert.equal(s.ids.size,0);
+});
+
+test('range selection follows visible order, survives view hiding, and drops removed IDs', async () => {
+  const {ClipSelection}=await model, s=new ClipSelection();
+  s.pick(['a','b','c','d'],'a');s.pick(['a','b','c','d'],'d',{ctrlKey:true});
+  s.pick(['b','c'],'c',{shiftKey:true},'b');assert.deepEqual([...s.ids],['b','c']);
+  s.pick(['a','b','c','d'],'a',{ctrlKey:true});
+  s.reconcile([{id:'a'},{id:'b'},{id:'c'},{id:'d'}]);assert.deepEqual([...s.ids],['b','c','a']);
+  s.reconcile([{id:'b'},{id:'c'}]);assert.deepEqual([...s.ids],['b','c']);assert.equal(s.anchor,null);
+});
+
+test('selected export summaries ignore click order and review filtering, including holds', async () => {
+  const m=await model, p={fps:'30000/1001',clips:[
+    {id:'a',inFrame:0,outFrame:11},{id:'b',inFrame:30,outFrame:60},
+    {id:'c',kind:'hold',durationFrames:17}],review:{rows:[]}};
+  const options={scope:'selected',clipIds:['c','a'],fps:'60'};
+  assert.equal(m.exportSummary(p,options).frames,56);
+  assert.equal(m.exportSummary(p,{...options,clipIds:[]}).frames,0);
+  assert.equal(m.exportSummary(p,{...options,scope:'full'}).frames,116);
+});
+
 test('human-reviewed badges distinguish count and detail gaps without resolving them', async () => {
   const m=await model, r={...row,countingIssueRequired:true};
   const x={...m.blank(),scoringPlayerId:'B',deadBallType:'out',reviewConfirmed:true};

@@ -17,7 +17,7 @@
   <div class="section-bar">
     <div class="segmented" role="group" data-i18n-aria-label="timelineView"><button id="timeline-full" data-i18n="fullTimeline" aria-pressed="true"></button><button id="timeline-review" data-i18n="reviewTimeline" aria-pressed="false"></button></div>
     <div class="inspector"><span id="selection-name" data-i18n="clip">Clip</span><label><span data-i18n="in">In</span> <input id="clip-in" type="number" min="0" step="1" aria-label="Clip in frame" data-i18n-aria-label="inFrame"></label><label><span data-i18n="out">Out</span> <input id="clip-out" type="number" min="1" step="1" aria-label="Clip out frame" data-i18n-aria-label="outFrame"></label><button id="apply-trim" data-i18n="applyTrim">Apply trim</button><button id="undo" class="icon-button" data-i18n-aria-label="undo" data-i18n-title="undo">Undo</button><button id="redo" class="icon-button" data-i18n-aria-label="redo" data-i18n-title="redo">Redo</button></div>
-    <span id="timeline-duration"></span>
+    <span id="selection-count" role="status" data-i18n-title="multiSelectHint"></span><span id="timeline-duration"></span>
     <select id="game-jump" data-i18n-aria-label="jumpToGame" data-i18n-title="jumpToGame"></select>
     <div class="spacer"></div>
     <button id="timeline-fit" type="button" data-i18n="fitAll" data-i18n-title="fitAllHint">Fit all</button>
@@ -36,11 +36,11 @@
 <dialog id="export-dialog" aria-labelledby="export-title">
   <div class="section-bar"><h2 id="export-title" data-i18n="exportSettings">Export video</h2><button id="close-export" data-i18n="close">Close</button></div>
   <form id="export-form" class="export-form">
+    <label class="export-destination"><span data-i18n="exportRange"></span><select id="export-scope" data-i18n-aria-label="exportRange"><option value="full" data-i18n="exportFull"></option><option value="selected" data-i18n="exportSelected"></option></select></label>
     <label><span data-i18n="resolution"></span><select id="export-size" aria-label="Resolution preset" data-i18n-aria-label="resolution"><option value="project" data-i18n="matchTimeline"></option><option value="1280x720">720p</option><option value="1920x1080">1080p</option><option value="2560x1440">1440p</option><option value="3840x2160">4K UHD</option><option value="custom" data-i18n="custom"></option></select></label>
     <div class="dimensions"><label><span data-i18n="width"></span><input id="export-width" type="number" min="2" max="8192" step="2" required></label><span>×</span><label><span data-i18n="height"></span><input id="export-height" type="number" min="2" max="8192" step="2" required></label></div>
     <label><span data-i18n="frameRate"></span><select id="export-fps" required data-i18n-aria-label="frameRate"><option value="project" data-i18n="matchTimeline"></option><option value="24000/1001">23.976 fps</option><option value="24">24 fps</option><option value="25">25 fps</option><option value="30000/1001">29.97 fps</option><option value="30">30 fps</option><option value="50">50 fps</option><option value="60000/1001">59.94 fps</option><option value="60">60 fps</option><option value="120">120 fps</option><option value="240">240 fps</option></select></label>
     <label><span data-i18n="videoBitrate"></span><select id="export-bitrate" required data-i18n-aria-label="videoBitrate"><option value="quality" data-i18n="bitrateQuality"></option><option value="source" data-i18n="bitrateSource" disabled></option><option value="4000000">4 Mbps</option><option value="8000000">8 Mbps</option><option value="12000000">12 Mbps</option><option value="20000000">20 Mbps</option><option value="35000000">35 Mbps</option><option value="50000000">50 Mbps</option><option value="80000000">80 Mbps</option></select></label>
-    <p class="export-hint" data-i18n="bitrateHint"></p>
     <label class="export-destination"><span data-i18n="outputFile"></span><input id="export-filename" value="edited.mp4" maxlength="180" required></label>
     <label class="export-destination"><span data-i18n="saveDirectory"></span><span class="path-control"><input id="export-directory" required spellcheck="false"><button id="browse-export" type="button" data-i18n="browse"></button></span></label>
   </form>
