@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026.10.20-v25.15
+
+- Ask for explicit cleanup confirmation after editing is complete and the user's final export succeeds; continuous editing or export authorization does not authorize workspace deletion.
+- Add manifest-based cleanup of job-specific disposable artifacts while retaining original media, the final video, statistics, the reopenable project and its dependencies, and all skill content. Verify protected hashes and project/export integrity, then report net freed space.
+
 ## 2026.10.19-v25.14
 
 - Make the final speed panel legal-serves-only: exclude faults, double faults, lets and N/A from fastest and mean speed calculations, while retaining raw attempts and independent opportunity/fault counts.

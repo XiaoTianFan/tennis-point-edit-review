@@ -41,7 +41,13 @@ speeds and timing; stage 6 builds panels and speed overlays together; stage 7 ve
 the result. Later exception review covers unresolved points or problem games that still disagree
 with the supplied final score after the agent's own checks.
 
-Current skill revision: **2026.10.19-v25.14**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, required recovery attempts, complete 3D screening and evidence-only/N/A labels.
+After editing is complete and the user's final export succeeds, the agent lists
+job-specific disposable files and asks whether to clean them up. Deletion requires
+explicit confirmation, including in continuous mode. The [cleanup workflow](skills/tennis-point-edit-review/references/cleanup.md)
+preserves original media, the final video, statistics, the reopenable project and
+its dependencies, and all skill content; it verifies integrity and reports net freed space.
+
+Current skill revision: **2026.10.20-v25.15**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, required recovery attempts, complete 3D screening and evidence-only/N/A labels.
 
 ChatCut, **Premiere Pro** and a standalone pipeline are primary editing choices.
 The [environment contract](skills/tennis-point-edit-review/references/editing-environments.md)
