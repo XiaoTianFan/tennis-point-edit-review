@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026.10.19-v25.14
+
+- Make the final speed panel legal-serves-only: exclude faults, double faults, lets and N/A from fastest and mean speed calculations, while retaining raw attempts and independent opportunity/fault counts.
+- Require resolved legal outcomes in the summary helper, preserve explicit N/A without zero filling, and align synthetic demo data with the same filter. This is a declared workflow convention, not an asserted ATP-wide definition.
+
 ## 2026.10.19-v25.13
 
 - Remove the repository's artificial 1 MB package ceiling. Keep checksum validation and input-relative decompression protection, with a verified larger-package round trip.

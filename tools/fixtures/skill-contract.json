@@ -182,7 +182,7 @@
       "checks": [
         {
           "path": "references/statistics.md",
-          "text": "检查原片中被主剪删掉的一发失误，不能只分析精剪保留的有效发球。"
+          "text": "检查原片中被主剪删掉的一发失误，保留其尝试、结果与可取得的估速证据；全量取证不等于全部纳入最终速度统计。"
         },
         {
           "path": "references/statistics.md",
@@ -207,6 +207,18 @@
         {
           "path": "references/statistics.md",
           "text": "不能为了“所有指标都有数”编造。"
+        },
+        {
+          "path": "references/statistics.md",
+          "text": "最终球速面板默认仅统计有效发球（outcome=in）"
+        },
+        {
+          "path": "references/statistics.md",
+          "text": "N/A保持null，不填0、不借组均值、不进入均值分母或最高值候选"
+        },
+        {
+          "path": "references/statistics.md",
+          "text": "原始失误/let/N/A记录不删除"
         }
       ]
     },
@@ -899,7 +911,7 @@
     },
     {
       "path": "scripts/check_launch_speed.py",
-      "sha256": "5472c9bf109a092e6bd58715b09403cad7db989bf408d670694af400f1f8d3f9"
+      "sha256": "94e377e861a7e730e7fe533a6ed23d9043f30ad588c7b42661fd673bb74c2aa8"
     },
     {
       "path": "scripts/check_serve_overlay.py",

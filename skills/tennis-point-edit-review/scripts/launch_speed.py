@@ -48,14 +48,18 @@ def reconstruct(distance, duration, height, end_height=0., *, drag=.020, lift=0.
             'parameters':{'dragPerM':drag,'liftPerM':lift,'gravityMS2':gravity},'endpointResidualM':math.hypot(*err)}
 
 def aggregate_serves(records, *, allow_imputed=False):
-    """Each included physical serve gets one vote; never select an error bound."""
+    """Final speed pool: accepted legal serves only; retain raw attempts elsewhere."""
     groups=defaultdict(list);seen=set()
     for r in records:
+        if not r.get('included',True):continue
+        if r.get('eventType')=='let' or r.get('outcome') in ('fault','let') or r.get('serviceFault') is True or r.get('doubleFault') is True:continue
         if not require_speed_eligible(r):continue
+        if r.get('outcome')!='in':raise ValueError('Resolve legal serve outcome before speed statistics')
         key=(r['setNumber'],r['serveId'])
         if key in seen:raise ValueError('Duplicate serve in set')
         seen.add(key)
         value=r.get('launchSpeedKphEstimate')
+        if value is None and r.get('method')=='unestimated':continue
         if isinstance(value,bool) or not isinstance(value,(int,float)) or not math.isfinite(value) or value<=0:raise ValueError('Complete per-serve estimates required; obtain evidence or explicitly labelled model imputation first')
         if type(r['serveNumber']) is not int or r['serveNumber'] not in (1,2):raise ValueError('Unresolved serve number')
         if r.get('method')=='model_imputed' and (not allow_imputed or not r.get('imputationBasis')):raise ValueError('Population filling requires explicit opt-in and disclosed support')

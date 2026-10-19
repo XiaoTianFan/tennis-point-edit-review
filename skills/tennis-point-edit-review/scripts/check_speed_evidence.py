@@ -14,7 +14,7 @@ def evidence():
         'endpointHeightMetres':p(.94,.89,.99),'dragPerM':p(.02,.012,.028),'liftPerM':p(0.,-.004,.004)}
 
 def speed_record(key='s1',speed=90,**kw):
-    r=dict(setNumber=1,serveId=key,serverId='A',serveNumber=1,eventType='serve',included=True,
+    r=dict(setNumber=1,serveId=key,serverId='A',serveNumber=1,eventType='serve',outcome='in',included=True,
            method='endpoint_physics',launchSpeedKphEstimate=speed,contactVerified=True,
            ballIdentityVerified=True,flightSegmentVerified=True)
     r.update(kw);return r
@@ -38,10 +38,10 @@ class EventChecks(unittest.TestCase):
         with self.assertRaises(ValueError):aggregate_serves([r])
         r['included']=False
         self.assertEqual(aggregate_serves([r,speed_record()])[0]['count'],1)
-    def test_let_scope_must_be_explicit(self):
+    def test_let_is_excluded_from_final_speed_summary(self):
         r=speed_record(eventType='let')
-        with self.assertRaises(ValueError):aggregate_serves([r])
-        r['includeLetsInSpeedScope']=True;self.assertEqual(aggregate_serves([r])[0]['count'],1)
+        self.assertEqual(aggregate_serves([r]),[])
+        r['includeLetsInSpeedScope']=True;self.assertEqual(aggregate_serves([r]),[])
     def test_unaccepted_partial_cannot_leak_into_statistics(self):
         r=speed_record(method='partial_trajectory_model',qualityAccepted=False)
         with self.assertRaises(ValueError):aggregate_serves([r])

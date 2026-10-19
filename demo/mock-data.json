@@ -4434,6 +4434,7 @@
       "serverId": "A",
       "pointId": "DEMO001",
       "serveNumber": 1,
+      "outcome": "in",
       "launchSpeedKphEstimate": 114,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4444,6 +4445,7 @@
       "serverId": "A",
       "pointId": "DEMO002",
       "serveNumber": 1,
+      "outcome": "in",
       "launchSpeedKphEstimate": 116,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4454,6 +4456,7 @@
       "serverId": "A",
       "pointId": "DEMO003",
       "serveNumber": 1,
+      "outcome": "fault",
       "launchSpeedKphEstimate": 118,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4464,6 +4467,7 @@
       "serverId": "A",
       "pointId": "DEMO003",
       "serveNumber": 2,
+      "outcome": "in",
       "launchSpeedKphEstimate": 94,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4474,6 +4478,7 @@
       "serverId": "A",
       "pointId": "DEMO004",
       "serveNumber": 1,
+      "outcome": "in",
       "launchSpeedKphEstimate": 120,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4484,6 +4489,7 @@
       "serverId": "A",
       "pointId": "DEMO005",
       "serveNumber": 1,
+      "outcome": "in",
       "launchSpeedKphEstimate": 122,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4494,6 +4500,7 @@
       "serverId": "A",
       "pointId": "DEMO006",
       "serveNumber": 1,
+      "outcome": "fault",
       "launchSpeedKphEstimate": 124,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4504,6 +4511,7 @@
       "serverId": "A",
       "pointId": "DEMO006",
       "serveNumber": 2,
+      "outcome": "in",
       "launchSpeedKphEstimate": 100,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4514,6 +4522,7 @@
       "serverId": "B",
       "pointId": "DEMO007",
       "serveNumber": 1,
+      "outcome": "in",
       "launchSpeedKphEstimate": 102,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4524,6 +4533,7 @@
       "serverId": "B",
       "pointId": "DEMO008",
       "serveNumber": 1,
+      "outcome": "in",
       "launchSpeedKphEstimate": 104,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4534,6 +4544,7 @@
       "serverId": "B",
       "pointId": "DEMO009",
       "serveNumber": 1,
+      "outcome": "fault",
       "launchSpeedKphEstimate": 106,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4544,6 +4555,7 @@
       "serverId": "B",
       "pointId": "DEMO009",
       "serveNumber": 2,
+      "outcome": "in",
       "launchSpeedKphEstimate": 82,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4554,6 +4566,7 @@
       "serverId": "B",
       "pointId": "DEMO010",
       "serveNumber": 1,
+      "outcome": "in",
       "launchSpeedKphEstimate": 108,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4564,6 +4577,7 @@
       "serverId": "B",
       "pointId": "DEMO011",
       "serveNumber": 1,
+      "outcome": "in",
       "launchSpeedKphEstimate": 110,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4574,6 +4588,7 @@
       "serverId": "B",
       "pointId": "DEMO012",
       "serveNumber": 1,
+      "outcome": "fault",
       "launchSpeedKphEstimate": 112,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4584,6 +4599,7 @@
       "serverId": "B",
       "pointId": "DEMO012",
       "serveNumber": 2,
+      "outcome": "in",
       "launchSpeedKphEstimate": 88,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4594,6 +4610,7 @@
       "serverId": "A",
       "pointId": "DEMO013",
       "serveNumber": 1,
+      "outcome": "in",
       "launchSpeedKphEstimate": 124,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4604,6 +4621,7 @@
       "serverId": "A",
       "pointId": "DEMO014",
       "serveNumber": 1,
+      "outcome": "in",
       "launchSpeedKphEstimate": 112,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4614,6 +4632,7 @@
       "serverId": "A",
       "pointId": "DEMO015",
       "serveNumber": 1,
+      "outcome": "fault",
       "launchSpeedKphEstimate": 114,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4624,6 +4643,7 @@
       "serverId": "A",
       "pointId": "DEMO015",
       "serveNumber": 2,
+      "outcome": "in",
       "launchSpeedKphEstimate": 90,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4634,6 +4654,7 @@
       "serverId": "A",
       "pointId": "DEMO016",
       "serveNumber": 1,
+      "outcome": "in",
       "launchSpeedKphEstimate": 116,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4644,6 +4665,7 @@
       "serverId": "A",
       "pointId": "DEMO017",
       "serveNumber": 1,
+      "outcome": "in",
       "launchSpeedKphEstimate": 118,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4654,6 +4676,7 @@
       "serverId": "A",
       "pointId": "DEMO018",
       "serveNumber": 1,
+      "outcome": "fault",
       "launchSpeedKphEstimate": 120,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4664,6 +4687,7 @@
       "serverId": "A",
       "pointId": "DEMO018",
       "serveNumber": 2,
+      "outcome": "in",
       "launchSpeedKphEstimate": 96,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4674,6 +4698,7 @@
       "serverId": "B",
       "pointId": "DEMO019",
       "serveNumber": 1,
+      "outcome": "in",
       "launchSpeedKphEstimate": 112,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4684,6 +4709,7 @@
       "serverId": "B",
       "pointId": "DEMO020",
       "serveNumber": 1,
+      "outcome": "in",
       "launchSpeedKphEstimate": 114,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4694,6 +4720,7 @@
       "serverId": "B",
       "pointId": "DEMO021",
       "serveNumber": 1,
+      "outcome": "fault",
       "launchSpeedKphEstimate": 102,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4704,6 +4731,7 @@
       "serverId": "B",
       "pointId": "DEMO021",
       "serveNumber": 2,
+      "outcome": "in",
       "launchSpeedKphEstimate": 78,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4714,6 +4742,7 @@
       "serverId": "B",
       "pointId": "DEMO022",
       "serveNumber": 1,
+      "outcome": "in",
       "launchSpeedKphEstimate": 104,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4724,6 +4753,7 @@
       "serverId": "B",
       "pointId": "DEMO023",
       "serveNumber": 1,
+      "outcome": "in",
       "launchSpeedKphEstimate": 106,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4734,6 +4764,7 @@
       "serverId": "B",
       "pointId": "DEMO024",
       "serveNumber": 1,
+      "outcome": "fault",
       "launchSpeedKphEstimate": 108,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4744,6 +4775,7 @@
       "serverId": "B",
       "pointId": "DEMO024",
       "serveNumber": 2,
+      "outcome": "fault",
       "launchSpeedKphEstimate": 84,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4754,6 +4786,7 @@
       "serverId": "A",
       "pointId": "DEMO025",
       "serveNumber": 1,
+      "outcome": "in",
       "launchSpeedKphEstimate": 120,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4764,6 +4797,7 @@
       "serverId": "A",
       "pointId": "DEMO026",
       "serveNumber": 1,
+      "outcome": "in",
       "launchSpeedKphEstimate": 122,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4774,6 +4808,7 @@
       "serverId": "A",
       "pointId": "DEMO027",
       "serveNumber": 1,
+      "outcome": "fault",
       "launchSpeedKphEstimate": 124,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4784,6 +4819,7 @@
       "serverId": "A",
       "pointId": "DEMO027",
       "serveNumber": 2,
+      "outcome": "in",
       "launchSpeedKphEstimate": 100,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4794,6 +4830,7 @@
       "serverId": "A",
       "pointId": "DEMO028",
       "serveNumber": 1,
+      "outcome": "in",
       "launchSpeedKphEstimate": 112,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4804,6 +4841,7 @@
       "serverId": "A",
       "pointId": "DEMO029",
       "serveNumber": 1,
+      "outcome": "in",
       "launchSpeedKphEstimate": 114,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4814,6 +4852,7 @@
       "serverId": "A",
       "pointId": "DEMO030",
       "serveNumber": 1,
+      "outcome": "fault",
       "launchSpeedKphEstimate": 116,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4824,6 +4863,7 @@
       "serverId": "A",
       "pointId": "DEMO030",
       "serveNumber": 2,
+      "outcome": "fault",
       "launchSpeedKphEstimate": 92,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4834,6 +4874,7 @@
       "serverId": "B",
       "pointId": "DEMO031",
       "serveNumber": 1,
+      "outcome": "in",
       "launchSpeedKphEstimate": 108,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4844,6 +4885,7 @@
       "serverId": "B",
       "pointId": "DEMO032",
       "serveNumber": 1,
+      "outcome": "in",
       "launchSpeedKphEstimate": 110,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4854,6 +4896,7 @@
       "serverId": "B",
       "pointId": "DEMO033",
       "serveNumber": 1,
+      "outcome": "fault",
       "launchSpeedKphEstimate": 112,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4864,6 +4907,7 @@
       "serverId": "B",
       "pointId": "DEMO033",
       "serveNumber": 2,
+      "outcome": "in",
       "launchSpeedKphEstimate": 88,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4874,6 +4918,7 @@
       "serverId": "B",
       "pointId": "DEMO034",
       "serveNumber": 1,
+      "outcome": "in",
       "launchSpeedKphEstimate": 114,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4884,6 +4929,7 @@
       "serverId": "B",
       "pointId": "DEMO035",
       "serveNumber": 1,
+      "outcome": "in",
       "launchSpeedKphEstimate": 102,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4894,6 +4940,7 @@
       "serverId": "B",
       "pointId": "DEMO036",
       "serveNumber": 1,
+      "outcome": "fault",
       "launchSpeedKphEstimate": 104,
       "method": "synthetic_demo",
       "synthetic": true
@@ -4904,6 +4951,7 @@
       "serverId": "B",
       "pointId": "DEMO036",
       "serveNumber": 2,
+      "outcome": "fault",
       "launchSpeedKphEstimate": 80,
       "method": "synthetic_demo",
       "synthetic": true
@@ -5204,20 +5252,20 @@
           "comparison": "higher",
           "highlight": "A",
           "comparisonValues": {
-            "A": 118.11111111111111,
-            "B": 107.66666666666667
+            "A": 117.5,
+            "B": 107.83333333333333
           }
         },
         {
           "key": "secondServeMeanLaunchKph",
           "label": "二发平均初速 · 估算",
-          "a": "约 95 km/h",
-          "b": "约 83 km/h",
+          "a": "约 96 km/h",
+          "b": "约 84 km/h",
           "comparison": "higher",
           "highlight": "A",
           "comparisonValues": {
-            "A": 95.33333333333333,
-            "B": 83.33333333333333
+            "A": 96.0,
+            "B": 84.0
           }
         }
       ]
@@ -6353,25 +6401,25 @@
       {
         "setNumber": 1,
         "serverId": "A",
-        "count": 24,
-        "allServeMeanKphEstimate": 112.41666666666667,
-        "firstServeMeanKphEstimate": 118.11111111111111,
-        "secondServeMeanKphEstimate": 95.33333333333333,
-        "firstServeCount": 18,
-        "secondServeCount": 6,
+        "count": 17,
+        "allServeMeanKphEstimate": 111.17647058823529,
+        "firstServeMeanKphEstimate": 117.5,
+        "secondServeMeanKphEstimate": 96.0,
+        "firstServeCount": 12,
+        "secondServeCount": 5,
         "fastestServeKphEstimate": 124,
-        "fastestServeId": "DEMO006-S1",
+        "fastestServeId": "DEMO013-S1",
         "imputedCount": 0
       },
       {
         "setNumber": 1,
         "serverId": "B",
-        "count": 24,
-        "allServeMeanKphEstimate": 101.58333333333333,
-        "firstServeMeanKphEstimate": 107.66666666666667,
-        "secondServeMeanKphEstimate": 83.33333333333333,
-        "firstServeCount": 18,
-        "secondServeCount": 6,
+        "count": 16,
+        "allServeMeanKphEstimate": 101.875,
+        "firstServeMeanKphEstimate": 107.83333333333333,
+        "secondServeMeanKphEstimate": 84.0,
+        "firstServeCount": 12,
+        "secondServeCount": 4,
         "fastestServeKphEstimate": 114,
         "fastestServeId": "DEMO020-S1",
         "imputedCount": 0

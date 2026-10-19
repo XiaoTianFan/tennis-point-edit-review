@@ -48,7 +48,7 @@ build_stats_pages(metrics,speedSummary,diagnostics)生成五页39行及副文本
 
 ## 发球初速与时序
 
-[取证恢复](serve-speed-audit.md)规定原帧、几何、逐发路线尝试与N/A资格。serve_event_audit核发次；speed_evidence.estimate_endpoint反推端点并扰动；serve_recovery.py INPUT.json NEW_OUTPUT.json完整执行3D多初值/留出/五族敏感性；impute_same_group仅显式补估/诊断。launch_speed.aggregate_serves(records)按合格中心值逐发等权，默认拒绝纳入model_imputed，显式allow_imputed=True才允许请求的补估统计。audit_speed_quality保留最高候选/补估影响诊断；build_speed_case.py为合成示例，不是实测。
+[取证恢复](serve-speed-audit.md)规定原帧、几何、逐发路线尝试与N/A资格。serve_event_audit核发次；speed_evidence.estimate_endpoint反推端点并扰动；serve_recovery.py INPUT.json NEW_OUTPUT.json完整执行3D多初值/留出/五族敏感性；impute_same_group仅显式补估/诊断。launch_speed.aggregate_serves(records)只汇总outcome=in的有效发球，过滤失误、let和method=unestimated/速度null的N/A，按合格中心值逐发等权；结果未知须先核实，不凭included=true推定进区。原始尝试及机会计数另存；旧输入须从事件证据补齐outcome。默认拒绝纳入model_imputed，显式allow_imputed=True只供用户请求的另列补估统计，不混入默认面板。audit_speed_quality保留最高候选/补估影响诊断；build_speed_case.py为合成示例，不是实测。
 
 serve_overlay.py INPUT.json PLAN.json：fps为有理数；records含setNumber/pointId/唯一serveId/serveNumber(1或2)、eventType(serve或let)、contactVerified=true、confirmedPostContactUs(原帧出球较晚边界)、launchSpeedKphEstimate、method、statsIncluded。clip含startFrame/durationFrames/sourceInUs(整数微秒)/playbackRate；可加pointEndFrame/nextServeStartFrame。CFR同时提供confirmedPostContactSourceFrame及clip.sourceInFrame/sourceFps，用精确源帧保护微秒取整；VFR依真实PTS，非恒速先分段。doubleFaultConfirmedUs/letConfirmedUs仅事件确证后切字，互斥、不重计时；挥空不输入助手。
 

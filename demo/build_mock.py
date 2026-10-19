@@ -44,6 +44,7 @@ def build():
             if length>3 and ix%4==0:p['netPlayers']=[w]
             for sn in range(1,n+1):
                 serves.append(dict(setNumber=1,serveId=f'{pid}-S{sn}',serverId=server,pointId=pid,serveNumber=sn,
+                    outcome='in' if sn==n and end!='DF' else 'fault',
                     launchSpeedKphEstimate=(112 if server=='A' else 102)-(sn-1)*24+(ix%7)*2,
                     method='synthetic_demo',synthetic=True))
             points.append(p)
