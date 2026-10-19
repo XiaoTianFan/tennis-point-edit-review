@@ -6,15 +6,17 @@ import argparse,base64,hashlib,json,zlib
 from pathlib import Path
 
 def archive_text(record):
-    """Read v1 text or v2 compressed UTF-8; bound decompression and verify hashes."""
+    """Read text or compressed UTF-8; bound expansion and verify hashes."""
     if 'text' in record:
         text=record['text']
         if not isinstance(text,str):raise ValueError('Invalid archive text')
     elif record.get('encoding')=='zlib+base64':
         raw=base64.b64decode(record['data'],validate=True)
+        # Expansion protection scales with the encoded input, not package size.
+        budget=max(8*1024*1024,len(raw)*256)
         decoder=zlib.decompressobj()
-        decoded=decoder.decompress(raw,1000001)
-        if len(decoded)>1000000 or not decoder.eof or decoder.unused_data:
+        decoded=decoder.decompress(raw,budget+1)
+        if len(decoded)>budget or not decoder.eof or decoder.unused_data:
             raise ValueError('Oversized or invalid compressed archive record')
         text=decoded.decode('utf-8')
     else:raise ValueError('Unknown archive encoding')

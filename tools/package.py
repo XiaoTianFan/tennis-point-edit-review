@@ -32,7 +32,6 @@ def with_archive(files):
     archive={'schema':'tennis-recovery/v3','version':version,'payload':{
         'encoding':'zlib+base64','data':base64.b64encode(zlib.compress(payload.encode('utf-8'),9)).decode('ascii'),'sha256':sha(payload)}}
     files[ARCHIVE]=json.dumps(archive,ensure_ascii=True,separators=(',',':'))+'\n'
-    if sum(len(v.encode()) for v in files.values())>=1000000:raise ValueError('Package exceeds 1 MB')
     return files
 def load_snapshot(path):
     data=json.loads(Path(path).read_text(encoding='utf-8-sig'))

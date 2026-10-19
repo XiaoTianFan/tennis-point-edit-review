@@ -54,9 +54,19 @@ class PackageTests(unittest.TestCase):
             loaded,_=m.load_snapshot(p)
         self.assertEqual(loaded['SKILL.md'],values['SKILL.md'])
     def test_compressed_archive_rejects_bomb_and_trailing_payload(self):
-        for payload in (zlib.compress(b'x'*1000001),zlib.compress(b'x')+b'junk'):
+        for payload in (zlib.compress(b'x'*(9*1024*1024)),zlib.compress(b'x')+b'junk',zlib.compress(b'x')[:-1]):
             record={'encoding':'zlib+base64','data':base64.b64encode(payload).decode(),'sha256':hashlib.sha256(b'x').hexdigest()}
             with self.assertRaises(ValueError):m._archive.archive_text(record)
+
+    def test_large_package_roundtrip_has_no_one_megabyte_ceiling(self):
+        text=''.join(hashlib.sha256(str(i).encode()).hexdigest()+'\n' for i in range(17000))
+        self.assertGreater(len(text.encode()),1000000)
+        files=m.with_archive({'SKILL.md':text,'references/package-version.json':'{"version":"large"}'})
+        with tempfile.TemporaryDirectory() as d:
+            p=Path(d)/'large.json';p.write_text(json.dumps({'packageFiles':files}),encoding='utf-8')
+            loaded,_=m.load_snapshot(p)
+        self.assertEqual(loaded['SKILL.md'],text)
+        self.assertGreater(sum(len(v.encode()) for v in loaded.values()),1000000)
     def fixture(self):
         return m.with_archive({'SKILL.md':'base','references/package-version.json':'{"version":"test"}','references/retained.md':'retained'})
     def write_fixture(self,root,files):

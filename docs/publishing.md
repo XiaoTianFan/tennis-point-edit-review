@@ -1,6 +1,17 @@
 # Publish this repository
 
-The repository is prepared locally. Creating a remote and uploading it are separate actions.
+Publishing requires an explicit user request. For an existing clone with `origin`:
+
+1. Inspect `git status` and the diff; keep match media, credentials and account exports out of commits.
+2. Run `python tools/package.py refresh`, `python tools/validate.py`, and relevant editor checks.
+3. Commit the intended changes, fetch origin, and inspect divergence before pushing. Do not force-push over remote work.
+4. Push the intended branch, compare local HEAD with its remote ref, and inspect the validation workflow result.
+
+Pushing this repository does not update an account-saved Skill or a running local
+editor. Account transfer follows [synchronization](synchronization.md); backend
+editor changes require a process restart. Report these delivery surfaces separately.
+
+For first publication to a new remote:
 
 1. Read the README and license, inspect screenshots, and run `python tools/validate.py`.
 2. Create an empty repository on GitHub under your chosen account.

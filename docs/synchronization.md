@@ -68,8 +68,11 @@ incomplete snapshots relative to their embedded archive.
 
 This package includes an ASCII-safe recovery archive with per-file SHA-256 hashes.
 `tennis-recovery/v3` compresses the complete UTF-8 file map together with zlib and
-Base64, retaining the 1 MB package cap without removing readable source or rules.
-The payload and each file have SHA-256 hashes, with bounded decompression. Current
+Base64. The repository imposes no total package-size ceiling; check the receiving
+host's actual requirements when transferring a package. The payload and each file
+have SHA-256 hashes. Compressed-input expansion is bounded relative to input size,
+with an 8 MiB minimum budget; this is decoder protection, not a host or skill-size
+limit. Current
 sync/recovery helpers also accept v1 text and v2 individually compressed records.
 Use the current helper for v3 archives; older decoders cannot read their payload.
 If retrieved text contains damaged Unicode but the archive validates, the helper

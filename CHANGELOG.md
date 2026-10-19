@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026.10.19-v25.13
+
+- Remove the repository's artificial 1 MB package ceiling. Keep checksum validation and input-relative decompression protection, with a verified larger-package round trip.
+- Align publishing and synchronization guidance with the current transport and explicit publication workflow; retain current workflow requirements and all seven JSX templates.
+
 ## 2026.10.19-v25.12
 
 - Add Ctrl/⌘ toggle and anchored Shift range selection, separate from last-click/playhead review focus; preserve selection across views and tab reloads without editing match state.
