@@ -303,9 +303,9 @@ def main():
         result = {'python': __import__('sys').version.split()[0],
                   'executables': {name: shutil.which(name) for name in ('ffmpeg', 'ffprobe', 'node')}}
         try:
-            import av, numpy
+            import av, numpy, PIL
             av.codec.Codec('libx264', 'w'); av.codec.Codec('aac', 'w')
-            result['exportDependencies'] = dict(ready=True, av=av.__version__, numpy=numpy.__version__)
+            result['exportDependencies'] = dict(ready=True, av=av.__version__, numpy=numpy.__version__, pillow=PIL.__version__)
         except (ImportError, ValueError) as error:
             result['exportDependencies'] = dict(ready=False, error=str(error))
         if result['executables']['node']:

@@ -20,6 +20,8 @@ illustration. No match footage, player identities or measured serve speeds are i
   independent UE/FE classification, and movement counts **within UE**.
 - Estimates launch speed for every included serve, then adds post-contact speed labels.
 - Reuses the navy/lime scoreboard, review labels, notes and statistics templates.
+- Exports identity-bound originals through one H.264/AAC encode; precision checks use native ROI pixels and original PTS.
+- Reclaims newly owned procedural images after persisted observations and key-evidence promotion through the [stage-cache lifecycle](skills/tennis-point-edit-review/references/stage-cache.md).
 
 Rendered edits without a source timeline can use [deterministic seam reconstruction](skills/tennis-point-edit-review/references/rendered-video.md)
 to propose editable clip ranges while preserving every frame. Cut detection is

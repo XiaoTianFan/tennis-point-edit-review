@@ -13,6 +13,11 @@ chunks do not introduce fades, padding, or encoder priming. Final sample count
 follows the actual output-frame duration; a fractional-frame tail is trimmed or
 padded with silence.
 
+The preview canvas controls layout only. Source pixels are fitted directly at
+the requested output size, while overlay canvases use the corresponding fit and
+padding. A smaller review proxy/canvas does not force a lower-resolution video
+resampling step before a larger export.
+
 `sourceMapping` includes the container start, grid origin and original time base.
 FFmpeg input seeking is relative to the container start while `copyts` retains
 absolute PTS for the filters. New proxies start at zero. Legacy binding accepts

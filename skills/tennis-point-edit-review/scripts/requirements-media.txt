@@ -1,0 +1,4 @@
+# Original export and native ROI / stage-cache helpers.
+av>=10,<17
+numpy>=1.26,<3
+Pillow>=9.2,<13

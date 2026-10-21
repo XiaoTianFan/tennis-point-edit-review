@@ -75,8 +75,22 @@ class StageTests(unittest.TestCase):
         plan=self.stage.root/'cleanup-plan.json';data=load(plan);data['protected']={};save(plan,data)
         with self.assertRaisesRegex(ValueError,'plan changed'):Stage(self.stage.root).finish()
 
+    def test_new_dangling_reference_blocks_resume(self):
+        with patch.object(Path,'unlink',side_effect=InterruptedError('stop')),self.assertRaises(InterruptedError):self.stage.finish(self.obs)
+        save(self.root/'new-decision.json',dict(image=self.a))
+        with self.assertRaisesRegex(ValueError,'still references'):self.stage.finish()
+        self.assertTrue(Path(self.a).exists())
+        with self.assertRaisesRegex(ValueError,'sealed'):self.stage.put('late.png',self.pixels)
+
+    def test_tampered_artifact_cannot_escape_cache(self):
+        manifest=load(self.stage.root/'manifest.json')
+        manifest['artifacts']['../outside.png']=dict(path=str(self.stage.root/'data'/'../outside.png'),**digest(self.canonical))
+        save(self.stage.root/'manifest.json',manifest)
+        with self.assertRaisesRegex(ValueError,'containment'):self.stage.finish(self.obs)
+        self.assertEqual(digest(self.canonical),self.before)
+
     def test_refuses_paths_hardlinks_and_nonimages(self):
-        for name in ('../source.png','project.json','nested/roi.png'):
+        for name in ('../source.png','project.json','nested/roi.png','CON.png','LPT1.jpg'):
             with self.assertRaises(ValueError):self.stage.put(name,self.pixels)
         with self.assertRaises(Exception):self.stage.put('fake.png',b'canonical records')
         alias=self.root/'hardlink.png'

@@ -24,6 +24,13 @@ def verify_original(asset):
     current = identity(path)
     if any(current[k] != expected.get(k) for k in ('size', 'sha256')):
         raise ValueError('Original identity mismatch: ' + str(path))
+    info=metadata(path)
+    video=next(s for s in info['streams'] if s['codec_type']=='video')
+    if video.get('color_transfer') in ('smpte2084','arib-std-b67'):
+        raise ValueError('HDR original requires an explicitly verified transform')
+    declared=mapping(info,asset.get('sourceStartSeconds',0))
+    if any(clock.get(k)!=declared[k] for k in ('timeBase','firstPts','originSeconds','containerStartSeconds','resampling')):
+        raise ValueError('Original timing mapping mismatch; reconcile source and cuts')
     return current
 
 

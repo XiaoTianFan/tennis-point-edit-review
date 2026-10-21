@@ -72,10 +72,14 @@ def video_command(project, settings, asset, clip, offset, count):
         args += ['-loop', '1', '-framerate', str(rate), '-i', overlay['image']]
     if hold:
         grid += ',trim=end_frame=1,setpts=PTS-STARTPTS,tpad=stop_mode=clone:stop=-1'
-    w, h = project['width'], project['height']
+    w, h = settings['width'], settings['height']
+    factor = min(Fraction(w,project['width']), Fraction(h,project['height']))
+    cw, ch = (max(2, int(project[k]*factor)//2*2) for k in ('width','height'))
+    # The preview canvas defines geometry, not the sampling resolution. Fit the
+    # original directly at output size; never downsample to a small proxy canvas.
     filters = [f'[0:v]{grid},trim=end_frame={count},setpts=N/({rate}*TB),'
-               f'scale={w}:{h}:force_original_aspect_ratio=decrease:out_range=tv:out_color_matrix=bt709,'
-               f'pad={w}:{h}:(ow-iw)/2:(oh-ih)/2,setsar=1,format=yuv420p[v0]']
+               f'scale={cw}:{ch}:force_original_aspect_ratio=decrease:flags=lanczos:out_range=tv:out_color_matrix=bt709,'
+               f'pad={cw}:{ch}:(ow-iw)/2:(oh-ih)/2,pad={w}:{h}:(ow-iw)/2:(oh-ih)/2,setsar=1,format=yuv420p[v0]']
     for i, overlay in enumerate(overlays):
         first, end = overlay_range(overlay, clip)
         extra = ''
@@ -84,11 +88,9 @@ def video_command(project, settings, asset, clip, offset, count):
             if fade:
                 extra = (f',setpts=PTS+{offset}/({rate}*TB),fade=t=in:st={first/float(rate)}:d={fade}:alpha=1'
                          f',fade=t=out:st={(end-1)/float(rate)-fade}:d={fade}:alpha=1,setpts=PTS-{offset}/({rate}*TB)')
-        filters += [f'[{i+1}:v]format=rgba{extra}[o{i}]',
+        filters += [f'[{i+1}:v]format=rgba,scale={cw}:{ch}:flags=lanczos,pad={w}:{h}:(ow-iw)/2:(oh-ih)/2:color=black@0{extra}[o{i}]',
                     f"[v{i}][o{i}]overlay=0:0:enable='gte(n,{first-offset})*lt(n,{end-offset})':shortest=1[v{i+1}]"]
-    w, h = settings['width'], settings['height']
-    filters += [f'[v{len(overlays)}]scale={w}:{h}:force_original_aspect_ratio=decrease:flags=lanczos,'
-                f'pad={w}:{h}:(ow-iw)/2:(oh-ih)/2,setsar=1,format=yuv420p[out]']
+    filters += [f'[v{len(overlays)}]format=yuv420p[out]']
     return args + ['-filter_complex_threads', '1', '-filter_complex', ';'.join(filters), '-map', '[out]',
                    '-an', '-frames:v', str(count), '-fps_mode', 'passthrough', '-threads', '1',
                    '-f', 'rawvideo', '-pix_fmt', 'yuv420p', 'pipe:1']

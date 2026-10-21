@@ -43,10 +43,13 @@ class OriginalExportTests(unittest.TestCase):
         p['clips']=[dict(id=f'cut{i}',assetId='src',pointId=f'P{i:03}',inFrame=(i*7)%80,outFrame=(i*7)%80+n) for i,n in enumerate(lengths)]
         p['clips'].append(dict(id='hold',kind='hold',assetId='src',inFrame=10,durationFrames=31))
         rate=Fraction(p['fps']); asset=p['assets'][0]
+        full_pcm=np.frombuffer(subprocess.check_output(['ffmpeg','-v','error','-i',asset['originalPath'],'-f','f32le','-ac','1','-']),dtype='<f4')
         reference=[]; global_frame=0
         for clip in p['clips']:
             n=clip.get('durationFrames',clip.get('outFrame',0)-clip['inFrame'])
-            reference.append(pcm_chunk(asset,clip,0,n,global_frame,rate,48000,1));global_frame+=n
+            length=nearest(Fraction(global_frame+n)*48000/rate)-nearest(Fraction(global_frame)*48000/rate)
+            first=nearest(Fraction(clip['inFrame'])*48000/rate)
+            reference.append((full_pcm[first:first+length] if clip.get('kind')!='hold' else np.zeros(length))[:,None]);global_frame+=n
         # Delete proxy: export has no dependency on its bytes or existence.
         Path(asset['path']).unlink()
         with patch('local_render.CHUNK_SECONDS',Fraction(1,4)):
@@ -79,7 +82,9 @@ class OriginalExportTests(unittest.TestCase):
         difference=np.frombuffer(raw,dtype=np.uint8).astype(float)-np.frombuffer(expected,dtype=np.uint8)
         self.assertLess(np.mean(difference**2),15)  # Proxy loss only, not a one-frame shift.
         result=export_video(p,self.root/'export',user_requested=True)
-        original=pcm_chunk(asset,p['clips'][0],0,30,0,Fraction(p['fps']),48000,1)[:,0]
+        full_pcm=np.frombuffer(subprocess.check_output(['ffmpeg','-v','error','-i',asset['originalPath'],'-f','f32le','-ac','1','-']),dtype='<f4')
+        first=nearest((Fraction(47,100)+Fraction(17)/Fraction(p['fps']))*48000)
+        original=full_pcm[first:first+nearest(Fraction(30)*48000/Fraction(p['fps']))]
         actual=np.frombuffer(subprocess.check_output(['ffmpeg','-v','error','-i',result['path'],'-f','f32le','-ac','1','-']),dtype='<f4')
         from scipy.signal import correlate, correlation_lags
         a,b=actual[2000:len(original)-2000],original[2000:-2000]
@@ -100,6 +105,10 @@ class OriginalExportTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'Unbound'):export_video(p,self.root/'bad',user_requested=True)
         self.assertFalse((self.root/'bad').exists())
         p['assets'][0]=asset
+        wrong=copy.deepcopy(asset);wrong['sourceMapping']['originSeconds']='1'
+        p['assets'][0]=wrong
+        with self.assertRaisesRegex(ValueError,'timing mapping mismatch'):export_video(p,self.root/'bad',user_requested=True)
+        p['assets'][0]=asset
         with Path(asset['originalPath']).open('r+b') as f: f.seek(-1,2); f.write(b'!')
         with self.assertRaisesRegex(ValueError,'identity mismatch'):export_video(p,self.root/'bad',user_requested=True)
         Path(asset['originalPath']).unlink()
@@ -115,6 +124,29 @@ class OriginalExportTests(unittest.TestCase):
         whole=subprocess.check_output(video_command(p,settings,asset,clip,0,90))
         pieces=b''.join(subprocess.check_output(video_command(p,settings,asset,clip,o,min(19,90-o))) for o in range(0,90,19))
         self.assertEqual(whole,pieces)
+
+    def test_small_review_canvas_never_downsamples_original_before_large_export(self):
+        p=self.project(self.source(audio=False))
+        p.update(width=80,height=48)
+        clip=dict(id='cut',assetId='src',pointId='P001',inFrame=13,outFrame=43)
+        p['clips']=[clip];asset=p['assets'][0]
+        actual=subprocess.check_output(video_command(p,dict(width=160,height=96),asset,clip,0,30))
+        expected=subprocess.check_output(['ffmpeg','-v','error','-i',asset['originalPath'],'-vf',
+            f"settb=AVTB,fps={p['fps']}:start_time=0:round=near,trim=start_frame=13:end_frame=43,setpts=PTS-STARTPTS,scale=160:96:out_range=tv:out_color_matrix=bt709",
+            '-fps_mode','passthrough','-f','rawvideo','-pix_fmt','yuv420p','-'])
+        self.assertEqual(actual,expected)
+
+    def test_interrupted_export_closes_decoder_and_can_retry(self):
+        p=self.project(self.source(audio=False))
+        p['clips']=[dict(id='cut',assetId='src',pointId='P001',inFrame=5,outFrame=120)]
+        def interrupt(value):
+            if value['progressPercent']>0:raise RuntimeError('Synthetic interruption')
+        with self.assertRaisesRegex(RuntimeError,'Synthetic interruption'):
+            export_video(p,self.root/'interrupted',interrupt,user_requested=True)
+        self.assertFalse((self.root/'interrupted'/'export.json').exists())
+        self.assertFalse((self.root/'interrupted'/'edited.mp4').exists())
+        result=export_video(p,self.root/'retry',user_requested=True)
+        self.assertEqual(result['frames'],115)
 
 
 if __name__=='__main__': unittest.main()

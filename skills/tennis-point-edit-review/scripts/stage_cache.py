@@ -14,6 +14,11 @@ import secrets
 import stat
 
 
+def image_name(name):
+    return (bool(re.fullmatch(r'[A-Za-z0-9_-]+\.(png|jpg|webp)',name)) and
+            not re.fullmatch(r'(?i)(con|prn|aux|nul|com[1-9]|lpt[1-9])\..*',name))
+
+
 def safe(path):
     path = Path(os.path.abspath(path))
     for part in [*reversed(path.parents), path]:
@@ -63,6 +68,8 @@ class Stage:
     def create(cls, job, purpose):
         job = safe(job)
         if not job.is_dir(): raise ValueError('Existing job directory required')
+        if job.is_relative_to(Path(__file__).resolve().parents[1]):
+            raise ValueError('Skill package cannot be used as a job cache')
         if purpose not in ('navigation','movement','stroke','boundary','line','net','contact','speed'):
             raise ValueError('Declare the inspection purpose')
         parent = safe(job/'.stage-cache'); parent.mkdir(exist_ok=True)
@@ -98,7 +105,7 @@ class Stage:
                 else: fcntl.flock(lock, fcntl.LOCK_UN)
 
     def put(self, name, data):
-        if not re.fullmatch(r'[A-Za-z0-9_-]+\.(png|jpg|webp)', name):
+        if not image_name(name):
             raise ValueError('A simple generated image name is required')
         # Image bytes only; authority is the exclusive creation record, not suffix.
         from PIL import Image
@@ -106,7 +113,7 @@ class Stage:
         with Image.open(io.BytesIO(data)) as image: image.verify()
         with self.locked():
             manifest = load(self.root/'manifest.json')
-            if manifest['state'] != 'active': raise ValueError('Stage is sealed')
+            if manifest['state'] != 'active' or manifest.get('planSha256'): raise ValueError('Stage is sealed')
             path = safe(self.root/'data'/name)
             with path.open('xb') as f: f.write(data); f.flush(); os.fsync(f.fileno())
             manifest['artifacts'][name] = dict(path=str(path), **digest(path))
@@ -120,7 +127,7 @@ class Stage:
             raise ValueError('Index must be canonical JSON inside the job, outside the cache')
         with self.locked():
             manifest = load(self.root/'manifest.json')
-            if manifest['state'] != 'active': raise ValueError('Stage is sealed')
+            if manifest['state'] != 'active' or manifest.get('planSha256'): raise ValueError('Stage is sealed')
             manifest['indexes'][str(path)] = digest(path)
             save(self.root/'manifest.json', manifest)
 
@@ -159,6 +166,13 @@ class Stage:
         """
         with self.locked():
             manifest = load(self.root/'manifest.json')
+            for name,item in manifest['artifacts'].items():
+                if not image_name(name) or safe(item['path']) != self.root/'data'/name:
+                    raise ValueError('Invalid artifact containment')
+            for p in manifest['indexes']:
+                path=safe(p)
+                if not path.is_relative_to(self.job) or path.is_relative_to(self.job/'.stage-cache') or path.suffix!='.json':
+                    raise ValueError('Invalid canonical index containment')
             plan_path = self.root/'cleanup-plan.json'
             if not plan_path.exists():
                 if manifest['state'] != 'active': raise ValueError('Invalid stage state')
@@ -198,9 +212,14 @@ class Stage:
                             artifacts=manifest['artifacts'], keep=keep, destination=str(destination),
                             indexBefore=manifest['indexes'], indexAfter=updates, protected=protected,
                             observations=str(obs), observationIdentity=digest(obs))
+                plan_hash=hashlib.sha256(json.dumps(plan,ensure_ascii=False,indent=2,allow_nan=False).encode('utf-8')).hexdigest()
+                if manifest.get('planSha256',plan_hash)!=plan_hash: raise ValueError('Interrupted plan inputs changed')
+                manifest['planSha256']=plan_hash;save(self.root/'manifest.json',manifest)
                 save(plan_path,plan,exclusive=True)
+            if manifest.get('planSha256') != digest(plan_path)['sha256']: raise ValueError('Cleanup plan changed')
             plan = load(plan_path)
-            if plan['stageId'] != self.owner['stageId'] or plan['artifacts'] != manifest['artifacts']:
+            if (plan['stageId'] != self.owner['stageId'] or plan['artifacts'] != manifest['artifacts'] or
+                    plan['indexBefore'] != manifest['indexes'] or set(plan['indexAfter']) != set(manifest['indexes'])):
                 raise ValueError('Cleanup plan ownership mismatch')
             outcome_path = self.root/'outcome.json'
             outcome = load(outcome_path) if outcome_path.exists() else dict(planSha256=digest(plan_path)['sha256'],deleted=[],promoted={},state='cleaning')
@@ -245,6 +264,9 @@ class Stage:
             for p, after in plan['indexAfter'].items():
                 if load(p) != after: raise ValueError('Canonical index changed during cleanup')
             self._check_references(plan['artifacts'])
+            for name,target in outcome['promoted'].items():
+                if digest(target)['sha256'] != plan['artifacts'][name]['sha256']:
+                    raise ValueError('Retained evidence changed during cleanup')
             outcome.update(state='cleaned',deletedBytes=sum(x['size'] for x in plan['artifacts'].values()),
                            retainedBytes=sum(plan['artifacts'][n]['size'] for n in plan['keep']))
             manifest['state']='cleaned'; save(self.root/'manifest.json',manifest); save(outcome_path,outcome)

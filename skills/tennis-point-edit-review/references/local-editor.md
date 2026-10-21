@@ -4,7 +4,9 @@
 
 ## 启动与依赖
 
-素材、工程、答案与输出放任务工作区，不写技能目录。先按[任务工作区](job-storage.md)创建或接续：默认使用技能项目主检出的 `outputs/`，用户指定目录优先；源录像和用户指定成片仍留原位置。需要Python 3.10+、PyAV 10+（含libx264/AAC）、NumPy、FFmpeg/ffprobe、Node 20+、现代Chromium；图形渲染需要React、React DOM、esbuild、Playwright。网页无构建步骤、CDN和第三方脚本。
+素材、工程、答案与输出放任务工作区，不写技能目录。先按[任务工作区](job-storage.md)创建或接续：默认使用技能项目主检出的 `outputs/`，用户指定目录优先；源录像和用户指定成片仍留原位置。需要Python 3.10+、PyAV 10+（含libx264/AAC）、NumPy、Pillow、FFmpeg/ffprobe、Node 20+、现代Chromium；图形渲染需要React、React DOM、esbuild、Playwright。网页无构建步骤、CDN和第三方脚本。
+
+Python媒体依赖可在工作区独立环境安装：`python -m pip install -r "<skill>/scripts/requirements-media.txt"`。
 
 ```sh
 python "<skill>/scripts/local_editor.py" doctor
@@ -93,7 +95,7 @@ UI/CLI同路输出H.264/AAC MP4：精准取帧、同源图形、统计淡变、�
 
 进度条按已处理时间线帧数显示连续百分比，不按片段数平分；合成和编码边读边做；核验与保存完成才到100%。失败保留错误与本次未完成文件，不显示完成。
 
-最终渲染只读`originalPath`，先逐源核对SHA-256；原片缺失或替换立即报错，绝不回退代理。原始解码与正式图层合成通过raw YUV流进入单一H.264编码器；每次最多一个源解码进程，PCM以最长10秒为界，不随片段数量增长，无有损逐段中间片或整场无损缓存。音频按累计时间线边界取整到样本，剪口淡变、静音和hold拼接后只编码一次AAC；最终fps只换算一次，尾音裁补到实际输出时长。实时预览仍读代理。
+最终渲染只读`originalPath`，先逐源核对SHA-256；原片缺失或替换立即报错，绝不回退代理。原始像素直接按目标尺寸采样，预览画布只定义布局，较小代理不限制高分辨率输出；原始解码与正式图层合成通过raw YUV流进入单一H.264编码器；每次最多一个源解码进程，PCM以最长10秒为界，不随片段数量增长，无有损逐段中间片或整场无损缓存。音频按累计时间线边界取整到样本，剪口淡变、静音和hold拼接后只编码一次AAC；最终fps只换算一次，尾音裁补到实际输出时长。实时预览仍读代理。
 
 成功保留最终MP4、project-snapshot.json、export.json（含源身份、累计样本数和资源上界）；仅移除本次同一成片的暂存副本。失败保留本次诊断文件，不清理其他导出或工作区。
 
