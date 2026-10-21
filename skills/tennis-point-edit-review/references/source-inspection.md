@@ -10,7 +10,8 @@
 |---|---|
 | 全片结构、身份、机位或光线变化 | 分批全幅概览，保留场外参照；局部裁切另附原图 |
 | 候选发球及归组 | 扩到前一分结束和发球间隙，结合球、双方动作及可用原声 |
-| 重抛/触拍、首次落点/死球 | 直接查事件前后连续原帧；必要时向前后扩窗，不重复依赖同一稀疏摘要 |
+| 大致动作、站位、击球类型与段界 | 联系表和缩小图可用，记录采样范围；具体事件仍看连续上下文 |
+| 压线／出界、网前死球、触拍／精确落点、估速 | 原片原生像素ROI与真实PTS；先裁ROI再排列，保留相邻帧夹逼与不确定度，不能由低清联系表定案 |
 | 漏分或局界矛盾 | 回查相关整局和相邻间隙，包括检测器未命中的范围 |
 
 已有同源原帧且时间定位、清晰度和采样密度满足当前问题时，优先复用并调整裁切或排列；缺少相邻帧或时间范围时再补提。
@@ -19,16 +20,27 @@
 
 ## 可直接运行
 
-路径均来自当前任务；输出放任务工作区的新目录。采样/连续帧需要OpenCV与NumPy；时间检查需要ffprobe。分批采样限制资源占用，可按原时间窗继续下一批，不把分批边界当分界。
+路径均来自当前任务；输出放任务工作区的新目录。导航采样需要OpenCV、NumPy、Pillow；精确取证需要PyAV 10+与Pillow，时间检查需要ffprobe。分批采样限制资源占用，可按原时间窗继续下一批，不把分批边界当分界。
 
 ```sh
-python scripts/source_inspect.py SOURCE 0 120 WORK/overview --step 5
-python scripts/source_inspect.py SOURCE 20 35 WORK/detail --step 0.5 --roi x,y,width,height
-python scripts/frame_evidence.py SOURCE 23 26 WORK/contact --no-candidates
+python scripts/source_inspect.py SOURCE 0 120 WORK/overview --job WORK --step 5 --purpose navigation
+python scripts/source_inspect.py SOURCE 20 35 WORK/detail --job WORK --step 0.5 --roi x,y,width,height --purpose movement
+python scripts/frame_evidence.py SOURCE 23 26 WORK/movement --job WORK --no-candidates
+python scripts/precision_evidence.py WORK/source-proxy.media.json 23 23.4 WORK/contact --job WORK --purpose contact --roi x,y,width,height
 python scripts/media_probe.py SOURCE WORK/timing.json
 ```
 
-`source_inspect`输出分页联系表、每张全幅原图和`samples.json`：源哈希、请求/实际解码时间、帧号、寻址误差及裁切/缩放。缺帧或不可用时间戳单列，不静默补图；只有已提取范围可供检查。图上的时间来自decoder POS_MSEC，精确触拍/估速仍须核对原片PTS，代理不能增加原始精度。`frame_evidence`保留原短窗接口，`--no-candidates`仅关闭候选标记。
+`source_inspect`输出分页联系表、每张全幅原图和`samples.json`：源哈希、请求/实际解码时间、帧号、寻址误差及裁切/缩放。缺帧或不可用时间戳单列，不静默补图；只有已提取范围可供检查。图上的时间来自decoder POS_MSEC，精确触拍/估速仍须核对原片PTS，代理不能增加原始精度。`frame_evidence`的OpenCV短窗只用于动作／候选定位，`--no-candidates`仅关闭候选标记，不升级为精确PTS证据。
+
+## 原生ROI与目的限制
+
+`precision_evidence`从绑定的`.media.json`读取`originalPath`与SHA-256；工程可用`project.json --asset-id ID`。原片缺失、替换或身份未绑定立即停止，不回退代理；旧绑定处理见[本地媒体](local-editor.md#导出与边界)。窗口参数是原片绝对PTS秒数，含容器起点；保留每帧原整数PTS、time base与有理秒数，不用代理帧号或OpenCV寻址时间替代。
+
+明确选择`line/net/contact/speed`，提供原片**编码像素坐标**的ROI；不自动旋转、纠正SAR或缩放，索引另存显示矩阵与像素宽高比，量坐标时不能混用预览坐标。PNG只含ROI，按原尺寸显示；需要拼图时也先裁原生ROI，每格至少原像素可辨，屏幕不足就拆页／打开单图，不缩成全画幅小格判线。图像是源解码后的RGB转换，不增加传感器细节，HDR须另验显示转换。
+
+默认最多240帧、每窗≤15秒，可显式提高到1200帧或分成重叠窗口。工具保留窗内全部原生帧及可取得的前后各一帧，记录缺少邻帧；抽取成功不等于已证实触拍／碰撞。按看到的事件夹逼填写时间和位置不确定度；网格、重复帧、模型插值及候选检测不能生成真实观测。
+
+所有新提图工具输出`stageId`、数值索引及受管理的过程图片。实际阅读并保存观察后，按[阶段缓存](stage-cache.md)提升关键证据、自动回收其余过程图；不能只写结论而丢弃唯一测量或关键视觉依据。
 
 ## 可选CV配置
 

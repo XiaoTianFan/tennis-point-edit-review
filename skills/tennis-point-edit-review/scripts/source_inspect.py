@@ -5,11 +5,14 @@ import math
 from pathlib import Path
 
 from media_probe import identity
+from stage_cache import Stage, safe
 
 
-def sample(source, start, end, output, step=5, roi=None, width=480, columns=3, page_size=12):
+def sample(source, start, end, output, step=5, roi=None, width=480, columns=3, page_size=12, purpose='navigation', job=None):
     import cv2
     import numpy as np
+    if purpose not in ('navigation','movement','stroke','boundary'):
+        raise ValueError('Precision questions require precision_evidence with native original PTS/ROI')
     if not all(math.isfinite(v) for v in (start, end, step)) or not 0 <= start < end or step <= 0:
         raise ValueError('Finite positive window and step required')
     if width < 64 or width > 1920 or not 1 <= columns <= 6 or not 1 <= page_size <= 48:
@@ -17,8 +20,16 @@ def sample(source, start, end, output, step=5, roi=None, width=480, columns=3, p
     count = math.ceil((end-start)/step)
     if count > 2000:
         raise ValueError('Split into batches of at most 2000 requested samples')
-    out = Path(output)
+    out = safe(output)
     out.mkdir(parents=True, exist_ok=False)
+    job=safe(job) if job else out
+    if not out.is_relative_to(job): raise ValueError('Catalog must be inside the declared job')
+    stage = Stage.create(job,purpose)
+    def put_image(name, pixels):
+        ok,data=cv2.imencode(Path(name).suffix,pixels)
+        if not ok: raise ValueError('Cannot encode inspection image')
+        return stage.put(name,data.tobytes())
+    def reference(name): return str(stage.root/'data'/name)
     fingerprint = identity(source)
     cap = cv2.VideoCapture(fingerprint['path'])
     if not cap.isOpened():
@@ -35,9 +46,7 @@ def sample(source, start, end, output, step=5, roi=None, width=480, columns=3, p
             y, x = i//columns*height, i%columns*width
             canvas[y:y+tile.shape[0], x:x+width] = tile
         name = f'sheet-{len(sheets):04d}.jpg'
-        if not cv2.imwrite(str(out/name), canvas):
-            raise ValueError('Cannot write contact sheet')
-        sheets.append(name)
+        sheets.append(put_image(name,canvas))
         page.clear()
 
     try:
@@ -62,15 +71,14 @@ def sample(source, start, end, output, step=5, roi=None, width=480, columns=3, p
             if rh*width/rw > 2160:
                 raise ValueError('Contact-sheet tile too tall; use a wider ROI or smaller width')
             name = f'{i:05d}-raw.png'
-            if not cv2.imwrite(str(out/name), frame):
-                raise ValueError('Cannot write raw frame')
+            raw=put_image(name,frame)
             image = frame[y:y+rh, x:x+rw]
             small = cv2.resize(image, (width, max(1, round(rh*width/rw))))
             bar = np.full((42, width, 3), 240, np.uint8)
             cv2.putText(bar, f'{actual:.6f}s | frame {index}', (6, 16), cv2.FONT_HERSHEY_SIMPLEX, .42, (20,20,20), 1)
             cv2.putText(bar, f'request {requested:.3f}s | raw {i:05d}', (6, 34), cv2.FONT_HERSHEY_SIMPLEX, .42, (20,20,20), 1)
             record.update(status='extracted', decodedSeconds=actual, decoderFrameIndex=index,
-                          seekErrorSeconds=actual-requested, raw=name, sheet=f'sheet-{len(sheets):04d}.jpg',
+                          seekErrorSeconds=actual-requested, raw=raw, sheet=reference(f'sheet-{len(sheets):04d}.jpg'),
                           sourceSize=[w,h], crop=[x,y,rw,rh], tileSize=[width,small.shape[0]])
             page.append(np.vstack([small,bar]))
             if len(page) == page_size:
@@ -81,12 +89,14 @@ def sample(source, start, end, output, step=5, roi=None, width=480, columns=3, p
     stat = Path(fingerprint['path']).stat()
     if (stat.st_size, stat.st_mtime_ns) != (fingerprint['size'], fingerprint['mtimeNs']):
         raise ValueError('Source changed during extraction')
-    manifest = {'schema': 'tennis-source-samples/v1', 'source': fingerprint,
+    manifest = {'schema': 'tennis-source-samples/v2', 'source': fingerprint, 'stageId':stage.owner['stageId'],
+                'purpose':purpose,'precisionSuitable':False,
                 'windowSeconds': [start,end], 'stepSeconds': step, 'roi': roi,
                 'timestampSource': 'decoder POS_MSEC; verify source PTS before precise event timing',
                 'inspection': 'sampled_only', 'visualReview': 'not_performed',
                 'records': records, 'sheets': sheets}
     (out/'samples.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding='utf-8')
+    stage.index(out/'samples.json')
     if not sheets:
         raise ValueError('No usable samples; see samples.json, use a PTS-aware decoder')
     return manifest
@@ -99,8 +109,11 @@ if __name__ == '__main__':
     parser.add_argument('--roi', help='x,y,width,height; full original frames are always retained')
     parser.add_argument('--width', type=int, default=480)
     parser.add_argument('--columns', type=int, default=3); parser.add_argument('--page-size', type=int, default=12)
+    parser.add_argument('--purpose',choices=('navigation','movement','stroke','boundary'),default='navigation')
+    parser.add_argument('--job',required=True,help='Full job root containing canonical records and output')
     args = parser.parse_args()
     result = sample(args.source, args.start, args.end, args.output, args.step,
                     list(map(int, args.roi.split(','))) if args.roi else None,
-                    args.width, args.columns, args.page_size)
-    print(json.dumps({'samples': len(result['records']), 'sheets': len(result['sheets']), 'output': args.output}))
+                    args.width, args.columns, args.page_size,args.purpose,args.job)
+    print(json.dumps({'samples': len(result['records']), 'sheets': len(result['sheets']), 'output': args.output,
+                      'stage':str(Path(args.job).resolve()/'.stage-cache'/result['stageId'])}))

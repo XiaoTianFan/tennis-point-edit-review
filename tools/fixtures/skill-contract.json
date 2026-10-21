@@ -373,7 +373,7 @@
         },
         {
           "path": "references/helper-usage.md",
-          "text": "短窗源帧与对比，不导入工程"
+          "text": "短窗动作／候选概览，不作精确PTS证据，不导入工程"
         },
         {
           "path": "SKILL.md",
@@ -870,6 +870,57 @@
           "text": "不改写旧记录掩盖缺口，不新增播放回退机制"
         }
       ]
+    },
+    {
+      "id": "R060",
+      "checks": [
+        {
+          "path": "references/local-editor.md",
+          "text": "最终渲染只读`originalPath`"
+        },
+        {
+          "path": "references/local-editor.md",
+          "text": "只编码一次AAC"
+        },
+        {
+          "path": "references/local-editor.md",
+          "text": "不证明历史身份"
+        }
+      ]
+    },
+    {
+      "id": "R061",
+      "checks": [
+        {
+          "path": "references/source-inspection.md",
+          "text": "保留每帧原整数PTS、time base与有理秒数"
+        },
+        {
+          "path": "references/source-inspection.md",
+          "text": "不缩成全画幅小格判线"
+        }
+      ]
+    },
+    {
+      "id": "R062",
+      "checks": [
+        {
+          "path": "references/stage-cache.md",
+          "text": "阶段观察落盘后直接执行，不逐阶段向用户另请清理许可"
+        },
+        {
+          "path": "references/stage-cache.md",
+          "text": "先提升关键图"
+        },
+        {
+          "path": "references/stage-cache.md",
+          "text": "不递归删目录，不接管未登记文件"
+        },
+        {
+          "path": "references/stage-cache.md",
+          "text": "不代替[导出后的收尾清理](cleanup.md)及其用户确认"
+        }
+      ]
     }
   ],
   "files": [
@@ -998,7 +1049,7 @@
     },
     {
       "path": "scripts/frame_evidence.py",
-      "sha256": "0c83c1ff0fefc4669e02e630e86bd0ad4b3b0f0a0dba6e3e2f4ab663841e5f61"
+      "sha256": "2ff9f04ceecd8b2cc217afbefde962db652d92c8d155c013364188168653b935"
     },
     {
       "path": "scripts/launch_speed.py"
@@ -1148,6 +1199,21 @@
     },
     {
       "path": "references/job-storage.md"
+    },
+    {
+      "path": "scripts/source_binding.py"
+    },
+    {
+      "path": "scripts/local_render.py"
+    },
+    {
+      "path": "scripts/precision_evidence.py"
+    },
+    {
+      "path": "scripts/stage_cache.py"
+    },
+    {
+      "path": "references/stage-cache.md"
     }
   ]
 }

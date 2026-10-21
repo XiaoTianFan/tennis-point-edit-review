@@ -24,3 +24,23 @@ actual media exports, overlay intervals/fades, dimensions/FPS, holds, original
 identity failures, nonzero source clocks, chunk equivalence and many-cut audio.
 `python tools/validate.py` checks the complete package and repository contracts.
 Render and evidence dependencies are reported by `local_editor.py doctor`.
+
+
+Precision extraction decodes a bounded VFR-aware interval using PyAV and saves
+native coded-pixel ROI PNGs, one preceding and one following frame where present.
+No resize/FPS filter runs. Integer PTS/time base, crop, source hash, SAR and display
+matrix remain in the canonical JSON. OpenCV contact sheets are explicitly marked
+unsuitable for precision timing and cannot select precision purposes.
+
+Stage image creation uses exclusive files and records identity/hash; existing
+files cannot be enrolled. Finish requires persisted readback observations and an
+explicit essential-image list. It verifies/promotes those images, reconciles its
+own numeric catalogs, scans canonical references and removes only unchanged owned
+images. A fixed plan and outcome journal support interrupted execution. Ancestor
+reparse points, hardlinks, changed records and new dangling references fail closed.
+The full job root must include authoritative records; this is not a scanner or
+cleanup authority for prior archives or external media libraries.
+
+Run `python -m unittest tools.test_stage_cache tools.test_precision_evidence` for
+native pixel/PTS equality, neighbor coverage, preserved measurements, promotion,
+changed-file fences, interrupted unlink recovery and Windows junction protection.

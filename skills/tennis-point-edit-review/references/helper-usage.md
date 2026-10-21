@@ -27,7 +27,7 @@
 | review_io.py build review-data.json review.html | 仅外部编辑器制作离线页，本地集成列表不另造HTML；[样例](../examples/review-data.json)、[模板](../examples/review-template.html)、[审核协议](ledger-and-review.md) |
 | review_io.py merge ledger.json exported-review.txt ledger-next.json | 新文件合并，账本含source、ledgerRevision、players、points；按版本与P/R匹配，不按行号猜 |
 | score_audit.py score-input.json | config与points，A/B映射当前双方；initialPoints是原始赢分次数；规则和默认见[输入](inputs-and-rules.md) |
-| frame_evidence.py VIDEO START END OUTPUT --roi x,y,width,height | 短窗源帧与对比，不导入工程；更多取证见[原片检查](source-inspection.md) |
+| frame_evidence.py VIDEO START END OUTPUT --roi x,y,width,height --job WORK | 短窗动作／候选概览，不作精确PTS证据，不导入工程；更多取证见[原片检查](source-inspection.md) |
 | evidence_audit.py coverage.json | scopes=[{source,startUs,endUs}]、intervals=[{source,startUs,endUs,kind,reviewed,retained,reason,pointId?}]；[覆盖样例](../examples/coverage-data.json) |
 | audit_lineage(points,lineage) | points含pointId、active、sourceOrder、sourceStartUs；lineage含kind=merge/split、from/to数组、reason、revision；不自动迁移拆分答案 |
 
@@ -64,3 +64,5 @@ python scripts/restore_package.py
 ```
 
 从技能目录运行；[规则检查](../scripts/check_helpers.py)。计算后由agent通过当前编辑器接口应用，并按[画面验收](presentation-and-qa.md#验证与交付)自检。restore_package默认核对ASCII安全zlib/Base64与逐文件SHA-256，--repair只恢复本地损坏副本；有意编辑应重建归档，不用旧归档覆盖，亦不等于保存账户技能。
+
+精确判线、网前死球、触拍和估速用[原生ROI／PTS工具](source-inspection.md#原生roi与目的限制)。实际阅读、规范观察落盘后调用[阶段缓存finish](stage-cache.md)，先提升关键图再回收本阶段自建过程图。

@@ -3,6 +3,7 @@
 ## 2026.10.21-v26.0
 
 - Render final H.264/AAC directly from identity-bound originals through bounded raw-frame/PCM streams; encode video and audio once, with one cumulative sample clock.
+- Add purpose-specific native-PTS ROI evidence and owned stage caches with promotion, reference checks and resumable cleanup after persisted observations.
 - Normalize newly prepared proxy origins and require explicit checked binding for legacy source identities.
 
 ## 2026.10.21-v25.18
