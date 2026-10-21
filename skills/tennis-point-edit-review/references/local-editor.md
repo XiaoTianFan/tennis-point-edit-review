@@ -4,7 +4,7 @@
 
 ## 启动与依赖
 
-素材、工程、答案与输出放任务工作区，不写技能目录。先按[任务工作区](job-storage.md)创建或接续：默认使用技能项目主检出的 `outputs/`，用户指定目录优先；源录像和用户指定成片仍留原位置。需要Python 3.10+、FFmpeg/ffprobe、Node 20+、现代Chromium；图形渲染需要React、React DOM、esbuild、Playwright。网页无构建步骤、CDN和第三方脚本。
+素材、工程、答案与输出放任务工作区，不写技能目录。先按[任务工作区](job-storage.md)创建或接续：默认使用技能项目主检出的 `outputs/`，用户指定目录优先；源录像和用户指定成片仍留原位置。需要Python 3.10+、PyAV 10+（含libx264/AAC）、NumPy、FFmpeg/ffprobe、Node 20+、现代Chromium；图形渲染需要React、React DOM、esbuild、Playwright。网页无构建步骤、CDN和第三方脚本。
 
 ```sh
 python "<skill>/scripts/local_editor.py" doctor
@@ -24,7 +24,7 @@ python "<skill>/scripts/local_editor.py" serve "<work>/edit" --open
 
 `media`按源分辨率、有理fps、音频采样率和声道生成H.264/AAC CFR代理及`.media.json`，不改原片；归一旋转/SAR、补齐偶数尺寸并保留源参数。明确转换用`--fps/--width`，有界片段用`--start/--duration`。SDR保留并输出Rec.709；HDR先验收色调映射，不静默转换PQ/HLG。
 
-计划可写`in/out/duration/start/endSeconds`，初始化只换算一次为整数帧、左闭右开；同一边界不能同时给秒与帧。原片时间=`sourceStartSeconds+frame/fps`；VFR代理可能重采样，估速和触拍必须保留原PTS，不把代理帧当原始精度。
+计划可写`in/out/duration/start/endSeconds`，初始化只换算一次为整数帧、左闭右开；同一边界不能同时给秒与帧。新代理首视频PTS为0，保存源SHA-256及`sourceMapping`；原片绝对PTS时间=`sourceMapping.originSeconds+frame/fps`（含容器起始时间）；VFR代理可能重采样，估速和触拍必须保留原PTS，不把代理帧当原始精度。
 
 暂停／步进使用FFmpeg精确解码帧并叠加正式透明PNG；播放由浏览器视频帧回调实时合成，不预渲染整片。内部跳剪可能短暂停顿；编码音画在实际导出后验收，导出要求与agent主动导出条件见[导出与边界](#导出与边界)。Source播放完整代理及原声、无图层；Edited播放当前视图。
 
@@ -91,9 +91,13 @@ python "<skill>/scripts/local_editor.py" render "<work>/edit" "<work>/new-export
 
 UI/CLI同路输出H.264/AAC MP4：精准取帧、同源图形、统计淡变、剪口两帧音频淡变、定格静音，最后统一换fps避免逐段舍入。默认沿用画幅/fps/音频，可选偶数宽高≤8192、fps 1–240和输出路径；等比补边，时长误差≤半输出帧。UI帧率使用预设下拉，默认“与时间线一致”并显示实际fps；23.976/29.97/59.94仅作显示，内部保留精确有理数，不改时间线。码率下拉默认quality（CRF 18），可选4/8/12/20/35/50/80 Mbps及source（匹配原片视频流平均码率，多源按保留时长加权）；原片码率未知时禁选source，不以代理或含音频的容器码率代替。Mbps为重编码目标平均视频码率，非严格恒定值；不改代理或时间线。CLI有--width/--height/--fps/--filename/--bitrate（quality/source/整数bits每秒）；UI用Tk选目录，缺Tk/桌面则填路径。不覆盖已有文件，保留project-snapshot.json及含帧数/哈希的export.json；编码成功仍须[画面与声音验收](presentation-and-qa.md#验证与交付)。
 
-进度条按编码器已处理的视频时长显示连续百分比：片段合成及最终编码均按各自视频时长计入总工作量，不按片段数平分；输出核验与保存完成才到100%。失败保留当前进度及错误，不显示完成。
+进度条按已处理时间线帧数显示连续百分比，不按片段数平分；合成和编码边读边做；核验与保存完成才到100%。失败保留错误与本次未完成文件，不显示完成。
 
-成功输出并保存记录后自动清理本次render-parts、重复编码中间文件和定格临时帧，保留最终MP4、project-snapshot.json及export.json；失败时保留本次诊断文件，不清理其他导出或工作区。
+最终渲染只读`originalPath`，先逐源核对SHA-256；原片缺失或替换立即报错，绝不回退代理。原始解码与正式图层合成通过raw YUV流进入单一H.264编码器；每次最多一个源解码进程，PCM以最长10秒为界，不随片段数量增长，无有损逐段中间片或整场无损缓存。音频按累计时间线边界取整到样本，剪口淡变、静音和hold拼接后只编码一次AAC；最终fps只换算一次，尾音裁补到实际输出时长。实时预览仍读代理。
+
+成功保留最终MP4、project-snapshot.json、export.json（含源身份、累计样本数和资源上界）；仅移除本次同一成片的暂存副本。失败保留本次诊断文件，不清理其他导出或工作区。
+
+旧工程没有`sourceIdentity/sourceMapping`时先核对原片及现有代理，再明确接受当前原片：`python scripts/local_editor.py bind-sources WORK/edit --expected-revision N --accept-current-originals`。只支持源和代理起点均为0的完整源网格，并检查旧sourceProbe；记录这是当前字节的绑定，不证明历史身份。非零／有界旧代理的映射有歧义时须重新prepare并复核剪口，不能静默平移。新代理可直接支持非零源起点。绑定不更改比分、答案或统计。
 
 剪辑结束、用户最终成片导出成功后的任务工作区清理按[收尾清理](cleanup.md)：先列范围并询问，得到明确确认再执行；当前project、源映射、统计、答案、代理及Undo/Redo仍引用的图层等依赖完整保留，清理后核验可重开性和skill完整性。
 

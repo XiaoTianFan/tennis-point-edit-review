@@ -287,6 +287,9 @@ def main():
     serve = sub.add_parser('serve'); serve.add_argument('directory'); serve.add_argument('--port', type=int, default=0); serve.add_argument('--open', action='store_true')
     inspect = sub.add_parser('context'); inspect.add_argument('directory'); inspect.add_argument('--output')
     update = sub.add_parser('update'); update.add_argument('directory'); update.add_argument('plan'); update.add_argument('--expected-revision', type=int, required=True)
+    bind = sub.add_parser('bind-sources', help='Accept current original bytes for an unambiguous legacy full-source grid')
+    bind.add_argument('directory'); bind.add_argument('--expected-revision', type=int, required=True)
+    bind.add_argument('--accept-current-originals', action='store_true', required=True)
     render = sub.add_parser('render'); render.add_argument('directory'); render.add_argument('output')
     render.add_argument('--fps'); render.add_argument('--width', type=int); render.add_argument('--height', type=int); render.add_argument('--filename', default='edited.mp4')
     render.add_argument('--bitrate', default='quality', help='quality (CRF 18), source, or target video bits/s')
@@ -299,11 +302,17 @@ def main():
     elif args.command == 'doctor':
         result = {'python': __import__('sys').version.split()[0],
                   'executables': {name: shutil.which(name) for name in ('ffmpeg', 'ffprobe', 'node')}}
+        try:
+            import av, numpy
+            av.codec.Codec('libx264', 'w'); av.codec.Codec('aac', 'w')
+            result['exportDependencies'] = dict(ready=True, av=av.__version__, numpy=numpy.__version__)
+        except (ImportError, ValueError) as error:
+            result['exportDependencies'] = dict(ready=False, error=str(error))
         if result['executables']['node']:
             check = subprocess.run(['node', '-e', "for(const m of ['react','react-dom','esbuild','playwright']) console.log(m+': '+require.resolve(m))"],
                                    cwd=WEB.parent, capture_output=True, text=True, encoding='utf-8')
             result['graphicsDependencies'] = {'ready': check.returncode == 0, 'details': check.stdout or check.stderr}
-        result['ready'] = all(result['executables'].values()) and result.get('graphicsDependencies', {}).get('ready', False)
+        result['ready'] = all(result['executables'].values()) and result.get('graphicsDependencies', {}).get('ready', False) and result['exportDependencies']['ready']
         result['browser'] = 'Render a small project to verify Chromium or the selected installed browser channel'
     elif args.command == 'media':
         result = prepare_media(args.source, args.output, args.fps, args.width, args.start, args.duration)
@@ -331,6 +340,15 @@ def main():
         result = {**context(Store(args.directory).get()), 'projectPath': str(Store(args.directory).path)}
         if args.output:
             write(args.output, result)
+    elif args.command == 'bind-sources':
+        from source_binding import bind_legacy
+        store = Store(args.directory)
+        old = store.get()
+        if old['revision'] != args.expected_revision:
+            raise Conflict('Stale revision; read current context before binding sources')
+        updated = copy.deepcopy(old)
+        updated['assets'] = [bind_legacy(a) for a in old['assets']]
+        result = store.commit(updated, args.expected_revision, {'type': 'owner-source-binding', 'historicalIdentityVerified': False})
     elif args.command == 'update':
         store = Store(args.directory)
         old, updated = store.get(), read(args.plan)

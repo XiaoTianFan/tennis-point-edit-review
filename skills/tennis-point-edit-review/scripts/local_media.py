@@ -9,6 +9,8 @@ import time
 from fractions import Fraction
 from pathlib import Path
 from local_model import read, write, duration, overlay_range, validate, check_export_request
+from media_probe import identity
+from source_binding import mapping, unchanged
 
 HERE = Path(__file__).resolve().parent
 
@@ -87,6 +89,7 @@ def prepare_media(source, output, fps=None, width=None, start=0, length=None):
     if output.exists() or source == output:
         raise ValueError('Use a new media path')
     info = probe(source)
+    fingerprint = identity(source)
     settings = source_settings(info)
     rate = Fraction(str(fps or settings['fps']))
     target_width = width or settings['width']
@@ -100,15 +103,20 @@ def prepare_media(source, output, fps=None, width=None, start=0, length=None):
     if video.get('color_transfer') in ('smpte2084', 'arib-std-b67'):
         raise ValueError('HDR source: establish and verify an SDR tone-map before creating this proxy')
     output.parent.mkdir(parents=True, exist_ok=True)
-    args = ['ffmpeg', '-v', 'error', '-nostdin', '-n', '-ss', start, '-i', source]
+    clock = mapping(info, start)
+    from local_render import source_input, grid_filter
+    bound = {'originalPath': str(source), 'sourceMapping': clock}
+    _, grid = grid_filter(bound, 0, rate)
+    args = source_input(bound, Fraction(clock['originSeconds'])) + ['-n']
     if length is not None:
         args += ['-t', length]
     args += ['-map', '0:v:0', '-map', '0:a:0?', '-vf',
-        f'fps={rate},scale={target_width}:{target_height}:force_original_aspect_ratio=decrease,pad={target_width}:{target_height}:(ow-iw)/2:(oh-ih)/2,setsar=1',
+        f'{grid},scale={target_width}:{target_height}:force_original_aspect_ratio=decrease,pad={target_width}:{target_height}:(ow-iw)/2:(oh-ih)/2,setsar=1',
         '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '19', '-pix_fmt', 'yuv420p', '-g', str(round(float(rate))),
         '-c:a', 'aac']
     if settings['audio']:
-        args += ['-ar', settings['audio']['sampleRate'], '-ac', settings['audio']['channels']]
+        args += ['-af', f"atrim=start={float(Fraction(clock['originSeconds'])):.9f},asetpts=PTS-({clock['originSeconds']})/TB,aresample=async=1:first_pts=0",
+                 '-ar', settings['audio']['sampleRate'], '-ac', settings['audio']['channels']]
     # Preserve supported SDR color tags. HDR requires an explicitly verified tone map.
     for key, option in [('color_space', '-colorspace'), ('color_transfer', '-color_trc'), ('color_primaries', '-color_primaries'), ('color_range', '-color_range')]:
         value = settings['color'].get(key)
@@ -116,6 +124,7 @@ def prepare_media(source, output, fps=None, width=None, start=0, length=None):
             args += [option, value]
     args += ['-movflags', '+faststart', output]
     run(args)
+    unchanged(fingerprint)
     checked = probe(output)
     stream = next(s for s in checked['streams'] if s['codec_type'] == 'video')
     result = {'path': str(output), 'frames': int(stream['nb_frames']), 'fps': str(rate),
@@ -123,7 +132,8 @@ def prepare_media(source, output, fps=None, width=None, start=0, length=None):
         'sourceSettings': settings,
         'hasAudio': any(s['codec_type'] == 'audio' for s in checked['streams']),
         'originalPath': str(source), 'sourceStartSeconds': start, 'sourceProbe': info,
-        'timing': 'cfr-proxy', 'mapping': 'original presentation time = sourceStartSeconds + frame / fps; resampled frames are not original frame numbers'}
+        'sourceIdentity': fingerprint, 'sourceMapping': clock,
+        'timing': 'cfr-proxy', 'mapping': 'original PTS time = sourceMapping.originSeconds + frame / fps; resampled frames are not original frame numbers'}
     write(output.with_suffix('.media.json'), result)
     return result
 
@@ -220,134 +230,60 @@ def export_settings(project, options=None):
     if 'audio' not in project and not result['audio']:
         asset = next((a for a in project['assets'] if a.get('hasAudio')), None)
         if asset:
-            result['audio'] = source_settings(probe(asset['path']))['audio']
+            result['audio'] = asset.get('sourceSettings', {}).get('audio')
     return result
 
 
 def export_video(project, directory, progress=lambda value: None, options=None, target=None, *, user_requested=False):
-    validate(project, check_files=True)
+    from local_render import preflight, encode
+    import shutil
+    validate(project)
     check_export_request(project, user_requested)
     settings = export_settings(project, options)
-    audio = settings['audio']
-    sample_rate, channels = (audio['sampleRate'], audio['channels']) if audio else (48000, 2)
     target = Path(target).resolve() if target else Path(directory).resolve() / settings['filename']
     if target.exists():
         raise ValueError('Output file already exists; choose another filename')
     directory = Path(directory).resolve()
     if directory.exists():
         raise ValueError('Use a new export directory')
-    directory.mkdir(parents=True)
-    parts_directory = directory / 'render-parts'
-    parts_directory.mkdir()
-    write(directory / 'project-snapshot.json', project)
-    # The snapshot remains the complete edit. Only this render's clip sequence changes.
     selected = set(settings['clipIds'])
-    ranges, master_frame, output_frame = [], 0, 0
+    ranges, master_frame, timeline_frames = [], 0, 0
     for clip in project['clips']:
         n = duration(clip)
         if clip['id'] in selected:
             ranges.append(dict(clipId=clip['id'], masterStartFrame=master_frame, masterEndFrame=master_frame+n,
-                exportStartFrame=output_frame, exportEndFrame=output_frame+n))
-            output_frame += n
+                exportStartFrame=timeline_frames, exportEndFrame=timeline_frames+n))
+            timeline_frames += n
         master_frame += n
-    project = {**project, 'clips': export_clips(project, settings['scope'], settings['clipIds'])}
-    assets = {a['id']: a for a in project['assets']}
-    fps = float(Fraction(str(project['fps'])))
-    timeline_frames = sum(duration(c) for c in project['clips'])
-    seconds = Fraction(timeline_frames) / Fraction(str(project['fps']))
-    expected = max(1, math.floor(seconds * Fraction(settings['fps']) + Fraction(1, 2)))
-    final_seconds = float(Fraction(expected) / Fraction(settings['fps']))
-    work_seconds = float(seconds) + final_seconds
-    percent = 0
-    def report_progress(stage, elapsed):
-        nonlocal percent
-        percent = max(percent, min(99, max(0, elapsed) / work_seconds * 100))
-        progress(dict(state='running', stage=stage, progressPercent=percent, durationSeconds=final_seconds))
-    report_progress('compositing', 0)
-    completed_seconds = 0
-    parts = []
-    for index, clip in enumerate(project['clips']):
-        asset = assets[clip['assetId']]
-        n = duration(clip)
-        clip_seconds = n / fps
-        args = ['ffmpeg', '-v', 'error', '-nostdin', '-n']
-        hold = clip.get('kind') == 'hold'
-        if hold:
-            image = frame_image(asset, clip['inFrame'], project['fps'], directory / f'hold-{index}.jpg')
-            args += ['-loop', '1', '-framerate', project['fps'], '-i', image]
-        else:
-            args += ['-ss', f'{clip["inFrame"]/fps:.9f}', '-i', asset['path']]
-        overlays = [o for o in project.get('overlays', []) if o.get('view','both') != 'review' and o['clipId'] == clip['id'] and overlay_range(o, clip)[1] > overlay_range(o, clip)[0]]
-        for overlay in overlays:
-            if not Path(overlay.get('image', '')).is_file():
-                raise ValueError('Missing rendered graphic: ' + overlay['id'])
-            args += ['-loop', '1', '-framerate', project['fps'], '-i', overlay['image']]
-        audio_index = 0
-        if hold or not asset.get('hasAudio'):
-            audio_index = 1 + len(overlays)
-            args += ['-f', 'lavfi', '-i', f'anullsrc=r={sample_rate}:cl={channels}c']
-        filters = [f'[0:v]setpts=PTS-STARTPTS,scale={project["width"]}:{project["height"]}:force_original_aspect_ratio=decrease:out_range=tv:out_color_matrix=bt709,pad={project["width"]}:{project["height"]}:(ow-iw)/2:(oh-ih)/2,setsar=1,format=yuv420p,setparams=range=limited:color_primaries=bt709:color_trc=bt709:colorspace=bt709[v0]']
-        for i, overlay in enumerate(overlays):
-            start, end = overlay_range(overlay, clip)
-            extra = ''
-            if overlay['component'] == 'statsPanel':
-                fade = min(max(1, round(.3 * fps)), (end-start)//2) / fps
-                extra = f',fade=t=in:st={start/fps}:d={fade}:alpha=1,fade=t=out:st={(end-1)/fps-fade}:d={fade}:alpha=1' if fade else ''
-            filters.append(f'[{i+1}:v]format=rgba{extra}[o{i}]')
-            filters.append(f"[v{i}][o{i}]overlay=0:0:enable='gte(n,{start})*lt(n,{end})':shortest=1[v{i+1}]")
-        filters.append(f'[{audio_index}:a]atrim=duration={clip_seconds},asetpts=PTS-STARTPTS,aresample={sample_rate},apad,afade=t=in:d={min(2/fps, clip_seconds/2)},afade=t=out:st={max(0, clip_seconds-2/fps)}:d={min(2/fps, clip_seconds/2)}[audio]')
-        part = parts_directory / f'part-{index:04}.mp4'
-        args += ['-filter_complex', ';'.join(filters), '-map', f'[v{len(overlays)}]', '-map', '[audio]',
-            '-frames:v', n, '-t', f'{clip_seconds:.9f}', '-r', project['fps'], '-c:v', 'libx264',
-            '-preset', 'veryfast', '-crf', '18', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-ar', sample_rate, '-ac', channels, part]
-        run_progress(args, project['fps'], lambda t: report_progress('compositing', completed_seconds + min(t, clip_seconds)))
-        parts.append(part)
-        completed_seconds += clip_seconds
-        report_progress('compositing', completed_seconds)
-    listing = parts_directory / 'parts.txt'
-    listing.write_text(''.join(f"file '{part.name}'\nduration {duration(clip)/fps:.9f}\n" for part, clip in zip(parts, project['clips'])), encoding='utf-8')
-    # Normalize the final timestamps and codec parameters across video and JPEG holds.
-    # Explicit segment durations keep AAC packet padding out of the timeline clock.
-    # Convert once after concatenation: no per-clip rounding drift or evidence reindexing.
-    w, h = settings['width'], settings['height']
+    render = {**project, 'clips': export_clips(project, settings['scope'], settings['clipIds'])}
+    fingerprints = preflight(render)  # Before creating ANY export files; no proxy fallback.
+    directory.mkdir(parents=True)
+    write(directory / 'project-snapshot.json', project)
     final_path = directory / '.encoded.mp4'
-    report_progress('encoding', float(seconds))
-    encoding = ['-b:v', str(settings['videoBitrate'])] if settings['videoBitrate'] else ['-crf', '18']
-    run_progress(['ffmpeg', '-v', 'error', '-nostdin', '-n', '-f', 'concat', '-safe', '1', '-i', listing,
-         '-vf', f'setpts=N/({project["fps"]}*TB),fps={settings["fps"]},scale={w}:{h}:force_original_aspect_ratio=decrease:flags=lanczos,pad={w}:{h}:(ow-iw)/2:(oh-ih)/2,setsar=1,tpad=stop_mode=clone:stop_duration=1',
-         '-af', f'aresample={sample_rate}:async=1:first_pts=0,apad',
-         '-frames:v', expected, '-t', f'{float(Fraction(expected)/Fraction(settings["fps"])):.9f}', '-r', settings['fps'],
-         '-c:v', 'libx264', *encoding, '-preset', 'veryfast', '-pix_fmt', 'yuv420p',
-         '-c:a', 'aac', '-ar', sample_rate, '-ac', channels, '-movflags', '+faststart', final_path],
-         settings['fps'], lambda t: report_progress('encoding', float(seconds) + min(t, final_seconds)))
-    report_progress('finalizing', work_seconds)
+    def report_progress(value, stage='encoding'):
+        progress(dict(state='running', stage=stage, progressPercent=value))
+    report_progress(0)
+    resources = encode(render, settings, final_path, fingerprints, report_progress)
+    report_progress(99, 'finalizing')
     result = probe(final_path)
     video = next(s for s in result['streams'] if s['codec_type'] == 'video')
-    if int(video['nb_frames']) != expected:
+    if int(video['nb_frames']) != resources['frames']:
         raise ValueError('Export frame count mismatch')
-    # Exclusive destination creation prevents accidental replacement, even across filesystems.
-    import shutil
-    with target.open('xb') as dest, final_path.open('rb') as src:
-        shutil.copyfileobj(src, dest)
-    report = {'state': 'complete', 'progressPercent': 100, 'stage': 'complete', 'durationSeconds': final_seconds,
-        'path': str(target), 'revision': project['revision'], 'frames': expected,
+    # Exclusive destination creation prevents accidental replacement across filesystems.
+    try:
+        with target.open('xb') as dest, final_path.open('rb') as src:
+            shutil.copyfileobj(src, dest, 1024*1024)
+    except BaseException:
+        # Leave diagnostics in this fresh export directory; never remove an existing target.
+        raise
+    report = {'state': 'complete', 'progressPercent': 100, 'stage': 'complete',
+        'durationSeconds': float(Fraction(resources['frames']) / Fraction(settings['fps'])),
+        'path': str(target), 'revision': project['revision'], 'frames': resources['frames'],
         'settings': settings, 'timelineFrames': timeline_frames, 'fullTimelineFrames': master_frame, 'ranges': ranges,
         'warnings': project.get('needsRebuild', []), 'userRequested': user_requested,
-        'sha256': hashlib.sha256(target.read_bytes()).hexdigest(), 'probe': result}
+        'sha256': identity(target)['sha256'], 'probe': result, 'render': resources,
+        'originals': list(fingerprints.values())}
     write(directory / 'export.json', report)
-    # Only prune intermediates created in this new export directory after the final
-    # destination and its records are durable. Never traverse an external target.
-    cleanup_errors = []
-    for intermediate in [parts_directory, final_path, *directory.glob('hold-*.jpg')]:
-        try:
-            if intermediate.is_dir():
-                shutil.rmtree(intermediate)
-            else:
-                intermediate.unlink()
-        except OSError as error:
-            cleanup_errors.append(str(error))
-    if cleanup_errors:
-        report['cleanupWarnings'] = cleanup_errors
-        write(directory / 'export.json', report)
+    final_path.unlink()  # Only the known duplicate created by this invocation.
     progress(report)
     return report

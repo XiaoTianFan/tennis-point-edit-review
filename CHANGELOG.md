@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026.10.21-v26.0
+
+- Render final H.264/AAC directly from identity-bound originals through bounded raw-frame/PCM streams; encode video and audio once, with one cumulative sample clock.
+- Normalize newly prepared proxy origins and require explicit checked binding for legacy source identities.
+
 ## 2026.10.21-v25.18
 
 - Document explicitly authorized minimal-evidence archives, preserving adopted key visuals and raw measurements while allowing nonessential procedural imagery to be discarded.
