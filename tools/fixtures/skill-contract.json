@@ -849,6 +849,27 @@
           "text": "原始录像和最终交付视频始终保留在用户最初放置或指定导出的位置"
         }
       ]
+    },
+    {
+      "id": "R-MINIMAL-EVIDENCE-ARCHIVE",
+      "checks": [
+        {
+          "path": "references/cleanup.md",
+          "text": "用户另行明确授权精简分析图片"
+        },
+        {
+          "path": "references/cleanup.md",
+          "text": "仅依赖原片的再生能力以原片仍在为条件"
+        },
+        {
+          "path": "references/cleanup.md",
+          "text": "agent仍不删除或搬移原片／最终视频"
+        },
+        {
+          "path": "references/cleanup.md",
+          "text": "不改写旧记录掩盖缺口，不新增播放回退机制"
+        }
+      ]
     }
   ],
   "files": [

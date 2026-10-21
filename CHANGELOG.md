@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026.10.21-v25.18
+
+- Document explicitly authorized minimal-evidence archives, preserving adopted key visuals and raw measurements while allowing nonessential procedural imagery to be discarded.
+- Make source-dependent recovery limits and owner-only future source deletion explicit. No editor runtime or template changes.
+
 ## 2026.10.21-v25.17
 
 - Clarify that original recordings and final deliveries remain in user-selected library locations; workspace exports do not redefine that boundary.
