@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026.10.21-v25.17
+
+- Clarify that original recordings and final deliveries remain in user-selected library locations; workspace exports do not redefine that boundary.
+- Document owner-authorized lean retention of superseded standalone projects and playback copies, preserving canonical records and regeneration metadata; image retention remains a separate evidence and authorization decision. No runtime behavior changes.
+
 ## 2026.10.21-v25.16
 
 - Default new jobs to organized folders under the saved skill checkout's ignored `outputs/`, including when invoked from a linked worktree; honor explicit user directories.

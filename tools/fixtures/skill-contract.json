@@ -828,6 +828,27 @@
           "text": "不重写历史清理清单、导出快照、证据或原始工程字节"
         }
       ]
+    },
+    {
+      "id": "R-LEAN-RETENTION",
+      "checks": [
+        {
+          "path": "references/cleanup.md",
+          "text": "这不是默认自动删除政策。"
+        },
+        {
+          "path": "references/cleanup.md",
+          "text": "需重建代理后播放"
+        },
+        {
+          "path": "references/cleanup.md",
+          "text": "没有图片删除授权时只报告候选、唯一信息及预计占用"
+        },
+        {
+          "path": "references/job-storage.md",
+          "text": "原始录像和最终交付视频始终保留在用户最初放置或指定导出的位置"
+        }
+      ]
     }
   ],
   "files": [

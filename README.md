@@ -47,7 +47,7 @@ explicit confirmation, including in continuous mode. The [cleanup workflow](skil
 preserves original media, the final video, statistics, the reopenable project and
 its dependencies, and all skill content; it verifies integrity and reports net freed space.
 
-Current skill revision: **2026.10.21-v25.16**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, required recovery attempts, complete 3D screening and evidence-only/N/A labels.
+Current skill revision: **2026.10.21-v25.17**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, required recovery attempts, complete 3D screening and evidence-only/N/A labels.
 
 ChatCut, **Premiere Pro** and a standalone pipeline are primary editing choices.
 The [environment contract](skills/tennis-point-edit-review/references/editing-environments.md)

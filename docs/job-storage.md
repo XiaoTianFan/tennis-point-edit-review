@@ -13,6 +13,15 @@ of cwd and linked worktrees. Extracted installations require an explicit absolut
 New default names are exclusive; collisions get a numeric suffix. Existing jobs
 resume in place, and source/final library locations are separate from job storage.
 
+Original recordings and final delivered videos stay where the user placed or
+exported them. Workspaces reference those paths; organizing outputs never moves
+these library files. A workspace exports folder is for project export records,
+snapshots and procedural outputs, not a new default library for final deliveries.
+The [cleanup contract](../skills/tennis-point-edit-review/references/cleanup.md#用户选择精简保留时)
+also supports explicitly authorized removal of old snapshots and playback copies:
+preserve canonical data and regeneration metadata, label deferred playback, and
+assess analysis images separately. This does not add automatic cleanup behavior.
+
 The operational [storage contract](../skills/tennis-point-edit-review/references/job-storage.md)
 defines the layout and migration boundaries. JSON reads in Courtside/Edit apply
 the closest `relocation-map.json` to absolute path values in memory. Original
