@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026.10.21-v25.16
+
+- Default new jobs to organized folders under the saved skill checkout's ignored `outputs/`, including when invoked from a linked worktree; honor explicit user directories.
+- Add CLI workspace creation and relocation-aware JSON loading, preserving historical file bytes while resolving live project, statistics and recovery dependencies through explicit path maps.
+- Document verified relocation separately from cleanup and disk reclamation.
+
 ## 2026.10.20-v25.15
 
 - Ask for explicit cleanup confirmation after editing is complete and the user's final export succeeds; continuous editing or export authorization does not authorize workspace deletion.

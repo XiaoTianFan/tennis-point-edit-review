@@ -1,6 +1,7 @@
 """Portable local timeline model, review protocol and revision-fenced persistence."""
 from output_language import resolve_language
 from review_io import validate_labels, LABEL_FIELDS
+from job_workspace import read_document
 import copy
 import json
 import os
@@ -15,7 +16,7 @@ CAUSES = {'out', 'net', 'two_bounces', 'replay', 'ace', 'winner', 'other'}
 COMPONENTS = {'scoreboard', 'serveLabel', 'serveSpeed', 'statsPanel', 'reviewId', 'reviewLabel', 'explanation'}
 
 def read(path):
-    return json.loads(Path(path).read_text(encoding='utf-8-sig'))
+    return read_document(path)
 
 def write(path, value):
     path = Path(path)

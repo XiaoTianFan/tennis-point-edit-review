@@ -8,7 +8,8 @@
 
 | 工具 | 调用与边界 |
 |---|---|
-| local_editor.py | doctor/media/init/serve/context/update/render；[本地工作台](local-editor.md)规定计划、版本围栏、用户导出及agent主动导出条件 |
+| local_editor.py | workspace/doctor/media/init/serve/context/update/render；[本地工作台](local-editor.md)规定计划、版本围栏、用户导出及agent主动导出条件 |
+| job_workspace.py | create/resolve/read；[任务工作区](job-storage.md)规定主检出outputs默认值、显式目录和迁移路径解析 |
 | premiere_exchange.py | 生成FCP7 XML与源帧/tick映射，不操作Pr；[Pr分支](premiere-pro.md)规定CFR、范围和待执行操作 |
 | premiere_mcp.cjs | 单请求stdio桥客户端；执行host操作，超时不盲重试，不当只读计算器 |
 | render_overlays.cjs | React/esbuild/Playwright将七个正式JSX渲染为RGBA PNG和哈希清单；不连接编辑器 |

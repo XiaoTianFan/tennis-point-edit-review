@@ -14,6 +14,10 @@ fields. Do not introduce new metrics that duplicate existing indicators.
 
 Check the actual recording, camera view and render target when verifying an edit.
 
+Keep job data under the saved checkout's ignored `outputs/`, unless the user
+specifies a directory. Follow [job storage](docs/job-storage.md) for defaults,
+immutable relocation maps and migration validation. Never commit private inventories.
+
 For local workbench changes run `npm run check:local` and verify the affected
 browser interaction. Cover full/review view mapping, long-timeline fit, known
 and unassigned games, and user-requested exports with confirmations absent.

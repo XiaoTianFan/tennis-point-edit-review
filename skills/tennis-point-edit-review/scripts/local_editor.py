@@ -17,6 +17,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
 from local_model import SCHEMA, Store, Conflict, context, read, write, validate, check_export_request
 from local_media import prepare_media, frame_image, render_graphics, export_video, export_settings, probe, source_settings
+from job_workspace import create_workspace, add_create_arguments
 
 WEB = Path(__file__).resolve().parent / 'local_web'
 
@@ -276,11 +277,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest='command', required=True)
     sub.add_parser('doctor', help='Check terminal dependencies without starting a browser')
+    add_create_arguments(sub.add_parser('workspace', help='Create an organized job in the saved repository outputs'))
     media = sub.add_parser('media', help='Create a browser-compatible CFR source proxy')
     media.add_argument('source'); media.add_argument('output'); media.add_argument('--fps')
     media.add_argument('--width', type=int); media.add_argument('--start', type=float, default=0)
     media.add_argument('--duration', type=float)
-    init = sub.add_parser('init'); init.add_argument('plan'); init.add_argument('directory')
+    init = sub.add_parser('init'); init.add_argument('plan'); init.add_argument('directory', nargs='?')
+    add_create_arguments(init)
     serve = sub.add_parser('serve'); serve.add_argument('directory'); serve.add_argument('--port', type=int, default=0); serve.add_argument('--open', action='store_true')
     inspect = sub.add_parser('context'); inspect.add_argument('directory'); inspect.add_argument('--output')
     update = sub.add_parser('update'); update.add_argument('directory'); update.add_argument('plan'); update.add_argument('--expected-revision', type=int, required=True)
@@ -291,7 +294,9 @@ def main():
     render.add_argument('--clip-id', action='append', default=[], help='Clip to include in selected scope; repeat as needed, exported in master order')
     render.add_argument('--user-requested', action='store_true', help='Export at the explicit request of the user, regardless of review/statistics confirmations')
     args = parser.parse_args()
-    if args.command == 'doctor':
+    if args.command == 'workspace':
+        result = create_workspace(args.source, args.work_dir, args.outputs_root, args.job_id)
+    elif args.command == 'doctor':
         result = {'python': __import__('sys').version.split()[0],
                   'executables': {name: shutil.which(name) for name in ('ffmpeg', 'ffprobe', 'node')}}
         if result['executables']['node']:
@@ -303,8 +308,12 @@ def main():
     elif args.command == 'media':
         result = prepare_media(args.source, args.output, args.fps, args.width, args.start, args.duration)
     elif args.command == 'init':
-        p = initialize(read(args.plan), args.directory, Path(args.plan).resolve().parent)
-        result = {'project': str(Path(args.directory).resolve() / 'project.json'), 'revision': p['revision']}
+        if args.directory and any((args.work_dir, args.outputs_root, args.job_id, args.source)):
+            parser.error('Use either an exact project directory or workspace options, not both')
+        plan = read(args.plan)
+        directory = args.directory or create_workspace(args.source, args.work_dir, args.outputs_root, args.job_id)['paths']['edit']
+        p = initialize(plan, directory, Path(args.plan).resolve().parent)
+        result = {'project': str(Path(directory).resolve() / 'project.json'), 'revision': p['revision']}
     elif args.command == 'serve':
         server = make_server(args.directory, args.port)
         write(Path(args.directory) / 'session.json', {'url': server.launch_url})

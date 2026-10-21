@@ -54,7 +54,7 @@ python tools/validate.py
 npm run check:adapters
 ```
 
-工作流与编辑器指南在 `references/`，正式模板在 `examples/`，计算与取证工具在 `scripts/`。当前版本 **2026.10.20-v25.15**；估速方法详见[中英文说明](docs/serve-speed-explained.md)。
+工作流与编辑器指南在 `references/`，正式模板在 `examples/`，计算与取证工具在 `scripts/`。当前版本 **2026.10.21-v25.16**；估速方法详见[中英文说明](docs/serve-speed-explained.md)。
 
 账户保存版本没有可以直接交给 Git 的目录地址。建议以本仓库作可版本管理的维护源。也支持先修改账户版本，再由 agent 完整取回、差异比较、合并、验证和提交；不会自动同步，更不会自动公开到 GitHub。详见[双向同步流程](docs/synchronization.md)。
 
@@ -69,3 +69,5 @@ MIT许可证；参见[发布步骤](docs/publishing.md)与[贡献说明](CONTRIB
 七个图层模板、五页39行统计、复核HTML及对比矩阵按用户主要交互语言生成；明确指定的渲染语言优先。工作台界面语言独立。接口、术语和重生成规则见[产物语言](skills/tennis-point-edit-review/references/output-language.md)。
 
 本地工作台在同一工程下切换完整全片／仅复核时间线，复用计分板和审核列表，不再制作离线HTML。已剪成片逐帧重建原剪口并保留全长；靠近游标的拖动剪口支持吸附。时间线支持全片适配、对数缩放和局次轨／局次跳转，Ctrl/⌘多选、Shift区间选择；最后点击段始终负责审核定位，导出选择独立保留。导出可选完整master或按主轨顺序拼接所选段。用户点击或明确要求导出时直接执行；确认前仅限制agent自行渲染完整临时样片，以免重复占盘。
+
+新任务默认在技能项目主检出的已忽略 `outputs/` 下创建独立工作区，用户指定目录优先；见[任务存储说明](docs/job-storage.md)。

@@ -4,10 +4,11 @@
 
 ## 启动与依赖
 
-素材、工程、答案与输出放任务工作区，不写技能目录。需要Python 3.10+、FFmpeg/ffprobe、Node 20+、现代Chromium；图形渲染需要React、React DOM、esbuild、Playwright。网页无构建步骤、CDN和第三方脚本。
+素材、工程、答案与输出放任务工作区，不写技能目录。先按[任务工作区](job-storage.md)创建或接续：默认使用技能项目主检出的 `outputs/`，用户指定目录优先；源录像和用户指定成片仍留原位置。需要Python 3.10+、FFmpeg/ffprobe、Node 20+、现代Chromium；图形渲染需要React、React DOM、esbuild、Playwright。网页无构建步骤、CDN和第三方脚本。
 
 ```sh
 python "<skill>/scripts/local_editor.py" doctor
+python "<skill>/scripts/local_editor.py" workspace --source "<source>"
 python "<skill>/scripts/local_editor.py" media "<source>" "<work>/source-proxy.mp4"
 python "<skill>/scripts/local_editor.py" init "<work>/plan.json" "<work>/edit"
 python "<skill>/scripts/local_editor.py" serve "<work>/edit" --open
@@ -16,6 +17,8 @@ python "<skill>/scripts/local_editor.py" serve "<work>/edit" --open
 `<skill>/<work>/<source>`替换为当前任务路径，参数加引号。缺模块时在工作区独立runtime运行`npm install --prefix "<work>/runtime" --save-exact react react-dom esbuild playwright`，保留锁文件并设置本进程`NODE_PATH`。可用已装Edge/Chrome，计划指定`browserChannel=msedge/chrome`；无浏览器时在runtime执行`npx playwright install chromium`。`doctor`仅证明依赖存在，实际`init`和合成预览才证明可用。
 
 `serve`输出带令牌回环URL并写`session.json`，交用户打开并保持进程运行；Ctrl+C停止。同目录重启保留工程与答案并换令牌。Python代码更新后须重启并打开新URL，刷新网页不重载后端。不绑定公网、转发端口或上传令牌；无浏览器控制能力仍可构建工程。
+
+`workspace` 返回的 `directory` 即 `<work>`；可加 `--work-dir` 使用用户指定目录。`init plan.json` 省略工程目录时也会创建默认任务工作区，工程放其 `edit/`；指定工程目录时严格使用该目录，不能同时传工作区选项。已有工程继续 `serve/context/update`，不重新 `init`。迁移工程的历史路径按[路径映射](job-storage.md#已授权迁移与路径解析)读取。
 
 ## 媒体与时间
 

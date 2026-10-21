@@ -6,6 +6,7 @@ __pycache__/
 .env.*
 !.env.example
 output/
+outputs/
 dist/
 .skill-sync/
 .playwright-cli/

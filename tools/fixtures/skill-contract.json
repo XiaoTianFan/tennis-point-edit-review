@@ -807,6 +807,27 @@
           "text": "每轮比赛工作回复（含单项修正/回填）结束时说明当前阶段、具体未解项和下一步责任/动作"
         }
       ]
+    },
+    {
+      "id": "R-STORAGE",
+      "checks": [
+        {
+          "path": "SKILL.md",
+          "text": "默认落到临时worktree"
+        },
+        {
+          "path": "references/job-storage.md",
+          "text": "素材路径或最终成片路径不等于用户指定了工作目录。"
+        },
+        {
+          "path": "references/job-storage.md",
+          "text": "移动字节数与净释放空间分开报告。迁移授权不等于额外删减保留数据。"
+        },
+        {
+          "path": "references/job-storage.md",
+          "text": "不重写历史清理清单、导出快照、证据或原始工程字节"
+        }
+      ]
     }
   ],
   "files": [
@@ -1079,6 +1100,12 @@
     },
     {
       "path": "scripts/serve_recovery.py"
+    },
+    {
+      "path": "scripts/job_workspace.py"
+    },
+    {
+      "path": "references/job-storage.md"
     }
   ]
 }
