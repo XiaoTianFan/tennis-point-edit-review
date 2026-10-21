@@ -132,7 +132,7 @@ class OriginalExportTests(unittest.TestCase):
         p['clips']=[clip];asset=p['assets'][0]
         actual=subprocess.check_output(video_command(p,dict(width=160,height=96),asset,clip,0,30))
         expected=subprocess.check_output(['ffmpeg','-v','error','-i',asset['originalPath'],'-vf',
-            f"settb=AVTB,fps={p['fps']}:start_time=0:round=near,trim=start_frame=13:end_frame=43,setpts=PTS-STARTPTS,scale=160:96:out_range=tv:out_color_matrix=bt709",
+            f"settb=AVTB,fps={p['fps']}:start_time=0:round=near,trim=start_frame=13:end_frame=43,setpts=PTS-STARTPTS,scale=160:96:flags=lanczos:out_range=tv:out_color_matrix=bt709",
             '-fps_mode','passthrough','-f','rawvideo','-pix_fmt','yuv420p','-'])
         self.assertEqual(actual,expected)
 
