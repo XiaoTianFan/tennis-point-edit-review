@@ -20,11 +20,13 @@ class OriginalExportTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory(); self.addCleanup(self.tmp.cleanup)
         self.root = Path(self.tmp.name)
 
-    def source(self, name='original.mkv', offset=0, audio=True):
+    def source(self, name='original.mkv', offset=0, audio=True, bt709=False):
         path = self.root/name
         args = ['ffmpeg','-v','error','-f','lavfi','-i','testsrc2=size=160x96:rate=60000/1001']
         if audio:
             args += ['-f','lavfi','-i','anoisesrc=seed=73:sample_rate=48000:amplitude=0.2']
+        if bt709:
+            args += ['-colorspace','bt709','-color_trc','bt709','-color_primaries','bt709','-color_range','tv']
         run(args+['-t','5','-c:v','ffv1','-c:a','pcm_s16le','-output_ts_offset',str(offset),path])
         return path
 
@@ -126,15 +128,23 @@ class OriginalExportTests(unittest.TestCase):
         self.assertEqual(whole,pieces)
 
     def test_small_review_canvas_never_downsamples_original_before_large_export(self):
-        p=self.project(self.source(audio=False))
+        # Isolate spatial sampling from unspecified-color conversion rounding,
+        # which differs between FFmpeg/libswscale versions and thread settings.
+        p=self.project(self.source(audio=False,bt709=True))
         p.update(width=80,height=48)
         clip=dict(id='cut',assetId='src',pointId='P001',inFrame=13,outFrame=43)
         p['clips']=[clip];asset=p['assets'][0]
         actual=subprocess.check_output(video_command(p,dict(width=160,height=96),asset,clip,0,30))
-        expected=subprocess.check_output(['ffmpeg','-v','error','-i',asset['originalPath'],'-vf',
+        expected=subprocess.check_output(['ffmpeg','-v','error','-filter_threads','1','-i',asset['originalPath'],'-vf',
             f"settb=AVTB,fps={p['fps']}:start_time=0:round=near,trim=start_frame=13:end_frame=43,setpts=PTS-STARTPTS,scale=160:96:flags=lanczos:out_range=tv:out_color_matrix=bt709",
             '-fps_mode','passthrough','-f','rawvideo','-pix_fmt','yuv420p','-'])
         self.assertEqual(actual,expected)
+        degraded=subprocess.check_output(['ffmpeg','-v','error','-filter_threads','1','-i',asset['originalPath'],'-vf',
+            f"settb=AVTB,fps={p['fps']}:start_time=0:round=near,trim=start_frame=13:end_frame=43,setpts=PTS-STARTPTS,scale=80:48,scale=160:96",
+            '-fps_mode','passthrough','-f','rawvideo','-pix_fmt','yuv420p','-'])
+        import numpy as np
+        delta=np.frombuffer(actual,dtype=np.uint8).astype(float)-np.frombuffer(degraded,dtype=np.uint8)
+        self.assertGreater(float(np.mean(delta**2)),10)
 
     def test_interrupted_export_closes_decoder_and_can_retry(self):
         p=self.project(self.source(audio=False))
