@@ -19,6 +19,15 @@ final QA. Stage 1 keeps the ledger internal and does not advance scores; stages
 
 ## Documentation ownership
 
+Raw-footage stage 1 uses `endpoint_audit.py` against a current clip/source snapshot.
+The sidecar binds every retained video clip to its source hash, source clock and
+exclusive frame boundaries, then checks the declared ending bracket, later serve
+anchor, forward inspection past the cut, and retained evidence files. Recutting
+invalidates that binding. Uncertain cessation and truncated sources stay provisional;
+this check does not adjudicate winners, prove visual correctness, lock editing, or
+change explicit user-export authority. Already edited inputs retain every frame.
+Run `python -B -m unittest tools.test_endpoints` for the changed contract.
+
 Keep the seven-stage contract and essential execution reminders in `SKILL.md`.
 Route required reading to sections when only part of a reference applies.
 Detailed rules have the following owners; other documents use a short action

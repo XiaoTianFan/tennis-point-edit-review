@@ -29,6 +29,7 @@
 | score_audit.py score-input.json | config与points，A/B映射当前双方；initialPoints是原始赢分次数；规则和默认见[输入](inputs-and-rules.md) |
 | frame_evidence.py VIDEO START END OUTPUT --roi x,y,width,height --job WORK | 短窗动作／候选概览，不作精确PTS证据，不导入工程；更多取证见[原片检查](source-inspection.md) |
 | evidence_audit.py coverage.json | scopes=[{source,startUs,endUs}]、intervals=[{source,startUs,endUs,kind,reviewed,retained,reason,pointId?}]；[覆盖样例](../examples/coverage-data.json) |
+| endpoint_audit.py project.json --evidence endpoints.json | 连续原片全量当前视频片段的源绑定、死球／保守尾段、下一发锚点及正向跨剪口检查；[字段与模板](endpoint-checks.md)，不判赢家 |
 | audit_lineage(points,lineage) | points含pointId、active、sourceOrder、sourceStartUs；lineage含kind=merge/split、from/to数组、reason、revision；不自动迁移拆分答案 |
 
 config模式：普通盘mode=sets，纯抢分mode=tiebreak，限时mode=timed；参数与抢分净胜规则见[输入](inputs-and-rules.md)。
