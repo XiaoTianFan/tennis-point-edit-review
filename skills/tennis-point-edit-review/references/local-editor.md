@@ -24,7 +24,9 @@ python "<skill>/scripts/local_editor.py" serve "<work>/edit" --open
 
 ## 媒体与时间
 
-`media`按源分辨率、有理fps、音频采样率和声道生成H.264/AAC CFR代理及`.media.json`，不改原片；归一旋转/SAR、补齐偶数尺寸并保留源参数。明确转换用`--fps/--width`，有界片段用`--start/--duration`。SDR保留并输出Rec.709；HDR先验收色调映射，不静默转换PQ/HLG。
+每个新任务先读取原片完整stream／format元数据：编码与显示尺寸、旋转/SAR、有理fps、起始PTS／time base、时长及音频采样率／声道；`media`保存这些信息与源SHA-256到`.media.json`。按显示画幅等比生成最大1080p工作副本（长边≤1920、短边≤1080，竖屏相应转置），较小原片默认不放大；归一旋转/SAR并补齐偶数尺寸，不改原片。工作副本一次由原片生成，不先做低清“原片”再制作第二份代理。
+
+`media`沿用源有理fps、音频采样率和声道生成H.264/AAC CFR代理；空间降采样不自动降低fps。显式`--width`也必须在1080p预算内，`--fps`独立设置；有界片段用`--start/--duration`。原片仍是originalPath和源身份的绑定对象，导航使用工作副本，精确取证回原片小ROI。SDR保留并输出Rec.709；HDR先验收色调映射，不静默转换PQ/HLG。
 
 计划可写`in/out/duration/start/endSeconds`，初始化只换算一次为整数帧、左闭右开；同一边界不能同时给秒与帧。新代理首视频PTS为0，保存源SHA-256及`sourceMapping`；原片绝对PTS时间=`sourceMapping.originSeconds+frame/fps`（含容器起始时间）；VFR代理可能重采样，估速和触拍必须保留原PTS，不把代理帧当原始精度。
 
@@ -37,6 +39,7 @@ python "<skill>/scripts/local_editor.py" serve "<work>/edit" --open
 | 字段 | 契约 |
 |---|---|
 | title/fps/width/height | 缺省由首资产继承；有理fps 1–240，偶数画幅各边≤8192；混合素材先显式统一 |
+| exportDefaults | 新工程独立保存首资产原片显示宽高（偶数尺寸）；可在计划中显式指定width/height。不从较小工作画布推定输出降分辨率；旧工程缺少此字段时沿用其既有画幅 |
 | players/assets | 当前两方id/name；稳定asset id及media元数据，核实实际帧率和帧数 |
 | clips | 唯一master数组：稳定id、assetId、inFrame/outFrame、pointId、setNumber/gameNumber与真实发球元数据；同分多段共P号，局盘未知留null |
 | hold | kind=hold、源inFrame、durationFrames，静音统计背景 |
@@ -91,7 +94,7 @@ python "<skill>/scripts/local_editor.py" render "<work>/edit" "<work>/new-export
 
 未获导出要求的agent不加此标志，遵循上述延后条件。UI调用HTTP `/api/render`时发送userRequested=true；程序接口export_video(..., user_requested=True)含义相同，不能为了绕过agent限制自行声称用户要求。context的agentExportBlockers仅向agent列出主动导出尚缺的条件；导出记录保存userRequested与待同步项，不修改审核答案、确认或统计状态。
 
-UI/CLI同路输出H.264/AAC MP4：精准取帧、同源图形、统计淡变、剪口两帧音频淡变、定格静音，最后统一换fps避免逐段舍入。默认沿用画幅/fps/音频，可选偶数宽高≤8192、fps 1–240和输出路径；等比补边，时长误差≤半输出帧。UI帧率使用预设下拉，默认“与时间线一致”并显示实际fps；23.976/29.97/59.94仅作显示，内部保留精确有理数，不改时间线。码率下拉默认quality（CRF 18），可选4/8/12/20/35/50/80 Mbps及source（匹配原片视频流平均码率，多源按保留时长加权）；原片码率未知时禁选source，不以代理或含音频的容器码率代替。Mbps为重编码目标平均视频码率，非严格恒定值；不改代理或时间线。CLI有--width/--height/--fps/--filename/--bitrate（quality/source/整数bits每秒）；UI用Tk选目录，缺Tk/桌面则填路径。不覆盖已有文件，保留project-snapshot.json及含帧数/哈希的export.json；编码成功仍须[画面与声音验收](presentation-and-qa.md#验证与交付)。
+UI/CLI同路输出H.264/AAC MP4：精准取帧、同源图形、统计淡变、剪口两帧音频淡变、定格静音，最后统一换fps避免逐段舍入。默认画幅取独立exportDefaults（旧工程沿用原画幅），fps/音频沿用时间线，可选偶数宽高≤8192、fps 1–240和输出路径；等比补边，时长误差≤半输出帧。UI帧率使用预设下拉，默认“与时间线一致”并显示实际fps；23.976/29.97/59.94仅作显示，内部保留精确有理数，不改时间线。码率下拉默认quality（CRF 18），可选4/8/12/20/35/50/80 Mbps及source（匹配原片视频流平均码率，多源按保留时长加权）；原片码率未知时禁选source，不以代理或含音频的容器码率代替。Mbps为重编码目标平均视频码率，非严格恒定值；不改代理或时间线。CLI有--width/--height/--fps/--filename/--bitrate（quality/source/整数bits每秒）；UI用Tk选目录，缺Tk/桌面则填路径。不覆盖已有文件，保留project-snapshot.json及含帧数/哈希的export.json；编码成功仍须[画面与声音验收](presentation-and-qa.md#验证与交付)。
 
 进度条按已处理时间线帧数显示连续百分比，不按片段数平分；合成和编码边读边做；核验与保存完成才到100%。失败保留错误与本次未完成文件，不显示完成。
 

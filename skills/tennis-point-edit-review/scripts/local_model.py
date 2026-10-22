@@ -94,6 +94,14 @@ def validate(project, check_files=False):
         integer(project[key], key, 2)
         if project[key] > 8192 or project[key] % 2:
             raise ValueError('Use even dimensions <= 8192')
+    if 'exportDefaults' in project:
+        defaults = project['exportDefaults']
+        if not isinstance(defaults, dict) or set(defaults) != {'width', 'height'}:
+            raise ValueError('exportDefaults must contain output width and height')
+        for key, value in defaults.items():
+            integer(value, 'export ' + key, 2)
+            if value > 8192 or value % 2:
+                raise ValueError('Use even export dimensions <= 8192')
     if project.get('audio'):
         integer(project['audio']['sampleRate'], 'audio sample rate', 1)
         integer(project['audio']['channels'], 'audio channels', 1)

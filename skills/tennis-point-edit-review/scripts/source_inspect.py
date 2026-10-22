@@ -6,6 +6,7 @@ from pathlib import Path
 
 from media_probe import identity
 from stage_cache import Stage, safe
+from working_media import require_budget, bounded_image
 
 
 def sample(source, start, end, output, step=5, roi=None, width=480, columns=3, page_size=12, purpose='navigation', job=None):
@@ -46,7 +47,12 @@ def sample(source, start, end, output, step=5, roi=None, width=480, columns=3, p
             y, x = i//columns*height, i%columns*width
             canvas[y:y+tile.shape[0], x:x+width] = tile
         name = f'sheet-{len(sheets):04d}.jpg'
-        sheets.append(put_image(name,canvas))
+        bounded = bounded_image(canvas)
+        for record in records:
+            if record.get('sheet') == reference(name):
+                record.update(sheetSize=[bounded.shape[1], bounded.shape[0]],
+                              sheetScale=[bounded.shape[1]/canvas.shape[1], bounded.shape[0]/canvas.shape[0]])
+        sheets.append(put_image(name,bounded))
         page.clear()
 
     try:
@@ -65,6 +71,7 @@ def sample(source, start, end, output, step=5, roi=None, width=480, columns=3, p
                 continue
             previous = actual
             h, w = frame.shape[:2]
+            require_budget(w, h)
             x, y, rw, rh = roi if roi else (0, 0, w, h)
             if x < 0 or y < 0 or rw <= 0 or rh <= 0 or x+rw > w or y+rh > h:
                 raise ValueError('ROI outside source frame')
@@ -106,7 +113,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('source'); parser.add_argument('start', type=float); parser.add_argument('end', type=float)
     parser.add_argument('output'); parser.add_argument('--step', type=float, default=5)
-    parser.add_argument('--roi', help='x,y,width,height; full original frames are always retained')
+    parser.add_argument('--roi', help='Working-image x,y,width,height; retained full frames must fit 1080p')
     parser.add_argument('--width', type=int, default=480)
     parser.add_argument('--columns', type=int, default=3); parser.add_argument('--page-size', type=int, default=12)
     parser.add_argument('--purpose',choices=('navigation','movement','stroke','boundary'),default='navigation')

@@ -132,6 +132,10 @@ def main():
     group.add_argument('--template', help='Write a new pending evidence document; never overwrite')
     group.add_argument('--evidence', help='Check filled evidence against current cuts')
     a = p.parse_args(); project = json.loads(Path(a.project).read_text(encoding='utf-8-sig'))
+    from source_binding import verify_original
+    selected = {c['assetId'] for c in project['clips'] if c.get('kind', 'video') == 'video'}
+    for asset in project['assets']:
+        if asset['id'] in selected: verify_original(asset)
     if a.template:
         with Path(a.template).open('x', encoding='utf-8') as f:
             json.dump(template(project), f, ensure_ascii=False, indent=2)

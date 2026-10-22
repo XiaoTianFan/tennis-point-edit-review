@@ -18,6 +18,15 @@ the requested output size, while overlay canvases use the corresponding fit and
 padding. A smaller review proxy/canvas does not force a lower-resolution video
 resampling step before a larger export.
 
+`prepare_media` probes the untouched original before conversion and caps the
+working display size at a 1920-pixel long edge and 1080-pixel short edge. Rotation
+and SAR are applied before fitting; the cap does not change the rational frame
+rate. Explicit working widths cannot bypass the cap. New projects store original
+display dimensions in `exportDefaults`, separate from the working canvas. Explicit
+output settings take precedence; existing projects without this field keep their
+previous defaults. The original identity/path and the persistent final encoders
+are independent of proxy creation.
+
 `sourceMapping` includes the container start, grid origin and original time base.
 FFmpeg input seeking is relative to the container start while `copyts` retains
 absolute PTS for the filters. New proxies start at zero. Legacy binding accepts
@@ -36,6 +45,15 @@ native coded-pixel ROI PNGs, one preceding and one following frame where present
 No resize/FPS filter runs. Integer PTS/time base, crop, source hash, SAR and display
 matrix remain in the canonical JSON. OpenCV contact sheets are explicitly marked
 unsuitable for precision timing and cannot select precision purposes.
+
+Navigation and movement extraction reject oversized full frames and bound their
+composites too. Native precision crops also fit the image budget without resizing;
+the `ending` purpose carries the same key-evidence retention requirement as line,
+contact and speed observations. `tools.test_working_media` checks orientation/SAR,
+fractional FPS, image limits, HTTP export defaults, and an actual high-resolution
+original export with the capped proxy removed. `tools.test_endpoints` checks the
+source/cut evidence contract; synthetic checks do not establish model reliability
+on unseen tennis recordings.
 
 Stage image creation uses exclusive files and records identity/hash; existing
 files cannot be enrolled. Finish requires persisted readback observations and an

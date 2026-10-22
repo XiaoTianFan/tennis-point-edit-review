@@ -8,8 +8,9 @@ from pathlib import Path
 from media_probe import metadata
 from source_binding import verify_original, unchanged
 from stage_cache import Stage, safe, save
+from working_media import require_budget
 
-PURPOSES = ('line','net','contact','speed')
+PURPOSES = ('ending','line','net','contact','speed')
 
 
 def extract(asset, start, end, output, purpose, roi, max_frames=240, job=None):
@@ -27,6 +28,7 @@ def extract(asset, start, end, output, purpose, roi, max_frames=240, job=None):
     if video.get('color_transfer') in ('smpte2084','arib-std-b67'):
         raise ValueError('HDR precision display requires an explicitly verified transform')
     x,y,w,h=roi
+    require_budget(w,h,'Native ROI')
     if min(x,y)<0 or min(w,h)<=0 or x+w>video['width'] or y+h>video['height']:
         raise ValueError('ROI outside native coded frame')
     out=safe(output); out.mkdir(parents=True,exist_ok=False)

@@ -11,6 +11,7 @@ from pathlib import Path
 from local_model import read, write, duration, overlay_range, validate, check_export_request
 from media_probe import identity
 from source_binding import mapping, unchanged
+from working_media import working_size
 
 HERE = Path(__file__).resolve().parent
 
@@ -92,11 +93,7 @@ def prepare_media(source, output, fps=None, width=None, start=0, length=None):
     fingerprint = identity(source)
     settings = source_settings(info)
     rate = Fraction(str(fps or settings['fps']))
-    target_width = width or settings['width']
-    target_height = round(settings['height'] * target_width / settings['width'])
-    # H.264 4:2:0 needs even dimensions; pad the last pixel instead of cropping.
-    target_width += target_width % 2
-    target_height += target_height % 2
+    target_width, target_height = working_size(settings['width'], settings['height'], width)
     if not 1 <= rate <= 240 or not 2 <= target_width <= 8192 or not 2 <= target_height <= 8192 or start < 0 or (length is not None and length <= 0):
         raise ValueError('Invalid media parameters')
     video = next(s for s in info['streams'] if s['codec_type'] == 'video')
@@ -129,7 +126,7 @@ def prepare_media(source, output, fps=None, width=None, start=0, length=None):
     stream = next(s for s in checked['streams'] if s['codec_type'] == 'video')
     result = {'path': str(output), 'frames': int(stream['nb_frames']), 'fps': str(rate),
         'width': stream['width'], 'height': stream['height'], 'audio': source_settings(checked)['audio'],
-        'sourceSettings': settings,
+        'sourceSettings': settings, 'workingResolutionPolicy': 'max-1080p',
         'hasAudio': any(s['codec_type'] == 'audio' for s in checked['streams']),
         'originalPath': str(source), 'sourceStartSeconds': start, 'sourceProbe': info,
         'sourceIdentity': fingerprint, 'sourceMapping': clock,
@@ -194,7 +191,8 @@ def export_settings(project, options=None):
         raise ValueError('Export options must be an object')
     scope = options.get('scope', 'full')
     clips = export_clips(project, scope, options.get('clipIds'))
-    result = {k: options.get(k, project[k]) for k in ('width', 'height', 'fps')}
+    defaults = {**{k: project[k] for k in ('width', 'height', 'fps')}, **project.get('exportDefaults', {})}
+    result = {k: options.get(k, defaults[k]) for k in ('width', 'height', 'fps')}
     result.update(scope=scope, clipIds=[c['id'] for c in clips])
     for key in ('width', 'height'):
         if type(result[key]) is not int or not 2 <= result[key] <= 8192 or result[key] % 2:

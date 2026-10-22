@@ -921,6 +921,23 @@
           "text": "不代替[导出后的收尾清理](cleanup.md)及其用户确认"
         }
       ]
+    },
+    {
+      "id": "R063",
+      "checks": [
+        {
+          "path": "references/local-editor.md",
+          "text": "长边≤1920、短边≤1080"
+        },
+        {
+          "path": "references/local-editor.md",
+          "text": "原片仍是originalPath和源身份的绑定对象"
+        },
+        {
+          "path": "references/local-editor.md",
+          "text": "不从较小工作画布推定输出降分辨率"
+        }
+      ]
     }
   ],
   "files": [
@@ -1049,7 +1066,7 @@
     },
     {
       "path": "scripts/frame_evidence.py",
-      "sha256": "2ff9f04ceecd8b2cc217afbefde962db652d92c8d155c013364188168653b935"
+      "sha256": "b34a8cce2fe4354686b6a066cef89b3204f140bd9d57de7246f32f3c93381bc4"
     },
     {
       "path": "scripts/launch_speed.py"
@@ -1223,6 +1240,9 @@
     },
     {
       "path": "references/endpoint-checks.md"
+    },
+    {
+      "path": "scripts/working_media.py"
     }
   ]
 }

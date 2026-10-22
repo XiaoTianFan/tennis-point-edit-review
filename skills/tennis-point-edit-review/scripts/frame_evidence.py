@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 from media_probe import identity
 from stage_cache import Stage, safe
+from working_media import require_budget, bounded_image
 
 def candidate_mask(frame,diff,roi,hsv_low,hsv_high,threshold):
     """Return filtering diagnostics, not ball-presence or event judgments."""
@@ -49,6 +50,7 @@ def evidence(source,start,end,out,roi=None,hsv_low=(18,42,80),hsv_high=(62,255,2
             if t>=end: break
             if not np.isfinite(t) or t<=last_time: raise ValueError("Decoder timestamps unreliable; use a PTS-aware extraction path")
             last_time=t
+            require_budget(frame.shape[1], frame.shape[0])
             gray=cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
             if previous is None: previous=gray; continue
             diff=cv2.absdiff(gray,previous); previous=gray
@@ -80,8 +82,10 @@ def evidence(source,start,end,out,roi=None,hsv_low=(18,42,80),hsv_high=(62,255,2
             scale=min(1,1800/strip.shape[1]);strip=cv2.resize(strip,(round(strip.shape[1]*scale),round(strip.shape[0]*scale)))
             bar=np.full((28,strip.shape[1],3),245,np.uint8)
             cv2.putText(bar,f"{t:.6f}s | raw / difference / candidates",(7,20),cv2.FONT_HERSHEY_SIMPLEX,.5,(0,0,0),1)
-            comparison_ref=image(name+'-compare.jpg',np.vstack([bar,strip]))
+            comparison=bounded_image(np.vstack([bar,strip]))
+            comparison_ref=image(name+'-compare.jpg',comparison)
             records.append({"timeSeconds":t,"decoderFrameIndex":round(cap.get(cv2.CAP_PROP_POS_FRAMES))-1,"raw":raw_ref,"comparison":comparison_ref,"candidates":candidates,
+                            "comparisonSize":[comparison.shape[1],comparison.shape[0]],
                             "filterCounts":counts,"componentLimits":{"area":area_limit,"span":span_limit}})
     finally: cap.release()
     if not records: raise ValueError("No frames extracted")

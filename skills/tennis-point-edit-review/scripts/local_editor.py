@@ -45,6 +45,9 @@ def initialize(plan, directory, base=None):
             raise ValueError('Asset fps must match timeline fps')
         asset['frames'] = int(video['nb_frames'])
         asset['hasAudio'] = any(s['codec_type'] == 'audio' for s in info['streams'])
+        # New projects retain original output size independently of the working canvas.
+        original = asset.get('sourceSettings', settings)
+        p.setdefault('exportDefaults', {k: original[k] + original[k] % 2 for k in ('width', 'height')})
     # Seconds-based plans are portable across source rates; explicit frame plans stay unchanged.
     for item in p['clips'] + p['overlays']:
         for prefix in ('in', 'out', 'duration', 'start', 'end'):
@@ -280,7 +283,7 @@ def main():
     add_create_arguments(sub.add_parser('workspace', help='Create an organized job in the saved repository outputs'))
     media = sub.add_parser('media', help='Create a browser-compatible CFR source proxy')
     media.add_argument('source'); media.add_argument('output'); media.add_argument('--fps')
-    media.add_argument('--width', type=int); media.add_argument('--start', type=float, default=0)
+    media.add_argument('--width', type=int, help='Working width within 1080p; final output size is independent'); media.add_argument('--start', type=float, default=0)
     media.add_argument('--duration', type=float)
     init = sub.add_parser('init'); init.add_argument('plan'); init.add_argument('directory', nargs='?')
     add_create_arguments(init)

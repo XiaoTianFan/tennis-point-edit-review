@@ -70,7 +70,7 @@ class Stage:
         if not job.is_dir(): raise ValueError('Existing job directory required')
         if job.is_relative_to(Path(__file__).resolve().parents[1]):
             raise ValueError('Skill package cannot be used as a job cache')
-        if purpose not in ('navigation','movement','stroke','boundary','line','net','contact','speed'):
+        if purpose not in ('navigation','movement','stroke','boundary','ending','line','net','contact','speed'):
             raise ValueError('Declare the inspection purpose')
         parent = safe(job/'.stage-cache'); parent.mkdir(exist_ok=True)
         root = parent/secrets.token_hex(12); root.mkdir()
@@ -185,7 +185,7 @@ class Stage:
                 keep = record.get('essentialArtifacts')
                 if not isinstance(keep,list) or any(x not in manifest['artifacts'] for x in keep) or len(set(keep)) != len(keep):
                     raise ValueError('List essential artifact names explicitly, or []')
-                if record.get('adopted') and self.owner['purpose'] in ('line','net','contact','speed') and not keep:
+                if record.get('adopted') and self.owner['purpose'] in ('ending','line','net','contact','speed') and not keep:
                     raise ValueError('Promote key evidence for the adopted precision conclusion')
                 for name, item in manifest['artifacts'].items():
                     if Path(item['path']) != self.root/'data'/name: raise ValueError('Invalid artifact ownership')
