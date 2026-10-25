@@ -115,6 +115,17 @@ export const messages = {
   'rebuild.unknown': ['Project changes need review', '工程更改需要复核'],
 };
 const errors = {
+  'Invalid terminal source time': ['Enter a finite decimal or fraction for source seconds.', '源秒请输入有效的小数或分数。'],
+  'Terminal observation outside its bound source window': ['Keep observation times inside the bound source window.', '观察时间须位于绑定的源检查窗口内。'],
+  'A declared source gap must have been reached in review': ['The reviewed forward extent must reach the declared source gap.', '已向前检查的范围须到达所声明的源缺口。'],
+  'Terminal observation requires ordered live and forward times': ['The last live observation must precede or equal the forward review extent.', '最后观察到活球的时间不得晚于向前检查范围。'],
+  'Cessation requires explicit forward review without observed continuation': ['Cessation needs a later forward observation without live continuation.', '停止判断需要更晚的向前观察，并明确未见有效延续。'],
+  'A source gap cannot establish cessation of the preceding play': ['A source gap cannot establish cessation of the preceding play.', '不能跨源缺口确认此前的比赛已经停止。'],
+  'A source gap cannot establish continuation of the preceding play': ['A source gap cannot establish continuation of the preceding play.', '不能跨源缺口确认此前的比赛仍在延续。'],
+  'Verified death requires an ordered bracket and later forward evidence': ['Order the live observation, dead-ball bracket and later forward evidence.', '请依次填写活球、首次死球区间及更晚的向前证据时间。'],
+  'Verified death requires declared native sequence evidence': ['Verified death requires native sequence evidence and its inspection method.', '核实首次死球须有原生序列证据引用和相应检查方式。'],
+  'Cannot verify death across a missing source interval': ['Cannot verify death across a missing source interval.', '不能跨源缺失区间核实首次死球。'],
+  'Truncated ending needs a source gap and cannot assert cessation or exact death': ['A truncated ending needs a source gap after live play, without a cessation or exact-death claim.', '终局中断须记录活球后的源缺口，不得同时确认停止或精确死球。'],
   'Native folder picker unavailable; enter the folder path instead': ['Native folder picker unavailable; enter the folder path instead.', '系统文件夹选择器不可用，请直接输入文件夹路径。'],
   'Output file already exists; choose another filename': ['Output file already exists; choose another filename.', '文件已存在，请更换文件名。'],
   'Use an absolute destination folder path': ['Use an absolute destination folder path.', '请输入完整的文件夹绝对路径。'],

@@ -1285,6 +1285,9 @@
       "path": "scripts/local_vision.py"
     },
     {
+      "path": "scripts/cv_terminal.py"
+    },
+    {
       "path": "scripts/local_web/vision-review.js"
     }
   ]

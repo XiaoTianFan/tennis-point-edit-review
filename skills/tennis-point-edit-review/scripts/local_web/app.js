@@ -87,9 +87,9 @@ const review = new Review((pid) => {
   const clip=visibleLayout().find(c=>c.assetId===project.visionReview.assetId && c.inFrame<=event.frame && event.frame<c.outFrame);
   if (!clip) { notice('noClip'); return; }
   select(clip.id);
-  if(event.playExample && event.motionExample) {
+  if((event.playExample && event.motionExample) || (event.playTerminal && event.terminalWindow)) {
     const number=value=>{const [n,d=1]=String(value).split('/').map(Number);return n/d;},asset=project.assets.find(a=>a.id===clip.assetId),origin=number(asset.sourceMapping.originSeconds);
-    const [lo,hi]=event.motionExample.intervalSeconds.map(s=>Math.round((number(s)-origin)*player.fps));
+    const [lo,hi]=(event.playTerminal ? event.intervalSeconds : event.motionExample.intervalSeconds).map(s=>Math.round((number(s)-origin)*player.fps));
     const start=clip.startFrame+Math.max(clip.inFrame,lo)-clip.inFrame, end=clip.startFrame+Math.min(clip.outFrame-1,hi)-clip.inFrame;
     player.seek(start,true,end);
   } else player.seek(clip.startFrame+event.frame-clip.inFrame);

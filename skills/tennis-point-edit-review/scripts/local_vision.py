@@ -2,6 +2,7 @@
 from fractions import Fraction
 import math
 import cv_profiles
+import cv_terminal
 
 SCHEMA = 'tennis-vision-review/v1'
 KINDS = {'racket_contact', 'bounce', 'serve_onset', 'dead_ball', 'other'}
@@ -16,7 +17,7 @@ def frame_number(value, count):
 
 
 def annotation(raw, count, player_ids=()):
-    allowed = {'verdict', 'kind', 'side', 'frame', 'note', 'evidence', 'reviewSeconds', 'updatedAt', 'motionExample'}
+    allowed = {'verdict', 'kind', 'side', 'frame', 'note', 'evidence', 'reviewSeconds', 'updatedAt', 'motionExample', 'terminalReview'}
     if not isinstance(raw, dict) or set(raw) - allowed:
         raise ValueError('Invalid vision annotation fields')
     value = {**dict(verdict='pending', kind=None, side=None, frame=None, note='', evidence=[], reviewSeconds=None), **raw}
@@ -37,6 +38,8 @@ def annotation(raw, count, player_ids=()):
         raise ValueError('Invalid vision annotation timestamp')
     if 'motionExample' in value:
         value['motionExample'] = cv_profiles.annotation(value['motionExample'], player_ids)
+    if 'terminalReview' in value:
+        value['terminalReview'] = cv_terminal.annotation(value['terminalReview'])
     return value
 
 
@@ -78,6 +81,13 @@ def validate_vision(project):
             raise ValueError('Imported vision proposals must remain unadopted')
         if 'motionExample' in event:
             cv_profiles.proposal(event['motionExample'], event, (origin, origin + Fraction(asset['frames']) / rate), player_ids)
+        if 'terminalWindow' in event:
+            cv_terminal.proposal(event['terminalWindow'], event, (origin, origin + Fraction(asset['frames']) / rate))
+            anchor = event['terminalWindow']['anchor']
+            if anchor['kind'] == 'recording_end':
+                last = review.get('sourceCoverage', {}).get('lastSeconds')
+                if last is None or Fraction(anchor['seconds']) != Fraction(last):
+                    raise ValueError('Recording-end anchor requires complete source coverage')
         interval = event.get('intervalSeconds')
         if interval is not None:
             if not isinstance(interval, list) or len(interval) != 2:
@@ -89,9 +99,15 @@ def validate_vision(project):
     if not isinstance(annotations, dict) or set(annotations) - ids:
         raise ValueError('Unknown vision annotation event')
     for eid, value in annotations.items():
-        annotation(value, asset['frames'], player_ids)
-        if 'motionExample' in value and 'motionExample' not in next(e for e in events if e['id'] == eid):
+        normalized = annotation(value, asset['frames'], player_ids)
+        event = next(e for e in events if e['id'] == eid)
+        if 'motionExample' in value and 'motionExample' not in event:
             raise ValueError('Motion annotation requires a bound example proposal')
+        if 'terminalReview' in value:
+            cv_terminal.validate_record(value['terminalReview'], event, normalized,
+                                        (origin, origin + Fraction(asset['frames']) / rate), origin, rate)
+        elif 'terminalWindow' in event and normalized['verdict'] != 'pending':
+            raise ValueError('Terminal event requires its forward observation record')
 
 
 def payload(project):
@@ -103,4 +119,5 @@ def payload(project):
                 proposalIdentity=review.get('proposalIdentity'), events=review['events'], annotations=values,
                 counts={state: sum(values.get(e['id'], {}).get('verdict', 'pending') == state for e in review['events']) for state in sorted(VERDICTS)},
                 motionProfile=cv_profiles.payload(project),
-                adoptedForScoring=False, adoptedForStatistics=False)
+                terminalStatusCounts={state: sum(values.get(e['id'], {}).get('terminalReview', {}).get('status', 'pending') == state for e in review['events'] if 'terminalWindow' in e) for state in sorted(cv_terminal.STATUSES)},
+                adoptedForScoring=False, adoptedForStatistics=False, adoptedForBoundaries=False)

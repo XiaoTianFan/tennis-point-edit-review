@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026.10.26-v26.7
+
+- Add optional source-bound forward ending reviews with distinct continuation, cessation-only, verified dead-ball bracket, source truncation and non-play states.
+- Preserve rational source times, native evidence references and declared observers through save, undo, redo, reopen and JSON handoff; reject inconsistent timing and source-gap claims.
+- Keep boundary, score, statistics and owner-approval adoption separate from event observations. Ordinary event forms and the seven canonical JSX templates are unchanged.
+
 ## 2026.10.21-v26.0
 
 - Render final H.264/AAC directly from identity-bound originals through bounded raw-frame/PCM streams; encode video and audio once, with one cumulative sample clock.

@@ -199,6 +199,55 @@ VFR或重新采样时，工作帧号不是原片帧号，精确事件时刻仍�
 技术统计和用户批准，事件复核工程不能确认整场归属/统计。需要将已核实
 事件用于现有比赛时，仍按规范账本、证据和版本围栏单独采用。
 
+### 可选末段向前核验
+
+有末段检查需求的事件可附`terminalWindow`，其余事件表单保持原样：
+
+```json
+{"schema":"tennis-terminal-window/v1",
+ "anchor":{"kind":"visual_discontinuity","seconds":"401/20"}}
+```
+
+把此对象放在事件的`terminalWindow`字段，同时提供源有理秒数的
+`intervalSeconds=[起,止]`。区间包含事件定位时刻和锚点；事件不得晚于锚点，
+整个窗口须位于绑定源内。锚点类型为`candidate_next_serve`、
+`visual_discontinuity`、`recording_end`或`manual`。下一发和剪口只提供检查
+位置，不证明已死球；`recording_end`必须匹配完整流的最后实际PTS。
+动作示例与末段检查使用不同事件ID，避免混用判断状态。
+
+表单的末段状态对应独立`visionAnnotations[eventId].terminalReview`：
+
+| 状态 | 所需观察及含义 |
+|---|---|
+| `pending` | 待核，可保存未完成输入，不确立终局 |
+| `continuation` | 最后观察到活球、向前检查范围及明确仍有有效延续；排除本次死球候选 |
+| `cessation_only` | 明确停止且未见继续比赛，检查范围晚于活球；首次死球区间保持null |
+| `verified` | 活球→首次死球区间→更晚向前证据的有序源时间，原生序列引用及明确停止/无延续 |
+| `source_truncated` | 活球后到达明确源缺口，无法确立停止或精确死球，保留不确定 |
+| `not_play` | 图文、非比赛画面等，不携带活球或死球断言；排除本次候选 |
+
+非待核记录须有观察说明、记录者`actor={role:agent/owner,id}`和
+`observedThroughSeconds`；涉及比赛的记录还需`lastLiveSeconds`。
+`firstDeadBallWindowSeconds=[起,止]`只在精确死球状态使用；可填
+`sourceGapSeconds`说明已检查到的缺口。所有时间使用源秒，支持小数及
+分数，存储归一为有理数，须在绑定窗口内。记录者角色是本地声明，既不是
+身份认证也不是整场用户批准。Agent不得代用户声明观察。
+
+`sampling`区分`navigation`、`sampled_native`、`continuous_playback`和
+`mixed`。精确死球必须用`sampled_native`或`mixed`，附非空
+`nativeEvidence`；连续播放本身不能代替原生精确序列。界面使用证据引用
+框填入这些引用，并从死球区间中点定位工作帧；工作帧不替代原生PTS。
+引用字符串只记录出处，接口不验证文件内容或图像是否实际阅读；Agent须
+先按[端点检查](endpoint-checks.md)读取序列，并保留实际采样PTS和观察。
+跨缺口不能确认此前的停止或延续，也不能把缺口两侧拼成首次死球区间。
+
+“播放末段检查窗口”按绑定区间播放并在终点暂停；其他定位取消该范围。
+状态决定事件判断：延续/非比赛为排除，停止未定位/源截断为不确定，精确
+死球为已核实。与当前状态不相容的时间输入在界面禁用，不作为该状态提交。
+保存、撤销、重做、重开和JSON交接保留完整观察及`terminalStatusCounts`。
+`adoptedForBoundaries/Scoring/Statistics`均为false；本记录不自动修剪、
+判赢家、增加统计或批准输出。已有成片仍保留全部源帧和用户剪口。
+
 ### 可选动作示例与档案
 
 全源事件可以附`motionExample`，把少量动作片段放进同一复核页。每项指定

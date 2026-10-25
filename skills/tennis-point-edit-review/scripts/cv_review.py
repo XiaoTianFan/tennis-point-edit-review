@@ -47,6 +47,7 @@ def make_plan(stream_path, proposals_path, media_path, players_path, output):
         events.append(dict(event, frame=frame))
     asset = dict(media, id='vision-source')
     review = dict(schema=SCHEMA, assetId=asset['id'], sourceIdentity=source,
+                  sourceCoverage=dict(stream['coverage']),
                   streamIdentity=identity(stream_path), proposalIdentity=identity(proposals_path), events=events,
                   quality=proposals.get('quality', 'unqualified'), metrics=proposals.get('metrics', {}))
     players = read(players_path)
