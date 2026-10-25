@@ -20,7 +20,7 @@ def configuration(value):
     if not isinstance(value, dict):
         raise ValueError('players must be an explicit configuration object')
     allowed = {'weights', 'architecture', 'stride', 'inputSize', 'threshold',
-               'nmsIoU', 'maxDetections', 'crops', 'device', 'half'}
+               'nmsIoU', 'maxDetections', 'crops', 'device', 'half', 'appearance'}
     if set(value) - allowed:
         raise ValueError('Unknown player observation configuration fields')
     c = dict(stride=6, inputSize=640, threshold=.15, nmsIoU=.7,
@@ -46,6 +46,9 @@ def configuration(value):
         if crop is not None and (not isinstance(crop, list) or len(crop) != 4 or
                 any(type(v) is not int for v in crop) or min(crop[:2]) < 0 or min(crop[2:]) <= 0):
             raise ValueError('Player crops must be native integer rectangles')
+    if 'appearance' in c:
+        from cv_appearance import configuration as appearance_configuration
+        c['appearance'] = appearance_configuration(c['appearance'], c['stride'])
     return c
 
 
@@ -106,6 +109,12 @@ class Players:
             modelLicense='external dependency and weights; not redistributed; review upstream terms')
         self.metrics = dict(sampledFrames=0, detections=0, preprocessingSeconds=0.,
                             inferenceSeconds=0., postprocessingSeconds=0.)
+        self.appearance = None
+        if 'appearance' in config:
+            from cv_appearance import Appearance
+            self.appearance = Appearance(config['appearance'])
+            self.provenance['appearance'] = self.appearance.provenance
+            self.metrics['appearance'] = self.appearance.metrics
 
     def detect(self, rgb, crop, view, frame_id):
         torch = self.torch; started = time.perf_counter()
@@ -159,6 +168,8 @@ class Players:
             observation = dict(schema='tennis-player-frame/v1', sampled=False,
                 detections=[], views=[], associations=[], motions=[], adjudication=None)
             row['playerObservations'] = observation
+            if self.appearance:
+                observation['appearanceSampled'] = False
             if int(row['id'][1:]) % self.c['stride'] == 0:
                 frame = SharedFrame(frame); rgb = frame.to_ndarray(format='rgb24')
                 observation['sampled'] = True
@@ -168,4 +179,10 @@ class Players:
                     observation['views'].append(dict(view=view, crop=crop, omittedByResourceLimit=dropped))
                 self.metrics['sampledFrames'] += 1
                 self.metrics['detections'] += len(observation['detections'])
+                if self.appearance:
+                    for detection in observation['detections']:
+                        detection['appearance'] = None
+                    if int(row['id'][1:]) % self.c['appearance']['stride'] == 0:
+                        self.appearance.annotate(rgb, observation['detections'])
+                        observation['appearanceSampled'] = True
             yield row, frame

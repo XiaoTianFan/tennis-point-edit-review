@@ -126,6 +126,9 @@ def scan(source, directory, value, resume=False, stop_after_chunks=None):
     external={k:identity(config[k]) for k in ('module','modelConfig','weights')}
     if 'players' in config:
         external.update({'players.'+k:identity(config['players'][k]) for k in ('weights','architecture')})
+        if 'appearance' in config['players']:
+            code['cv_appearance.py'] = identity(Path(__file__).with_name('cv_appearance.py'))['sha256']
+            external.update({'players.appearance.'+k:identity(config['players']['appearance'][k]) for k in ('module','weights')})
     fence=dict(schema=SCHEMA,sourceIdentity=source,config=config,code=code,external=external)
     run_id=hashlib.sha256(json.dumps(fence,sort_keys=True).encode()).hexdigest()
     directory.mkdir(parents=True,exist_ok=resume)

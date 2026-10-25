@@ -135,6 +135,43 @@ run，不静默改变已提交运行的后端。每个CLI进程使用run内的�
 目录，不下载模型、不启用Hub/同步；若外部包已在别的设置环境加载，须
 使用新进程。当前实测按设备分别记录，Windows结果不能当Mac验证。
 
+### 可选人体外观特征
+
+可在`players`中显式增加`appearance`，复用该帧RGB，输出匿名人体外观
+向量。需要本地已核实来源的[OSNet-AIN作者实现](https://github.com/KaiyangZhou/deep-person-reid)
+`torchreid/models/osnet_ain.py`和[作者权重](https://huggingface.co/kaiyangzhou/osnet)
+中的`osnet_ain_x1_0`纯Tensor state_dict。模块加载会执行Python代码；
+模型和代码由任务提供，不自动下载、不随技能分发。依赖PyTorch、
+torchvision、Pillow；当前Windows数值检查使用PyTorch 2.5.1及torchvision
+0.20.1，其他平台仍须单独验证。行人训练域不保证适合网球机位或小人物。
+
+```json
+{"appearance":{"module":"/absolute/osnet/osnet_ain.py",
+ "weights":"/absolute/models/osnet-ain-state.pth",
+ "stride":30,"batchSize":16,"device":"cpu","overlayMasks":[]}}
+```
+
+此对象合并到`players`内。`stride`必须是人体采样间隔的整数倍，按源帧
+序号计；`batchSize`为同帧裁图批次上限，范围1–64。CPU和CUDA均用完整
+FP32；外观推理临时关闭TF32并恢复原设置，不改变球/姿态的计算策略。
+CUDA不可用明确失败；改CPU须另建run。没有`appearance`配置时不加载模型。
+
+人体框按原生坐标向外取整并裁到画幅，RGB经PIL双线性缩放为256×128，
+使用ImageNet归一化和512维L2向量。`overlayMasks`可显式列最多16个原生
+整数`[x0,y0,x1,y1]`矩形，须完全在画幅内；只把外观分支副本的对应区域
+置零，不能由此宣称整个分析流程排除了渲染图层。
+
+`playerObservations.appearanceSampled`区分外观采样与未采样。每个人体的
+`appearance`为null（未采样），或`tennis-body-appearance/v1`记录，含
+`cropXYXY/status/embedding/normalized/adopted=false`。空裁图记
+`invalid_crop`、向量null；空检测数组不制造人体。非有限、维数错误或零
+范数的模型输出使运行失败，不发布完成结果。余弦距离不是概率，向量不
+建立`playerId`、轨迹、惯用手、击球类或任何统计采用。
+
+源码/权重、预处理、运行时版本和计算精度进入provenance及恢复围栏；
+采样/裁图数、预处理和推理耗时独立记录。更换模型、遮罩或后端须新建
+run，不能拼接旧块；这些组件耗时不包含身份推断、选例与实际复核成本。
+
 ### 有界接口的观察层
 
 `observations.jsonl` 每个实际解码帧一行：
