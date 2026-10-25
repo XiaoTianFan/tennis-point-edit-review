@@ -21,6 +21,12 @@ export class Player {
     const tick = (_now, metadata) => {
       if (this.playing && (this.mode === "source" || this.clip?.kind !== "hold") && !this.video.seeking) {
         const sf = Math.round(metadata.mediaTime * this.fps);
+        const position = this.mode === 'source' ? sf : this.clip.startFrame + sf - this.clip.inFrame;
+        if (this.stopFrame != null && position >= this.stopFrame) {
+          this.seek(this.stopFrame);
+          this.video.requestVideoFrameCallback(tick);
+          return;
+        }
         if (this.mode === "source") {
           this.frame = Math.min(this.asset.frames - 1, sf);
           this.paint();
@@ -53,8 +59,9 @@ export class Player {
     const w = Math.min(box.width, box.height * aspect);
     $('canvas').style.width = w + 'px'; $('canvas').style.height = w / aspect + 'px';
   }
-  async seek(frame, play = false) {
+  async seek(frame, play = false, stopFrame = null) {
     if (!this.p) return;
+    this.stopFrame = stopFrame;
     const generation = ++this.seekGeneration;
     this.navigationPending = !play;
     this.playing = false;

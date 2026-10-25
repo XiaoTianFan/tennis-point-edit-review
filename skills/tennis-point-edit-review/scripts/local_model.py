@@ -267,7 +267,7 @@ class Store:
     def apply(self, expected, operation):
         p = self.get()
         kind = operation['type']
-        snapshot_fields = ('clips', 'overlays', 'answers', 'needsRebuild') + (('visionAnnotations',) if 'visionReview' in p else ())
+        snapshot_fields = ('clips', 'overlays', 'answers', 'needsRebuild') + (('visionReview', 'visionAnnotations') if 'visionReview' in p else ())
         if kind in ('undo', 'redo'):
             source, target = ('undo', 'redo') if kind == 'undo' else ('redo', 'undo')
             stack = p.get(source, [])
@@ -317,9 +317,19 @@ class Store:
                 if not review or operation.get('eventId') not in {e['id'] for e in review['events']}:
                     raise ValueError('Unknown vision event')
                 asset = next(a for a in value['assets'] if a['id'] == review['assetId'])
-                reviewed = vision_annotation(operation['annotation'], asset['frames'])
+                reviewed = vision_annotation(operation['annotation'], asset['frames'], {p['id'] for p in value['players']})
                 reviewed['updatedAt'] = datetime.now(timezone.utc).isoformat()
                 value.setdefault('visionAnnotations', {})[operation['eventId']] = reviewed
+            elif kind == 'motion-example':
+                review = value.get('visionReview')
+                if not review:
+                    raise ValueError('Motion examples require a vision event project')
+                event = next((e for e in review['events'] if e['id'] == operation.get('eventId')), None)
+                if event is None:
+                    raise ValueError('Unknown motion example event')
+                event['motionExample'] = copy.deepcopy(operation['proposal'])
+                # A changed clip/profile cannot inherit an old confirmation.
+                value.get('visionAnnotations', {}).get(event['id'], {}).pop('motionExample', None)
             elif kind == 'selection':
                 value['selection'] = {k: operation[k] for k in ('clipId', 'frame', 'mode', 'timelineView') if k in operation}
             elif kind == 'approval':
@@ -341,6 +351,6 @@ class Store:
                 value['approval'][field] = operation['confirmed']
             else:
                 raise ValueError('Unknown operation')
-        if kind not in ('selection', 'approval', 'vision-review'):
+        if kind not in ('selection', 'approval', 'vision-review', 'motion-example'):
             value['approval'] = {}
         return self.commit(value, expected, {'type': kind, 'operation': operation})

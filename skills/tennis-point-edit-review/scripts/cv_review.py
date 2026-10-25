@@ -49,9 +49,10 @@ def make_plan(stream_path, proposals_path, media_path, players_path, output):
     review = dict(schema=SCHEMA, assetId=asset['id'], sourceIdentity=source,
                   streamIdentity=identity(stream_path), proposalIdentity=identity(proposals_path), events=events,
                   quality=proposals.get('quality', 'unqualified'), metrics=proposals.get('metrics', {}))
-    validate_vision(dict(assets=[asset], fps=media['fps'], visionReview=review))
+    players = read(players_path)
+    validate_vision(dict(assets=[asset], fps=media['fps'], visionReview=review, players=players))
     plan = dict(title='视觉事件证据复核', outputLanguage='zh-CN', workingMode='agent-dominant',
-                players=read(players_path), assets=[dict(id=asset['id'], metadata=str(Path(media_path).resolve()))],
+                players=players, assets=[dict(id=asset['id'], metadata=str(Path(media_path).resolve()))],
                 clips=[dict(id='vision-full-source', assetId=asset['id'], inFrame=0, outFrame=media['frames'], label='完整源视频')],
                 review=dict(source='cv:'+stream['runId'], ledgerRevision='cv:'+stream['runId'][:16], purpose='vision-events', rows=[]),
                 visionReview=review, visionAnnotations={}, overlays=[], statistics=dict(status='pending'), approval={})

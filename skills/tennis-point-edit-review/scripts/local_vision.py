@@ -1,6 +1,7 @@
 """Source-bound event review records, separate from point answers and approvals."""
 from fractions import Fraction
 import math
+import cv_profiles
 
 SCHEMA = 'tennis-vision-review/v1'
 KINDS = {'racket_contact', 'bounce', 'serve_onset', 'dead_ball', 'other'}
@@ -14,8 +15,8 @@ def frame_number(value, count):
     return value
 
 
-def annotation(raw, count):
-    allowed = {'verdict', 'kind', 'side', 'frame', 'note', 'evidence', 'reviewSeconds', 'updatedAt'}
+def annotation(raw, count, player_ids=()):
+    allowed = {'verdict', 'kind', 'side', 'frame', 'note', 'evidence', 'reviewSeconds', 'updatedAt', 'motionExample'}
     if not isinstance(raw, dict) or set(raw) - allowed:
         raise ValueError('Invalid vision annotation fields')
     value = {**dict(verdict='pending', kind=None, side=None, frame=None, note='', evidence=[], reviewSeconds=None), **raw}
@@ -34,6 +35,8 @@ def annotation(raw, count):
         raise ValueError('Invalid vision review duration')
     if 'updatedAt' in value and not isinstance(value['updatedAt'], str):
         raise ValueError('Invalid vision annotation timestamp')
+    if 'motionExample' in value:
+        value['motionExample'] = cv_profiles.annotation(value['motionExample'], player_ids)
     return value
 
 
@@ -57,6 +60,7 @@ def validate_vision(project):
     if not isinstance(events, list) or len(events) > 100000:
         raise ValueError('Invalid vision proposal list')
     ids = set()
+    player_ids = {p['id'] for p in project.get('players', [])}
     for event in events:
         if not isinstance(event, dict):
             raise ValueError('Invalid vision proposal object')
@@ -72,6 +76,8 @@ def validate_vision(project):
             raise ValueError('Vision proposal clock and frame disagree')
         if event.get('adjudication') is not None:
             raise ValueError('Imported vision proposals must remain unadopted')
+        if 'motionExample' in event:
+            cv_profiles.proposal(event['motionExample'], event, (origin, origin + Fraction(asset['frames']) / rate), player_ids)
         interval = event.get('intervalSeconds')
         if interval is not None:
             if not isinstance(interval, list) or len(interval) != 2:
@@ -82,8 +88,10 @@ def validate_vision(project):
     annotations = project.get('visionAnnotations', {})
     if not isinstance(annotations, dict) or set(annotations) - ids:
         raise ValueError('Unknown vision annotation event')
-    for value in annotations.values():
-        annotation(value, asset['frames'])
+    for eid, value in annotations.items():
+        annotation(value, asset['frames'], player_ids)
+        if 'motionExample' in value and 'motionExample' not in next(e for e in events if e['id'] == eid):
+            raise ValueError('Motion annotation requires a bound example proposal')
 
 
 def payload(project):
@@ -94,4 +102,5 @@ def payload(project):
     return dict(schema=SCHEMA, sourceIdentity=review['sourceIdentity'], assetId=review['assetId'],
                 proposalIdentity=review.get('proposalIdentity'), events=review['events'], annotations=values,
                 counts={state: sum(values.get(e['id'], {}).get('verdict', 'pending') == state for e in review['events']) for state in sorted(VERDICTS)},
+                motionProfile=cv_profiles.payload(project),
                 adoptedForScoring=False, adoptedForStatistics=False)

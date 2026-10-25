@@ -155,7 +155,55 @@ VFR或重新采样时，工作帧号不是原片帧号，精确事件时刻仍�
 技术统计和用户批准，事件复核工程不能确认整场归属/统计。需要将已核实
 事件用于现有比赛时，仍按规范账本、证据和版本围栏单独采用。
 
-### 有界窗口复核
+### 可选动作示例与档案
+
+全源事件可以附`motionExample`，把少量动作片段放进同一复核页。每项指定
+`profileId`、`recordingGroupIds`、原源有理数`intervalSeconds`及可选
+`suggested`标签；区间须包含事件定位时刻并处于绑定源范围。录制组表示
+同一拍摄/比赛的关联来源，原片与不同成片不能因文件哈希不同便冒充独立组。
+示例区间应覆盖完整校准短片；不把单个触拍帧当作校准片段的全部范围。
+
+标签分为`playerId`、`handedness=left/right/unknown`、
+`family=forehand/backhand/overhead/serve/unknown`、
+`form=groundstroke/volley/smash/serve/unknown`和
+`spin=flat/topspin/slice/kick/unknown`。正反手切削、正反手截击、高压和
+发球分别组合记录；未知惯用手不在这个观察契约内默认补成右手。动作家族
+和击球方式须相容，证据不足的旋转/身份保留未知。
+
+页面支持`agent_proposed/agent_observed/owner_confirmed/unknown/skipped`，
+保存确认者角色及标识、观察、证据和页面可见停留时间。Agent记录不得选择
+用户确认；只有用户实际确认才能如此标记。角色是本地声明来源，接口并非
+身份认证系统。未知或跳过不阻塞其他事件；保存示例不会采用比分、统计或
+训练标签。观察与用户确认分别显示，不能用测试自动点击制造实际确认。
+“播放示例片段”从绑定区间起点播放，到区间终点自动暂停；其他定位或播放
+操作取消这次片段范围。原生触拍/判线仍须单独取证，工作副本帧不是源PTS。
+
+给已有候选追加或修订示例，使用含上述字段的JSON及当前工程revision：
+
+```sh
+python "<skill>/scripts/cv_profiles.py" attach "<work>/vision-edit" EVENT_ID "<work>/example.json" --expected-revision REVISION
+python "<skill>/scripts/cv_profiles.py" export "<work>/vision-edit" "<work>/motion-profile.json"
+```
+
+追加/修订有版本围栏；改变示例片段或档案会清除该示例旧判断，工程历史仍
+保存旧版。撤销/重做一并恢复片段定义与判断。导出`tennis-motion-profile/v1`
+包含工程revision、源身份、片段、建议和独立判断；`context`及交接输出中
+的`visionReview.motionProfile`相同。不自动训练、下载模型或从一例推定全场。
+
+在适应实验前，用`split`保存支持/查询隔离记录。查询JSON为含`id`、
+`sourceIdentity.sha256`、`recordingGroupIds`、`intervalSeconds`的片段数组：
+
+```sh
+python "<skill>/scripts/cv_profiles.py" split "<work>/motion-profile.json" "<work>/query-clips.json" "<work>/query-split.json" --mode session_assisted --context-seconds 2
+```
+
+`unseen_recording`排除全部重叠录制组；`session_assisted`排除同源校准片段及
+双方模型时序上下文，同组不同导出因缺时间映射而整体排除。未知/跳过的
+已看示例也在排除范围内。上下文秒数须覆盖实际特征提取和时序模型感受野，
+不是固定默认2秒。此检查依赖真实录制分组及完整片段范围，不代替数据
+出处核验。冻结协议后才读查询标签；计入选例、确认、训练与后续复核成本。
+
+### 有界窗口计划
 
 为同一输入按[媒体准备](local-editor.md#媒体与时间)建立绑定工作副本，
 至少覆盖全部扫描窗。`players.json` 为当前两位选手的 id/name 数组。
