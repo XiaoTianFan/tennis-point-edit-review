@@ -1,5 +1,10 @@
 # Tennis Match Edit · 网球逐分精剪、计分与复核
 
+显式启用的[可选视觉证据管线](skills/tennis-point-edit-review/references/optional-vision.md)
+可在有界窗口生成球、球场与落点候选，并交接现有 Courtside/Edit。
+默认 agent 主导路线继续保留；不自动整场判分或判线。参见
+[组件研究](docs/cv-component-research.md)与[首轮实验报告](docs/cv-research-milestone.md)。
+
 [English](README.md) · [技能入口](skills/tennis-point-edit-review/SKILL.md) · [演示图库](docs/gallery.md) · [账户同步](docs/synchronization.md)
 
 把网球录像整理为逐分精剪、可追溯计分、少量必要复核以及五页技术统计。原片取证、判断、剪辑与检查由 agent 承担，避免把技术统计变成用户逐字段填写的任务。

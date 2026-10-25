@@ -938,6 +938,11 @@
           "text": "不从较小工作画布推定输出降分辨率"
         }
       ]
+    },
+    {
+      "id": "CV001",
+      "path": "references/optional-vision.md",
+      "text": "默认仍为 `agent-dominant`，完整检查、判分、统计与复核规则不变。"
     }
   ],
   "files": [
@@ -1243,6 +1248,24 @@
     },
     {
       "path": "scripts/working_media.py"
+    },
+    {
+      "path": "scripts/cv_pipeline.py"
+    },
+    {
+      "path": "scripts/cv_observations.py"
+    },
+    {
+      "path": "scripts/cv_reference.py"
+    },
+    {
+      "path": "scripts/cv_evaluate.py"
+    },
+    {
+      "path": "scripts/requirements-vision.txt"
+    },
+    {
+      "path": "references/optional-vision.md"
     }
   ]
 }

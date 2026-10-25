@@ -16,3 +16,13 @@ Those external publications and brands are not relicensed by this repository.
 
 Demo court artwork, fictional event data and rendered screenshots are original
 repository assets covered by the repository MIT License. No match footage is included.
+
+## Optional vision experiments
+
+The optional vision adapter can explicitly load a user's separately obtained
+TennisProject architecture and state dictionaries. No third-party architecture,
+weights, recorded footage or dataset is bundled. Those files retain their own
+terms; a public download link does not establish redistribution permission.
+OpenCV, NumPy, PyAV and optional PyTorch remain external dependencies. Research
+references and inspected versions are documented in docs/cv-component-research.md.
+

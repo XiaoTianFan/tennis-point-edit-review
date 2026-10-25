@@ -1,0 +1,5 @@
+# Optional bounded vision observations; the default agent route does not need this.
+-r requirements-media.txt
+opencv-python-headless>=4.9,<5
+# local-tracknet also needs a separately selected compatible CPU/CUDA PyTorch.
+# No third-party checkpoints or architecture source are installed automatically.

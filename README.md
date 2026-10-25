@@ -31,6 +31,13 @@ still require inspection. Before outcome recognition, the skill prepares an
 The default is agent-dominant work; human-first mode lets you start manually in
 offline HTML or the local workbench and hand back complete or partial answers.
 
+An explicitly selected [optional vision pilot](skills/tennis-point-edit-review/references/optional-vision.md)
+adds bounded ball/court observations and bounce proposals while preserving the
+agent-led route. It uses source PTS, keeps abstentions, maps rendered-input
+references and creates a separate unconfirmed Courtside experiment. It is not
+automatic whole-match segmentation or line adjudication. See the
+[component research](docs/cv-component-research.md) and [milestone report](docs/cv-research-milestone.md).
+
 The workflow resumes from the current stage and defaults to stage checkpoints,
 with inspected deliverables, the current/next stage, and a question asking whether to proceed.
 When stage 2 needs human review, continue through stage 3 and deliver its verified
@@ -49,7 +56,7 @@ explicit confirmation, including in continuous mode. The [cleanup workflow](skil
 preserves original media, the final video, statistics, the reopenable project and
 its dependencies, and all skill content; it verifies integrity and reports net freed space.
 
-Current skill revision: **2026.10.22-v26.1**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, required recovery attempts, complete 3D screening and evidence-only/N/A labels.
+Current skill revision: **2026.10.25-v26.2**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, required recovery attempts, complete 3D screening and evidence-only/N/A labels.
 
 ChatCut, **Premiere Pro** and a standalone pipeline are primary editing choices.
 The [environment contract](skills/tennis-point-edit-review/references/editing-environments.md)
