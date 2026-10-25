@@ -1,9 +1,11 @@
 import { t } from "./i18n.js";
 import { $, el, answer, causes, changeAnswer, reviewStatus, reviewBadge } from "./model.js";
+import { VisionReview } from './vision-review.js';
 export class Review {
-  constructor(select, save) {
+  constructor(select, save, selectEvent) {
     this.select = select;
     this.save = save;
+    this.vision = new VisionReview(selectEvent, save);
     this.nodes = /* @__PURE__ */ new Map();
     $("search").oninput = () => this.search();
     $("search").onkeydown = (e) => {
@@ -11,7 +13,9 @@ export class Review {
     };
   }
   setProject(p) {
+    if (this.p?.visionReview && !p.visionReview) this.ids = null;
     this.p = p;
+    if (p.visionReview) { this.vision.setProject(p); return; }
     const ids = JSON.stringify([p.review.rows, p.players]);
     if (this.ids !== ids) {
       this.ids = ids;
@@ -96,6 +100,7 @@ export class Review {
     }
   }
   localize() {
+    if (this.p.visionReview) { this.vision.localize(); return; }
     $('review-panel').setAttribute('aria-label', t(this.p.review.purpose === 'initial-labeling' ? 'initialLabeling' : 'review'));
     for (const r of this.p.review.rows) {
       const n = this.nodes.get(r.pointId), x = answer(this.p,r), sid = this.p.review.purpose === 'initial-labeling' ? x.serverId : r.serverId, server = this.p.players.find(p => p.id === sid)?.name ?? t('unassigned');
@@ -154,6 +159,7 @@ export class Review {
     this.search();
   }
   highlight(pid, { reveal = false } = {}) {
+    if (this.p?.visionReview) return;
     const changed = this.highlightedPoint !== pid;
     this.highlightedPoint = pid;
     for (const [id, n] of this.nodes) n.card.classList.toggle("selected", id === pid);
@@ -165,6 +171,7 @@ export class Review {
     }
   }
   search() {
+    if (this.p.visionReview) { this.vision.search(); return; }
     const q = $("search").value.trim().toLowerCase();
     let count = 0;
     for (const r of this.p.review.rows) {

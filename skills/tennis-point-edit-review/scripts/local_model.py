@@ -1,6 +1,7 @@
 """Portable local timeline model, review protocol and revision-fenced persistence."""
 from output_language import resolve_language
 from review_io import validate_labels, LABEL_FIELDS
+from local_vision import validate_vision, annotation as vision_annotation, payload as vision_payload
 from job_workspace import read_document
 import copy
 import json
@@ -159,6 +160,7 @@ def validate(project, check_files=False):
         if pid not in pids:
             raise ValueError('Unknown answer point')
         normalize_answer(answer, players)
+    validate_vision(project)
     return project
 
 def normalize_answer(raw, players):
@@ -221,7 +223,8 @@ def context(project):
         'overlays': project.get('overlays', []), 'selection': project.get('selection', {}),
         'needsRebuild': project.get('needsRebuild', []), 'events': project.get('events', []),
         'reviewTimeline': layout(project, 'review'), 'agentExportBlockers': export_blockers(project),
-        'approval': project.get('approval', {}), 'statistics': project.get('statistics', {})}
+        'approval': project.get('approval', {}), 'statistics': project.get('statistics', {}),
+        **({'visionReview': vision_payload(project)} if project.get('visionReview') else {})}
 
 class Conflict(ValueError):
     pass
@@ -264,6 +267,7 @@ class Store:
     def apply(self, expected, operation):
         p = self.get()
         kind = operation['type']
+        snapshot_fields = ('clips', 'overlays', 'answers', 'needsRebuild') + (('visionAnnotations',) if 'visionReview' in p else ())
         if kind in ('undo', 'redo'):
             source, target = ('undo', 'redo') if kind == 'undo' else ('redo', 'undo')
             stack = p.get(source, [])
@@ -271,12 +275,12 @@ class Store:
                 raise ValueError('Nothing to ' + kind)
             value = copy.deepcopy(p)
             snapshot = value[source].pop()
-            value.setdefault(target, []).append({k: copy.deepcopy(p[k]) for k in ('clips', 'overlays', 'answers', 'needsRebuild')})
+            value.setdefault(target, []).append({k: copy.deepcopy(p.get(k, {} if k in ('answers', 'visionAnnotations') else [])) for k in snapshot_fields})
             value.update(snapshot)
         else:
             value = copy.deepcopy(p)
             if kind != 'selection':
-                value['undo'] = (p.get('undo', []) + [{k: copy.deepcopy(p.get(k, {} if k == 'answers' else [])) for k in ('clips', 'overlays', 'answers', 'needsRebuild')}])[-40:]
+                value['undo'] = (p.get('undo', []) + [{k: copy.deepcopy(p.get(k, {} if k in ('answers', 'visionAnnotations') else [])) for k in snapshot_fields}])[-40:]
                 value['redo'] = []
             clips = keyed(value['clips'], 'clip')
             if kind == 'trim':
@@ -308,9 +312,19 @@ class Store:
                     raise ValueError('Double fault cannot score for server')
                 value.setdefault('answers', {})[row['pointId']] = answer
                 value['needsRebuild'] = sorted(set(value.get('needsRebuild', []) + ['score-and-statistics']))
+            elif kind == 'vision-review':
+                review = value.get('visionReview')
+                if not review or operation.get('eventId') not in {e['id'] for e in review['events']}:
+                    raise ValueError('Unknown vision event')
+                asset = next(a for a in value['assets'] if a['id'] == review['assetId'])
+                reviewed = vision_annotation(operation['annotation'], asset['frames'])
+                reviewed['updatedAt'] = datetime.now(timezone.utc).isoformat()
+                value.setdefault('visionAnnotations', {})[operation['eventId']] = reviewed
             elif kind == 'selection':
                 value['selection'] = {k: operation[k] for k in ('clipId', 'frame', 'mode', 'timelineView') if k in operation}
             elif kind == 'approval':
+                if value['review'].get('purpose') == 'vision-events':
+                    raise ValueError('Event inspection does not establish match approval')
                 field = operation['field']
                 if field not in ('pointAttribution', 'statistics') or type(operation['confirmed']) is not bool:
                     raise ValueError('Invalid approval')
@@ -327,6 +341,6 @@ class Store:
                 value['approval'][field] = operation['confirmed']
             else:
                 raise ValueError('Unknown operation')
-        if kind not in ('selection', 'approval'):
+        if kind not in ('selection', 'approval', 'vision-review'):
             value['approval'] = {}
         return self.commit(value, expected, {'type': kind, 'operation': operation})

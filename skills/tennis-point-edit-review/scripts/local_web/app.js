@@ -46,7 +46,7 @@ function notice(key, values = {}) {
 function saveState(key) { $('save-state').dataset.i18n = key; $('save-state').textContent = t(key); }
 function projectStatus() { $('project-status').textContent = t('projectStatus', {count: new Set(project.clips.map(c => c.pointId).filter(Boolean)).size, revision: project.revision}); }
 function handoffText() {
-  if (handoffValues) $('handoff-text').value = t('handoffText', {...handoffValues, mode: t(handoffValues.mode)}) + '\n\n' + JSON.stringify(contextData.review, null, 2);
+  if (handoffValues) $('handoff-text').value = t('handoffText', {...handoffValues, mode: t(handoffValues.mode)}) + '\n\n' + JSON.stringify(contextData.visionReview ?? contextData.review, null, 2);
 }
 $('language').onclick = () => {
   setLocale(getLocale() === 'en' ? 'zh' : 'en');
@@ -83,7 +83,11 @@ const review = new Review((pid) => {
   const c = visibleLayout().find((c2) => c2.pointId === pid);
   if (c) select(c.id);
   else notice("noClip");
-}, save);
+}, save, event => {
+  const clip=visibleLayout().find(c=>c.assetId===project.visionReview.assetId && c.inFrame<=event.frame && event.frame<c.outFrame);
+  if (!clip) { notice('noClip'); return; }
+  select(clip.id); player.seek(clip.startFrame+event.frame-clip.inFrame); timeline.reveal(player.frame);
+});
 const timeline = new Timeline(url, (id, overlayId, event) => {
   if (event) {
     clipSelection.pick(visibleLayout().map(c => c.id), id, event, selectedClip);
@@ -143,8 +147,8 @@ function setProject(p) {
   const approval = p.approval?.ledgerRevision === p.review.ledgerRevision ? p.approval : {};
   $('confirm-points').checked = approval.pointAttribution === true;
   $('confirm-statistics').checked = approval.statistics === true;
-  $('confirm-points').disabled = !!p.needsRebuild?.length || p.review.rows.some(r => !['resolved','replay'].includes(reviewStatus(r,answer(p,r))));
-  $('confirm-statistics').disabled = !!p.needsRebuild?.length || p.statistics?.status !== 'complete' || p.statistics?.ledgerRevision !== p.review.ledgerRevision;
+  $('confirm-points').disabled = p.review.purpose === 'vision-events' || !!p.needsRebuild?.length || p.review.rows.some(r => !['resolved','replay'].includes(reviewStatus(r,answer(p,r))));
+  $('confirm-statistics').disabled = p.review.purpose === 'vision-events' || !!p.needsRebuild?.length || p.statistics?.status !== 'complete' || p.statistics?.ledgerRevision !== p.review.ledgerRevision;
   refreshExport();
   selectionChanged();
   $("undo").disabled = !p.undo?.length;
@@ -293,8 +297,8 @@ $("copy-handoff").onclick = async () => {
 };
 $("download-review").onclick = () => {
   const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([JSON.stringify(contextData.review, null, 2)], { type: "application/json" }));
-  a.download = "review.json";
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(contextData.visionReview ?? contextData.review, null, 2)], { type: "application/json" }));
+  a.download = contextData.visionReview ? "vision-review.json" : "review.json";
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 1e3);
 };

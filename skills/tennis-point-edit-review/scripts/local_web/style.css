@@ -893,3 +893,5 @@ body.resizing-timeline, body.resizing-timeline * { cursor: row-resize !important
 .approval-controls label { display: flex; gap: 6px; align-items: center; }
 
 footer{min-height:30px;flex-wrap:wrap;padding-block:5px} .approval-controls{font-size:11px}
+.vision-field{display:flex;flex-direction:column;gap:5px;margin:9px 0;font-size:12px}
+.vision-field select,.vision-field input,.vision-field textarea{width:100%;min-width:0;box-sizing:border-box}

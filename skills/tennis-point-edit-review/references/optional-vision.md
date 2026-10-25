@@ -47,8 +47,8 @@ agent 路线。未验证的 checkpoint 兼容性会报错，不偷偷换模型�
 ### 全长WASB观察与恢复
 
 `cv_stream.py`处理完整输入流，按真实PTS保存球候选。它不读取历史答案，
-不生成分组、赢家或技术统计。此结果格式尚不能直接传给下文的窗口计划
-生成器；应先完成事件/分组分析与证据采用，再按现有工程协议交接。
+不生成分组、赢家或技术统计。流式结果使用下文的全源事件复核入口；
+有界结果使用窗口计划生成器。事件判断与逐分采用保持独立。
 
 需另行提供已检查来源的[官方WASB实现](https://github.com/nttcom/WASB-SBDT)
 中的`src/models/hrnet.py`、`src/configs/model/wasb.yaml`及官方网球权重。
@@ -124,6 +124,39 @@ python "<skill>/scripts/cv_stream.py" "<input>" "<work>/stream-run" --config "<w
 
 ## 现有工作台交接
 
+### 全源事件复核
+
+完整流式结果可配合显式事件提案交给`cv_review.py`。提案文件使用
+`schema=tennis-vision-proposals/v1`、`status=complete`、同源`sourceIdentity`
+及流式result文件的`streamIdentity.sha256`。`events`中每项含唯一`id`、
+`kind`（`racket_contact/bounce/serve_onset/dead_ball/other`）、
+`side`（`near/far/unknown/null`）、有理数`seconds`、`adjudication=null`；
+可附`intervalSeconds=[起,止]`及模型支持证据。导航秒数必须是已经提交的
+实际源PTS；支持窗须包含该秒数，不把窗宽当时刻精度或置信区间。
+推断器需另行提供：球观察结果不自动成为这些事件。
+
+```sh
+python "<skill>/scripts/cv_review.py" "<work>/stream-run/result.json" "<work>/proposals.json" "<work>/working.media.json" "<work>/players.json" "<work>/vision-plan.json"
+python "<skill>/scripts/local_editor.py" init "<work>/vision-plan.json" "<work>/vision-edit"
+python "<skill>/scripts/local_editor.py" serve "<work>/vision-edit" --open
+```
+
+工作副本须覆盖完整流。生成器核对源/提案/工作副本身份、提交块哈希与
+PTS，再创建保留全源的一个连续段，`purpose=vision-events`，不制造P号。
+点击候选定位，记录事件类型、场端、判断、工作副本复核帧与原生证据引用；
+VFR或重新采样时，工作帧号不是原片帧号，精确事件时刻仍依据原生PTS。
+保存、撤销、重做和重开均保留独立`visionAnnotations`；跨行保存和语言
+切换保留当前页未保存输入，关闭页面前仍须保存。`reviewSeconds`只计
+选中事件时页面可见的停留时间，不证明注意力、真实agent耗时或token成本；
+自动验收的停留时间须从效率评价剔除。
+
+“交给agent”与下载输出源绑定`visionReview`，工程目录另存
+`vision-review.json`；命令行`context`也含同一结构。它们不改变逐分答案、
+技术统计和用户批准，事件复核工程不能确认整场归属/统计。需要将已核实
+事件用于现有比赛时，仍按规范账本、证据和版本围栏单独采用。
+
+### 有界窗口复核
+
 为同一输入按[媒体准备](local-editor.md#媒体与时间)建立绑定工作副本，
 至少覆盖全部扫描窗。`players.json` 为当前两位选手的 id/name 数组。
 
@@ -133,7 +166,7 @@ python "<skill>/scripts/local_editor.py" init "<work>/vision-plan.json" "<work>/
 python "<skill>/scripts/local_editor.py" serve "<work>/vision-edit" --open
 ```
 
-只创建新实验工程；计划保留全部扫描窗，每窗为暂定 CV 编号，并非一分。
+此窗口入口只创建新实验工程；计划保留全部扫描窗，每窗为暂定 CV 编号，并非一分。
 复核理由包含事件时间，用户在原有完整/复核时间线播放、定位、步进。
 答案、赢家、局次、发次、采用结论和批准不预填。实验窗口是内部研究
 表面，不向既有比赛工程发布新一轮全场人工审核。

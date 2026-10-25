@@ -943,6 +943,11 @@
       "id": "CV001",
       "path": "references/optional-vision.md",
       "text": "默认仍为 `agent-dominant`，完整检查、判分、统计与复核规则不变。"
+    },
+    {
+      "id": "CV002",
+      "path": "references/optional-vision.md",
+      "text": "它们不改变逐分答案、"
     }
   ],
   "files": [
@@ -1266,6 +1271,21 @@
     },
     {
       "path": "references/optional-vision.md"
+    },
+    {
+      "path": "scripts/cv_stream.py"
+    },
+    {
+      "path": "scripts/cv_wasb.py"
+    },
+    {
+      "path": "scripts/cv_review.py"
+    },
+    {
+      "path": "scripts/local_vision.py"
+    },
+    {
+      "path": "scripts/local_web/vision-review.js"
     }
   ]
 }

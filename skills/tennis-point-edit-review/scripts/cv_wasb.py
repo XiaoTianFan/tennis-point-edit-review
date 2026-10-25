@@ -50,6 +50,8 @@ def configuration(value):
 
 class WASB:
     def __init__(self, config):
+        import av
+        import platform
         import torch
         import yaml
         self.c = config
@@ -81,6 +83,7 @@ class WASB:
         self.mean = np.array([.485, .456, .406], dtype='float32')[:, None, None]
         self.std = np.array([.229, .224, .225], dtype='float32')[:, None, None]
         self.provenance = dict(backend='external-wasb', files=files, torch=torch.__version__,
+            runtime=dict(python=platform.python_version(), pyav=av.__version__, opencv=cv2.__version__, numpy=np.__version__, pyyaml=yaml.__version__),
             cuda=torch.version.cuda, device=config['device'], half=config['half'],
             gpu=torch.cuda.get_device_name(0) if config['device']=='cuda' else None,
             preprocessing='RGB uniform affine 512x288; ImageNet normalization; chronological 3-in/3-out',

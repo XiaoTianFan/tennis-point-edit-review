@@ -246,10 +246,12 @@ test('unassigned clips do not invent games; explicit initial-labeling correction
 
 test('cursor point changes reveal only the review scroller; playback and answers preserve scroll', async()=>{
  const encode=source=>'data:text/javascript;base64,'+Buffer.from(source).toString('base64');
- const source=fs.readFileSync(path.join(root,'scripts/local_web/review.js'),'utf8')
+ const dependencies=source=>source
   .replace('./model.js',encode(fs.readFileSync(path.join(root,'scripts/local_web/model.js'),'utf8')))
   .replace('./i18n.js',encode(fs.readFileSync(path.join(root,'scripts/local_web/i18n.js'),'utf8')));
- const {Review}=await import(encode(source));
+ const source=fs.readFileSync(path.join(root,'scripts/local_web/review.js'),'utf8')
+  .replace('./vision-review.js',encode(dependencies(fs.readFileSync(path.join(root,'scripts/local_web/vision-review.js'),'utf8'))));
+ const {Review}=await import(encode(dependencies(source)));
  const list={scrollTop:0,getBoundingClientRect:()=>({top:100,bottom:600})};
  const selected=new Set();
  const card=(pid,top)=>({classList:{toggle:(name,on)=>on?selected.add(pid):selected.delete(pid)},getBoundingClientRect:()=>({top:top-list.scrollTop,bottom:top+350-list.scrollTop})});

@@ -158,7 +158,7 @@ def make_server(directory, port=0):
         def do_GET(self):
             try:
                 route = unquote(urlparse(self.path).path)
-                public = {'/': 'index.html', '/app.js': 'app.js', '/model.js': 'model.js', '/review.js': 'review.js', '/timeline.js': 'timeline.js', '/player.js': 'player.js', '/style.css': 'style.css', '/i18n.js': 'i18n.js', '/view-state.js': 'view-state.js'}
+                public = {'/': 'index.html', '/app.js': 'app.js', '/model.js': 'model.js', '/review.js': 'review.js', '/vision-review.js': 'vision-review.js', '/timeline.js': 'timeline.js', '/player.js': 'player.js', '/style.css': 'style.css', '/i18n.js': 'i18n.js', '/view-state.js': 'view-state.js'}
                 if route in public or route == '/favicon.ico':
                     if self.headers.get('Host') != f'127.0.0.1:{self.server.server_port}':
                         self.reply({'error': 'Invalid host'}, 403)
@@ -229,6 +229,8 @@ def make_server(directory, port=0):
                         value = {**context(p), 'projectPath': str(store.path)}
                         write(store.directory / 'agent-context.json', value)
                         write(store.directory / 'review.json', value['review'])
+                        if value.get('visionReview'):
+                            write(store.directory / 'vision-review.json', value['visionReview'])
                     self.reply(value)
                 elif route == '/api/pick-directory':
                     if not picker_lock.acquire(blocking=False):
