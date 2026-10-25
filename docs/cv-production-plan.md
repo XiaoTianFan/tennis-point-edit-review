@@ -150,6 +150,8 @@ Core ML、ONNX等选择，不强制CUDA。明确Mac架构/最低环境；无macO
 时刻/主体关联精度、补核参考及测量总成本；验证/留出门仍未解封。实验账本为
 [cv-experiments.md](cv-experiments.md)；私有任务目录的`execution.json`
 保存当前配置、acceptance状态、失败待办、下一步以及正在运行的进程。
+[验收现状](cv-acceptance-status.md)汇总各门最强证据、适用范围与尚缺验证，
+与实验账本逐轮更新，不将组件通过写成完整生产通过。
 公开文档用匿名案例，私有manifest保留精确身份。恢复时先读二者和git状态，
 不重跑已完成昂贵实验，不把未完成进程当结果。
 
