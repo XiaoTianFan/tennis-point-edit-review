@@ -16,6 +16,7 @@ import time
 import av
 
 from cv_wasb import WASB, configuration
+from cv_players import Players, configuration as player_configuration
 from job_workspace import safe_path
 from media_probe import identity, metadata
 from source_binding import unchanged
@@ -106,7 +107,11 @@ def decoded(source, state, maximum):
 
 
 def scan(source, directory, value, resume=False, stop_after_chunks=None):
-    started=time.perf_counter();config=configuration(value)
+    started=time.perf_counter()
+    ball_config={k:v for k,v in value.items() if k!='players'}
+    config=configuration(ball_config)
+    if 'players' in value:
+        config['players']=player_configuration(value['players'])
     if stop_after_chunks is not None and (type(stop_after_chunks) is not int or stop_after_chunks<1):
         raise ValueError('stop_after_chunks must be positive')
     directory=safe_path(directory)
@@ -117,8 +122,10 @@ def scan(source, directory, value, resume=False, stop_after_chunks=None):
     if video.get('color_transfer') in ('smpte2084','arib-std-b67') or video.get('sample_aspect_ratio','1:1') not in ('1:1','0:1','N/A') or any(float(s.get('rotation',0))%360 for s in video.get('side_data_list',[])):
         raise ValueError('This detector requires SDR, unrotated square-pixel input')
     code={name:identity(Path(__file__).with_name(name))['sha256'] for name in
-          ('cv_stream.py','cv_wasb.py','media_probe.py','source_binding.py')}
+          ('cv_stream.py','cv_wasb.py','cv_players.py','media_probe.py','source_binding.py')}
     external={k:identity(config[k]) for k in ('module','modelConfig','weights')}
+    if 'players' in config:
+        external.update({'players.'+k:identity(config['players'][k]) for k in ('weights','architecture')})
     fence=dict(schema=SCHEMA,sourceIdentity=source,config=config,code=code,external=external)
     run_id=hashlib.sha256(json.dumps(fence,sort_keys=True).encode()).hexdigest()
     directory.mkdir(parents=True,exist_ok=resume)
@@ -159,12 +166,17 @@ def scan(source, directory, value, resume=False, stop_after_chunks=None):
 
         try:
             backend=WASB(config)
+            players=Players(config['players'],directory/'runtime/player-settings') if 'players' in config else None
+            if players:
+                backend.provenance['players']=players.provenance
+                backend.metrics['players']=players.metrics
             if state.get('backend') and state['backend']!=backend.provenance:
                 raise ValueError('Runtime/backend changed; start a new run')
             state['backend']=backend.provenance;save(directory/'state.json',state)
             # Snapshot coverage: committing chunks must not change the decoder's resume boundary.
             origin=dict(frames=state['frames'],lastSeconds=state['lastSeconds'])
-            observations=backend.observe(decoded(source['path'],origin,config['maxFrames']))
+            frames=decoded(source['path'],origin,config['maxFrames'])
+            observations=backend.observe(players.annotate(frames) if players else frames)
             for row in observations:
                 chunk_rows.append(row)
                 if len(chunk_rows)==config['chunkFrames']:
@@ -184,7 +196,8 @@ def scan(source, directory, value, resume=False, stop_after_chunks=None):
                 chunks=state['chunks'],coverage=dict(frames=state['frames'],firstSeconds=state['firstSeconds'],lastSeconds=state['lastSeconds']),
                 attempts=state['attempts'],statistics=None,adjudications=[],labelsRead=False,
                 limitations=['detector observations only','view candidates are not fused or adopted',
-                             'frame coverage is not visible-ball recall','no point/event or winner decisions'])
+                             'frame coverage is not visible-ball recall','no point/event or winner decisions',
+                             'optional person boxes/keypoints do not establish player identity, motion class or metric location'])
             save(directory/'result.json',result)
             state.update(status='complete',resultSha256=identity(directory/'result.json')['sha256'])
             save(directory/'state.json',state)

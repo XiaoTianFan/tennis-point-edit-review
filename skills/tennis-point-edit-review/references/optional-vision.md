@@ -91,6 +91,50 @@ python "<skill>/scripts/cv_stream.py" "<input>" "<work>/stream-run" --config "<w
 哈希，不能把目录里未提交文件加入结果。完整帧覆盖不是可见球召回，
 检测成功不代表事件、统计、复核成本或生产验收通过。
 
+### 同次解码的人体观察
+
+全长配置可以显式增加`players`，在球观察旁保存独立人体框与17个COCO
+关键点。需在任务隔离runtime中安装兼容的外部Ultralytics（已测试
+8.3.239）及PyTorch/torchvision；第三方依赖与模型不随技能分发，使用前
+核查其授权。不得因缺此依赖阻塞默认agent路线或仅球检测模式。
+
+```json
+{"players":{"weights":"/absolute/models/pose-state.pt",
+ "architecture":"/absolute/models/pose-state.json",
+ "device":"cpu","half":false,"stride":6,"inputSize":640,
+ "threshold":0.15,"nmsIoU":0.7,"maxDetections":32,"crops":[null]}}
+```
+
+此对象合并到上方WASB配置；仍使用`cv_stream.py`命令。权重必须是预先
+核实来源的纯Tensor state_dict，`weights_only=True`严格加载。
+架构JSON含`stateSha256`和`architecture`，前者须匹配权重，后者为经过
+来源审查的Ultralytics PoseModel定义；本接口不转换任意pickle，也不
+接受未知来源的可执行架构定义。仅支持单类person、17×3关键点输出。
+模型输入为RGB、等比缩放、32步长letterbox及114填充、0–1归一化，所有
+坐标映回源编码像素，低响应关键点不删除、不当作已验证位置。
+
+`stride`按实际源帧序号采样，VFR时不等于固定Hz；其余源帧仍保存球观察
+及`playerObservations.sampled=false`。采样帧中的空检测数组表示本次未
+检出，不能与未采样或确实无人混同。每项保留view、crop、边缘截断和
+未校准响应；超过`maxDetections`的NMS结果数量记在该视图的
+`omittedByResourceLimit`。多视图人体不自动融合为同一人。
+
+`playerObservations`使用`tennis-player-frame/v1`，继承同一外层源PTS、
+画幅和坐标空间。检测ID绑定帧/view，`playerId/trackId`为null，场端及
+惯用手为unknown，`associations/motions`为空。人体框与关键点没有建立
+球员身份、正反手/旋转、米制位置或触拍关系，后续推断和采用须另列证据。
+未确认的人体观察不进入计分、技术统计或校准真值。
+
+球与人体共用一个解码器；已采样帧的RGB转换在两后端间复用，缓存随该帧
+释放。独立保留人体的采样/检测数、预处理/推理/后处理耗时；这不等于
+完整流程或人工复核成本。人体配置、架构、权重、实现与运行时加入恢复
+围栏；变更后新建run，不拼接旧块。无需人体观察时省略`players`。
+
+CPU使用FP32；CUDA不可用会明确报错，改为`device=cpu,half=false`并新建
+run，不静默改变已提交运行的后端。每个CLI进程使用run内的离线设置
+目录，不下载模型、不启用Hub/同步；若外部包已在别的设置环境加载，须
+使用新进程。当前实测按设备分别记录，Windows结果不能当Mac验证。
+
 ### 有界接口的观察层
 
 `observations.jsonl` 每个实际解码帧一行：
