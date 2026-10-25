@@ -2,8 +2,9 @@
 
 默认仍为 `agent-dominant`，完整检查、判分、统计与复核规则不变。
 仅在用户选择 CV 辅助或研究路线时运行本接口。它提供可复现的观察与
-待核候选；agent 阅读结构化结果、回看原生证据并处理缺口。当前接口是
-有界窗口原型，不支持无人审核的全场找分、自动判线或自动技术统计。
+待核候选；agent 阅读结构化结果、回看原生证据并处理缺口。有界接口提供
+窗口复核；流式接口提供全长球检测观察与恢复。两者都不支持无人审核的
+全场找分、自动判线或自动技术统计。
 
 ## 输入、依赖与运行
 
@@ -42,6 +43,55 @@ agent 路线。未验证的 checkpoint 兼容性会报错，不偷偷换模型�
 遮挡分布不保证覆盖当前素材。运行时不训练、不填补失踪球。
 
 ## 证据契约
+
+### 全长WASB观察与恢复
+
+`cv_stream.py`处理完整输入流，按真实PTS保存球候选。它不读取历史答案，
+不生成分组、赢家或技术统计。此结果格式尚不能直接传给下文的窗口计划
+生成器；应先完成事件/分组分析与证据采用，再按现有工程协议交接。
+
+需另行提供已检查来源的[官方WASB实现](https://github.com/nttcom/WASB-SBDT)
+中的`src/models/hrnet.py`、`src/configs/model/wasb.yaml`及官方网球权重。
+模块路径会执行本地Python代码；只从已核实来源选择。权重按
+`weights_only=True`加载，必须含`model_state_dict`；源码、配置、权重哈希
+全部记录，不自动下载或随技能包分发。Python依赖同上，额外选择兼容的
+PyTorch/CUDA；FP16仅在CUDA使用，不改变全局环境或其他服务。
+
+```json
+{"module":"/absolute/wasb/src/models/hrnet.py",
+ "modelConfig":"/absolute/wasb/src/configs/model/wasb.yaml",
+ "weights":"/absolute/models/tennis_best.pth.tar",
+ "device":"cuda","half":true,"batch":4,"threads":4,
+ "chunkFrames":1800,"maxFrames":1000000,"threshold":0.5,"crops":[null]}
+```
+
+```sh
+python "<skill>/scripts/cv_stream.py" "<input>" "<work>/stream-run" --config "<work>/stream-config.json"
+python "<skill>/scripts/cv_stream.py" "<input>" "<work>/stream-run" --config "<work>/stream-config.json" --resume
+```
+
+`crops`最多4个视图，`null`为全幅，其余为原生像素`[x,y,width,height]`。
+裁切视图坐标映射回原图并保留view编号；多视图候选未经融合，不能合计为
+多个真实球。RGB仿射512×288、ImageNet归一化、连续3帧输入/3帧输出；
+最后不足3帧仅重复上下文，记录`paddedContext`，不制造新观察或插值球。
+网络响应不是存在概率。每个视图超过1024个连通候选会明确报资源错误。
+
+`chunkFrames`须为`3*batch`的倍数。执行器只保留一批预处理图像与一个块
+的数值结果；提交块有SHA-256、起止PTS和帧数。`state.json`记录进度与每次
+执行的成本；只有读到完整流尾、覆盖检查完成才发布`result.json`。
+`--stop-after-chunks N`在本次N个块后保存检查点，不声称完成。
+
+恢复先核对源、配置、代码、外部模型和已提交块，再定位最后已提交PTS，
+确认它仍存在后处理后续每帧。配置或源变化须新建run；不能混用结果。
+中断的未提交数据可保留在目录中，但不计入有效观察，不自动删文件。
+同run不允许同时执行。`failed/interrupted/checkpointed`都不是完成；达到
+预算、解码、模型或指纹错误会保留具体错误及最近已提交进度。
+
+逐帧记录在`result.json`列出的`chunks`文件中；必须按该列表读取并校验
+哈希，不能把目录里未提交文件加入结果。完整帧覆盖不是可见球召回，
+检测成功不代表事件、统计、复核成本或生产验收通过。
+
+### 有界接口的观察层
 
 `observations.jsonl` 每个实际解码帧一行：
 
