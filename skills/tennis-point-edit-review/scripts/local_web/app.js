@@ -1,4 +1,4 @@
-import { $, rate, length, layout, buttonIcon, exportSummary, answer, reviewStatus, ClipSelection } from "./model.js";
+import { $, rate, length, layout, buttonIcon, exportSummary, answer, reviewStatus, ClipSelection, reviewExport, sourceWindowRange } from "./model.js";
 import { Review } from "./review.js";
 import { Timeline } from "./timeline.js";
 import { Player } from "./player.js";
@@ -44,9 +44,9 @@ function notice(key, values = {}) {
   if (key) noticeTimer = setTimeout(() => { noticeState = null; renderNotice(); }, key === 'exportComplete' ? 30000 : 10000);
 }
 function saveState(key) { $('save-state').dataset.i18n = key; $('save-state').textContent = t(key); }
-function projectStatus() { $('project-status').textContent = t('projectStatus', {count: new Set(project.clips.map(c => c.pointId).filter(Boolean)).size, revision: project.revision}); }
+function projectStatus() { $('project-status').textContent = t(project.clips.some(c=>c.candidatePoint) ? 'projectCandidateStatus' : 'projectStatus', {count: new Set(project.clips.map(c => c.pointId).filter(Boolean)).size, revision: project.revision}); }
 function handoffText() {
-  if (handoffValues) $('handoff-text').value = t('handoffText', {...handoffValues, mode: t(handoffValues.mode)}) + '\n\n' + JSON.stringify(contextData.visionReview ?? contextData.review, null, 2);
+  if (handoffValues) $('handoff-text').value = t('handoffText', {...handoffValues, mode: t(handoffValues.mode)}) + '\n\n' + JSON.stringify(reviewExport(contextData).value, null, 2);
 }
 $('language').onclick = () => {
   setLocale(getLocale() === 'en' ? 'zh' : 'en');
@@ -90,8 +90,8 @@ const review = new Review((pid) => {
   if((event.playExample && event.motionExample) || (event.playTerminal && event.terminalWindow)) {
     const number=value=>{const [n,d=1]=String(value).split('/').map(Number);return n/d;},asset=project.assets.find(a=>a.id===clip.assetId),origin=number(asset.sourceMapping.originSeconds);
     const [lo,hi]=(event.playTerminal ? event.intervalSeconds : event.motionExample.intervalSeconds).map(s=>Math.round((number(s)-origin)*player.fps));
-    const start=clip.startFrame+Math.max(clip.inFrame,lo)-clip.inFrame, end=clip.startFrame+Math.min(clip.outFrame-1,hi)-clip.inFrame;
-    player.seek(start,true,end);
+    const window=sourceWindowRange(visibleLayout(),clip.assetId,event.frame,lo,hi);
+    if(window) player.seek(window.startFrame,true,window.endFrame);
   } else player.seek(clip.startFrame+event.frame-clip.inFrame);
   timeline.reveal(player.frame);
 });
@@ -304,8 +304,9 @@ $("copy-handoff").onclick = async () => {
 };
 $("download-review").onclick = () => {
   const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([JSON.stringify(contextData.visionReview ?? contextData.review, null, 2)], { type: "application/json" }));
-  a.download = contextData.visionReview ? "vision-review.json" : "review.json";
+  const exported = reviewExport(contextData);
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(exported.value, null, 2)], { type: "application/json" }));
+  a.download = exported.filename;
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 1e3);
 };

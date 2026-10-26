@@ -36,6 +36,8 @@ export const messages = {
   zoom: ['Zoom', '缩放'], timelineZoom: ['Timeline zoom', '时间线缩放'], time: ['TIME', '时间'],
   sourceVideo: ['Source video', '源视频'], scoreboard: ['Scoreboard', '计分板'], serveTrack: ['Serve / speed', '发球 / 球速'],
   statistics: ['Statistics', '统计'], reviewGraphics: ['Review graphics', '复核图形'], editedPlayhead: ['Edited timeline playhead', '成片时间线播放位置'],
+  pointReview: ['Points', '逐分'], eventReview: ['Event evidence', '事件证据'], reviewKind: ['Review content', '复核内容'],
+  projectCandidateStatus: ['{count} point groups (includes candidates) · revision {revision} · local project', '{count} 个分组（含待核候选）· 版本 {revision} · 本地工程'],
   keyPlay: ['play', '播放'], keyFrame: ['frame', '逐帧'], keyPoint: ['point', '逐分'], keyUndo: ['undo', '撤销'],
   localProject: ['Local project · media stays on this computer', '本地工程 · 媒体保留在本机'],
   projectStatus: ['{count} points · revision {revision} · local project', '{count} 分 · 版本 {revision} · 本地工程'],

@@ -184,6 +184,8 @@ h2 {
   gap: 8px;
   flex-shrink: 0;
 }
+.review-modes { margin: 7px 8px 0; flex-shrink: 0; }
+.review-modes[hidden] { display: none; }
 .searchbar input {
   flex: 1;
   min-width: 0;

@@ -18,12 +18,17 @@ const terminalVerdict = {pending:'pending',continuation:'rejected',cessation_onl
 
 export class VisionReview {
   constructor(select, save) {
-    this.select=select; this.save=save; this.nodes=new Map(); this.elapsed=new Map(); this.drafts=new Map();
+    this.select=select; this.save=save; this.nodes=new Map(); this.elapsed=new Map(); this.drafts=new Map(); this.visible=true;
     document.addEventListener('visibilitychange',()=>{
-      this.tick(); this.started=this.active && !document.hidden ? performance.now() : null;
+      this.tick(); this.started=this.visible && this.active && !document.hidden ? performance.now() : null;
     });
   }
   words() { const locale=getLocale() === 'zh' ? 'zh' : 'en';return {...labels[locale],...motionWords[locale],...terminalWords[locale]}; }
+  setVisible(visible) {
+    if(visible===this.visible) return;
+    this.tick(); this.visible=visible;
+    this.started=visible && this.active && !document.hidden ? performance.now() : null;
+  }
   tick() { if (this.started != null && this.active) this.elapsed.set(this.active,(this.elapsed.get(this.active) ?? 0)+(performance.now()-this.started)/1000); this.started=null; }
   setProject(p) {
     this.p=p; const key=JSON.stringify([p.visionReview.events,getLocale()]);

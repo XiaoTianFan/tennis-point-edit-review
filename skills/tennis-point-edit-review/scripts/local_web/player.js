@@ -14,7 +14,7 @@ export class Player {
     this.seekGeneration = 0;
     new ResizeObserver(() => this.resize()).observe($("viewer"));
     this.video.onended = () => {
-      if (this.mode === "edited" && this.frame < this.total - 1) this.seek(this.clips.find((c) => c.id === this.clip.id).endFrame, true);
+      if (this.mode === "edited" && this.frame < this.total - 1) this.seek(this.clips.find((c) => c.id === this.clip.id).endFrame, true, this.stopFrame);
       else this.pause();
     };
     this.video.onerror = () => this.error("decodeError");
@@ -31,7 +31,7 @@ export class Player {
           this.frame = Math.min(this.asset.frames - 1, sf);
           this.paint();
         } else if (sf >= this.clip.outFrame) {
-          if (this.clip.endFrame < this.total) this.seek(this.clip.endFrame, true);
+          if (this.clip.endFrame < this.total) this.seek(this.clip.endFrame, true, this.stopFrame);
           else this.pause();
         } else if (sf >= this.clip.inFrame) {
           this.frame = this.clip.startFrame + sf - this.clip.inFrame;
@@ -131,7 +131,7 @@ export class Player {
         if (!this.playing) return;
         this.frame = base + Math.floor((performance.now() - start) / 1e3 * this.fps * this.video.playbackRate);
         if (this.frame >= this.clip.endFrame) {
-          if (this.clip.endFrame < this.total) this.seek(this.clip.endFrame, true);
+          if (this.clip.endFrame < this.total) this.seek(this.clip.endFrame, true, this.stopFrame);
           else {
             this.frame = this.total - 1;
             this.pause();

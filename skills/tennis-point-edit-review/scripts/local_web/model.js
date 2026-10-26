@@ -125,6 +125,25 @@ export function tc(frame, fps) {
 }
 export const causes = [["out", "Out"], ["net", "Net"], ["two_bounces", "Two bounces"], ["replay", "Replay"], ["ace", "Ace"], ["winner", "Winner"], ["other", "Other"]];
 export const blank = () => ({ scoringPlayerId: null, winnerUndetermined: false, deadBallType: null, doubleFaultConfirmed: null, extra: false, reviewConfirmed: false, countingIssueResolved: false, note: "" });
+export function reviewModes(project) {
+  return [...(project.review.rows.length || !project.visionReview ? ['points'] : []), ...(project.visionReview ? ['events'] : [])];
+}
+export function reviewExport(context) {
+  if (context.visionReview && context.review.rows.length) return {filename:'agent-context.json', value:context};
+  return context.visionReview ? {filename:'vision-review.json', value:context.visionReview} : {filename:'review.json', value:context.review};
+}
+export function sourceWindowRange(clips, assetId, frame, lo, hi) {
+  const index=clips.findIndex(c=>c.kind!=='hold' && c.assetId===assetId && c.inFrame<=frame && frame<c.outFrame);
+  if(index<0 || ![lo,hi].every(Number.isFinite) || lo>hi) return null;
+  let first=index,last=index;
+  const joins=(a,b)=>a.kind!=='hold' && b.kind!=='hold' && a.assetId===assetId && b.assetId===assetId && a.outFrame===b.inFrame && a.endFrame===b.startFrame;
+  while(first>0 && joins(clips[first-1],clips[first])) first--;
+  while(last+1<clips.length && joins(clips[last],clips[last+1])) last++;
+  const start=Math.max(clips[first].inFrame,lo), end=Math.min(clips[last].outFrame-1,hi);
+  if(start>end) return null;
+  const offset=clips[first].startFrame-clips[first].inFrame;
+  return {startFrame:offset+start,endFrame:offset+end};
+}
 export function answer(p, r) {
   const labels = p.review?.purpose === 'initial-labeling' ? {serverId:r.serverId ?? null, serveNumber:r.serveNumber ?? null, gameNumber:r.gameNumber ?? null, setNumber:r.setNumber ?? null} : {};
   return { ...blank(), ...labels, ...p.answers[r.pointId] ?? { ...r.initial, reviewConfirmed: false } };

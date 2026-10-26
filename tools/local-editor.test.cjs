@@ -10,6 +10,36 @@ const geometry = loadUi('view-state.js');
 const project = { players: [{id:'A'}, {id:'B'}], fps:'30000/1001', answers:{} };
 const row = { pointId:'P001', serverId:'A' };
 
+test('mixed review keeps point and event access and exports both without merging decisions', async () => {
+  const m=await model, review={rows:[{pointId:'P001'}],schema:'tennis-point-review/v1'}, visionReview={events:[{id:'contact-1'}],annotations:{},adoptedForScoring:false};
+  const mixed={schema:'tennis-local-context/v1',revision:7,review,visionReview,approval:{}};
+  assert.deepEqual(m.reviewModes(mixed),['points','events']);
+  assert.equal(m.reviewExport(mixed).filename,'agent-context.json');
+  assert.strictEqual(m.reviewExport(mixed).value,mixed);
+  assert.deepEqual(m.reviewModes({review,visionReview:null}),['points']);
+  assert.deepEqual(m.reviewExport({review}),{filename:'review.json',value:review});
+  const eventsOnly={review:{rows:[]},visionReview};
+  assert.deepEqual(m.reviewModes(eventsOnly),['events']);
+  assert.deepEqual(m.reviewExport(eventsOnly),{filename:'vision-review.json',value:visionReview});
+  assert.deepEqual(mixed.approval,{});
+  assert.equal(visionReview.adoptedForScoring,false);
+});
+
+test('source review windows cross preserved partitions but stop at missing source or holds', async () => {
+  const m=await model, clips=[
+    {assetId:'a',inFrame:0,outFrame:100,startFrame:0,endFrame:100},
+    {assetId:'a',inFrame:100,outFrame:200,startFrame:100,endFrame:200},
+    {assetId:'a',inFrame:220,outFrame:300,startFrame:200,endFrame:280}];
+  assert.deepEqual(m.sourceWindowRange(clips,'a',110,80,130),{startFrame:80,endFrame:130});
+  assert.deepEqual(m.sourceWindowRange(clips,'a',195,190,230),{startFrame:190,endFrame:199});
+  assert.deepEqual(m.sourceWindowRange(clips,'a',230,190,250),{startFrame:200,endFrame:230});
+  assert.equal(m.sourceWindowRange(clips,'a',210,200,220),null);
+  assert.equal(m.sourceWindowRange(clips,'b',10,0,20),null);
+  assert.equal(m.sourceWindowRange(clips,'a',10,30,20),null);
+  const held=[clips[0],{...clips[1],kind:'hold'},clips[2]];
+  assert.deepEqual(m.sourceWindowRange(held,'a',90,80,130),{startFrame:80,endFrame:99});
+});
+
 test('clip selection separates implicit cursor focus from explicit toggle and anchored ranges', async () => {
   const {ClipSelection}=await model, s=new ClipSelection(), order=['a','b','c','d','e'];
   s.focus('a');assert.deepEqual([...s.ids],['a']);

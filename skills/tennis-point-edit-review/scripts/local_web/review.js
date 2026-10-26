@@ -1,5 +1,5 @@
 import { t } from "./i18n.js";
-import { $, el, answer, causes, changeAnswer, reviewStatus, reviewBadge } from "./model.js";
+import { $, el, answer, causes, changeAnswer, reviewStatus, reviewBadge, reviewModes } from "./model.js";
 import { VisionReview } from './vision-review.js';
 export class Review {
   constructor(select, save, selectEvent) {
@@ -7,15 +7,26 @@ export class Review {
     this.save = save;
     this.vision = new VisionReview(selectEvent, save);
     this.nodes = /* @__PURE__ */ new Map();
+    this.scrollPositions = {};
+    for (const mode of ['points','events']) $('review-'+mode).onclick = () => this.switchMode(mode);
     $("search").oninput = () => this.search();
     $("search").onkeydown = (e) => {
       if (e.key === "Enter") document.querySelector(".search-match")?.scrollIntoView({ block: "center" });
     };
   }
   setProject(p) {
-    if (this.p?.visionReview && !p.visionReview) this.ids = null;
+    const modes = reviewModes(p);
+    if (this.p?.projectId !== p.projectId || !this.mode) {
+      this.mode = modes[0];
+      try { const saved=sessionStorage.getItem('courtside-review-mode:'+p.projectId); if(modes.includes(saved)) this.mode=saved; } catch { /* View choice is optional. */ }
+    }
+    if (!modes.includes(this.mode)) this.mode=modes[0];
+    if (this.renderedMode !== this.mode) { this.ids=null; this.vision.key=null; }
+    this.renderedMode=this.mode;
     this.p = p;
-    if (p.visionReview) { this.vision.setProject(p); return; }
+    this.renderModes();
+    this.vision.setVisible(this.mode==='events');
+    if (this.mode==='events') { this.vision.setProject(p); return; }
     const ids = JSON.stringify([p.review.rows, p.players]);
     if (this.ids !== ids) {
       this.ids = ids;
@@ -25,6 +36,26 @@ export class Review {
     }
     this.localize();
     this.sync();
+  }
+  renderModes() {
+    const modes=reviewModes(this.p);
+    $('review-modes').hidden=modes.length<2;
+    for(const mode of ['points','events']) {
+      const button=$('review-'+mode);
+      button.textContent=t(mode==='points' ? 'pointReview' : 'eventReview');
+      button.classList.toggle('active',mode===this.mode);
+      button.setAttribute('aria-pressed',String(mode===this.mode));
+    }
+  }
+  switchMode(mode) {
+    if(mode===this.mode || !reviewModes(this.p).includes(mode)) return;
+    document.activeElement?.blur();
+    this.scrollPositions[this.mode]=$('review-list').scrollTop;
+    this.mode=mode;
+    try { sessionStorage.setItem('courtside-review-mode:'+this.p.projectId,mode); } catch { /* View still changes. */ }
+    this.setProject(this.p);
+    $('review-list').scrollTop=this.scrollPositions[mode] ?? 0;
+    this.search();
   }
   build() {
     this.nodes.clear();
@@ -100,7 +131,8 @@ export class Review {
     }
   }
   localize() {
-    if (this.p.visionReview) { this.vision.localize(); return; }
+    this.renderModes();
+    if (this.mode==='events') { this.vision.localize(); return; }
     $('review-panel').setAttribute('aria-label', t(this.p.review.purpose === 'initial-labeling' ? 'initialLabeling' : 'review'));
     for (const r of this.p.review.rows) {
       const n = this.nodes.get(r.pointId), x = answer(this.p,r), sid = this.p.review.purpose === 'initial-labeling' ? x.serverId : r.serverId, server = this.p.players.find(p => p.id === sid)?.name ?? t('unassigned');
@@ -141,6 +173,7 @@ export class Review {
     this.save({ type: "review", pointId: r.pointId, answer: x });
   }
   sync() {
+    if(this.mode==='events') { this.vision.sync(); return; }
     this.savedNotes = {};
     for (const r of this.p.review.rows) {
       const x = answer(this.p, r), n = this.nodes.get(r.pointId), s = reviewStatus(r, x);
@@ -159,7 +192,7 @@ export class Review {
     this.search();
   }
   highlight(pid, { reveal = false } = {}) {
-    if (this.p?.visionReview) return;
+    if (this.mode==='events') return;
     const changed = this.highlightedPoint !== pid;
     this.highlightedPoint = pid;
     for (const [id, n] of this.nodes) n.card.classList.toggle("selected", id === pid);
@@ -171,7 +204,7 @@ export class Review {
     }
   }
   search() {
-    if (this.p.visionReview) { this.vision.search(); return; }
+    if (this.mode==='events') { this.vision.search(); return; }
     const q = $("search").value.trim().toLowerCase();
     let count = 0;
     for (const r of this.p.review.rows) {
