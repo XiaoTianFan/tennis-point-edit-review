@@ -921,6 +921,26 @@
           "text": "不代替[导出后的收尾清理](cleanup.md)及其用户确认"
         }
       ]
+    },
+    {
+      "id": "joint-speed-source-capture-clock",
+      "path": "references/serve-speed-pipeline.md",
+      "text": "**Source clock** is the decoded PTS timeline used for clips, audio and labels."
+    },
+    {
+      "id": "joint-speed-complete-path",
+      "path": "references/serve-speed-pipeline.md",
+      "text": "The reconstruction and initial velocity are fitted together."
+    },
+    {
+      "id": "joint-speed-conditional-range",
+      "path": "references/serve-speed-uncertainty.md",
+      "text": "Do not relabel 2.5–97.5 percentile endpoints as a validated 95% confidence interval."
+    },
+    {
+      "id": "joint-speed-adapter-boundary",
+      "path": "references/serve-speed-joint-api.md",
+      "text": "No CLI runs automatic video-to-speed inference."
     }
   ],
   "files": [
