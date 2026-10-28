@@ -4,11 +4,13 @@ from fractions import Fraction
 from output_language import resolve_language, text
 from pathlib import Path
 from speed_evidence import unavailable_reason
+from joint_speed_quality import require_joint_acceptance
+from trajectory_uncertainty import display_values
 
 def fraction(value):
     return Fraction(str(value))
 
-def build_plan(records, fps, language="zh-CN", *, allow_imputed=False):
+def build_plan(records, fps, language="zh-CN", *, allow_imputed=False, show_uncertainty=False):
     """See helper-usage.md. All source timestamps are integer microseconds.
 
     confirmedPostContactUs is visually verified outgoing-ball evidence, NOT a
@@ -41,6 +43,7 @@ def build_plan(records, fps, language="zh-CN", *, allow_imputed=False):
             if not math.isfinite(speed) or speed<=0:raise ValueError('Invalid speed estimate')
             if method=='partial_trajectory_model' and r.get('qualityAccepted') is not True:
                 raise ValueError('Unaccepted partial fit cannot receive a numeric label')
+            require_joint_acceptance(r)
             if method=='model_imputed' and (not allow_imputed or not r.get('imputationBasis')):
                 raise ValueError('Imputed labels require explicit opt-in and documented support')
         c=r['clip']
@@ -87,13 +90,24 @@ def build_plan(records, fps, language="zh-CN", *, allow_imputed=False):
             else:fault_after_window=True
         entry=dict(setNumber=r['setNumber'],pointId=r['pointId'],serveId=r['serveId'],startFrame=start,endFrame=end,durationFrames=end-start,
                         labelStartFrame=c['startFrame'],labelEndFrame=end,labelStates=states,outcomeAfterOverlayWindow=fault_after_window,
-                        qualifier='' if missing else text('补估' if method=='model_imputed' else '约',language),speed='N/A' if missing else str(math.floor(speed+.5)),unit='' if missing else 'km/h',statsIncluded=r['statsIncluded'])
+                        qualifier='' if missing else text('补估' if method=='model_imputed' else '约',language),speed='N/A' if missing else str(display_values(speed)['speedKph']),unit='' if missing else 'km/h',statsIncluded=r['statsIncluded'])
         if missing:entry.update(speedAvailable=False,unavailableReason=reason)
+        if not missing:
+            if show_uncertainty and (method=='model_imputed' or not isinstance(r.get('modelUncertainty'),dict)):
+                raise ValueError('Requested model uncertainty needs an accepted individual range')
+            display=display_values(speed,r.get('modelUncertainty') if show_uncertainty else None,
+                                   estimate_id=r.get('candidateId') if method=='joint_trajectory_model' else r.get('estimateId'))
+            entry['speed']=str(display['speedKph'])
+            if show_uncertainty:
+                low,high=display['rangeKph']
+                entry.update(uncertaintyRangeKph=[low,high],
+                             uncertaintyLabel='Model uncertainty' if language=='en' else '模型不确定范围',
+                             uncertaintyText=f'{low}–{high} km/h')
         out.append(entry)
     return out
 
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('input');p.add_argument('output');a=p.parse_args()
     d=json.loads(Path(a.input).read_text(encoding='utf-8-sig'))
-    Path(a.output).write_text(json.dumps(build_plan(d['records'],d['fps'],d.get('outputLanguage','zh-CN'),allow_imputed=d.get('allowImputed') is True),ensure_ascii=False,indent=2),encoding='utf8')
+    Path(a.output).write_text(json.dumps(build_plan(d['records'],d['fps'],d.get('outputLanguage','zh-CN'),allow_imputed=d.get('allowImputed') is True,show_uncertainty=d.get('showUncertainty') is True),ensure_ascii=False,indent=2),encoding='utf8')
 

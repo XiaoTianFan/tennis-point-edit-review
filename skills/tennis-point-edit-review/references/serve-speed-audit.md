@@ -2,6 +2,8 @@
 
 阶段5按[方法选择](serve-speed-model.md)执行。工具可用不等于本发已尝试；未执行是pending，不得写成拟合失败或N/A。由agent补查，不增用户逐发表。
 
+新任务还按[联合估速架构](serve-speed-pipeline.md)审查C路线：原生时钟/逐帧配准、独立场地与网标定、带协方差的观测、抛球与出球共享触拍、首碰撞及局部反弹定位。C不适用时沿用A/B；可用时执行[联合API及质量门槛](serve-speed-joint-api.md)，不因旧运行器只支持B就跳过。纯估速先提取带精确源映射的分析片段，交付仍保留原片全部帧、剪口和声音，含失误/擦网。
+
 ## 默认恢复路径
 
 1. 冻结已确认球果/剪口，列全真实发球及排除事件；逐点用`serve_event_audit.audit_attempts`核发次。事件字段见助手；二发起录先定initial_serve=2，合法发球/双误后关闭本分。
@@ -36,4 +38,6 @@
 每发保留set/server/pointId/serveId/serveNumber、事件资格、源时刻/原帧、触拍夹逼、真实观测、几何/假设来源、方法尝试及结果、采用理由、中心值/范围和最高候选复查。分/发球机会统计与速度池纳入分开。
 
 无解用method=unestimated、launchSpeedKphEstimate=null、included=false，保留真实发球统计及原因。`unavailableAudit`含sourceSearch/contactReview/geometryReview/preImpactExtension，每项status=complete/unavailable/not_applicable及reason；methods含endpoint_physics、partial_trajectory_model，每项status=rejected/unavailable/not_applicable及reason。rejected还须attempted=true、resultRef；未补齐前置与不可取得前置须区分，不能以“脚本没做”冒称素材不可用。`unavailable_reason`拒绝pending、已accepted或无执行记录的rejected。仅此最终状态允许[下方N/A](serve-speed-overlay.md)，不显示失败候选或组均值。
+
+新版审计设置`methodologyVersion=joint-v1`，methods还必须包含`joint_trajectory_model`的已执行拒收或不适用/不可取得理由；旧A/B审计只作历史兼容。联合中心值需`jointQuality`绑定当前候选且accepted；全相机/轨迹扰动区间另需`modelUncertainty.accepted`。保留所有失败与贴边抽样，宽敏感性和条件区间分开，不为得到窄区间删除困难结果。
 

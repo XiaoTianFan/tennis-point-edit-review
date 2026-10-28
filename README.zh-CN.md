@@ -54,7 +54,9 @@ python tools/validate.py
 npm run check:adapters
 ```
 
-工作流与编辑器指南在 `references/`，正式模板在 `examples/`，计算与取证工具在 `scripts/`。当前版本 **2026.10.21-v26.0**；估速方法详见[中英文说明](docs/serve-speed-explained.md)。
+工作流与编辑器指南在 `references/`，正式模板在 `examples/`，计算与取证工具在 `scripts/`。当前版本 **2026.10.28-v27.0**；估速方法详见[中英文说明](docs/serve-speed-explained.md)。
+
+新版[完整估速架构](skills/tennis-point-edit-review/references/serve-speed-pipeline.md)增加抛球/触拍/飞行联合重建、源/捕获双时钟、完整3D路径积分和[条件模型区间](skills/tennis-point-edit-review/references/serve-speed-uncertainty.md)。[API指南](skills/tennis-point-edit-review/references/serve-speed-joint-api.md)区分已实现助手与仍需实际取证的标定、追踪、渲染适配；合成数值验证不等于雷达精度。
 
 账户保存版本没有可以直接交给 Git 的目录地址。建议以本仓库作可版本管理的维护源。也支持先修改账户版本，再由 agent 完整取回、差异比较、合并、验证和提交；不会自动同步，更不会自动公开到 GitHub。详见[双向同步流程](docs/synchronization.md)。
 

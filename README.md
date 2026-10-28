@@ -49,7 +49,9 @@ explicit confirmation, including in continuous mode. The [cleanup workflow](skil
 preserves original media, the final video, statistics, the reopenable project and
 its dependencies, and all skill content; it verifies integrity and reports net freed space.
 
-Current skill revision: **2026.10.21-v26.0**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, required recovery attempts, complete 3D screening and evidence-only/N/A labels.
+Current skill revision: **2026.10.28-v27.0**. See the [bilingual serve-speed explanation](docs/serve-speed-explained.md) for event timing, collision handling, physics, required recovery attempts, complete 3D screening and evidence-only/N/A labels.
+
+The [comprehensive serve-speed architecture](skills/tennis-point-edit-review/references/serve-speed-pipeline.md) adds joint toss/contact/flight reconstruction, separate source/capture clocks, full 3D path integration and [conditional uncertainty](skills/tennis-point-edit-review/references/serve-speed-uncertainty.md). The [API guide](skills/tennis-point-edit-review/references/serve-speed-joint-api.md) distinguishes implemented helpers from reviewed camera/tracking/render adapters. Synthetic recovery tests demonstrate numerical behavior, not radar accuracy.
 
 ChatCut, **Premiere Pro** and a standalone pipeline are primary editing choices.
 The [environment contract](skills/tennis-point-edit-review/references/editing-environments.md)

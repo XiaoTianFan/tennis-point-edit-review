@@ -21,3 +21,9 @@
 `serve_overlay.py`按[输入契约](helper-usage.md#发球初速与时序)生成时段，执行层应用到当前编辑器；未知值必须method=unestimated、null及完整unavailableAudit，已拒收部分轨迹不得以数值渲染。默认拒绝model_imputed，显式allow_imputed仅对应用户要求。
 
 全量核一发一记录、状态连续、出球后出现、≤3秒、大小标签共同退出、剪辑变更后映射更新。检查出现前一帧/首帧/末帧/退出后一帧的实际合成，并覆盖长短球、双误、let及N/A。N/A无单位且不漏入均值；最高候选及面板与逐发版本一致。用户无需新增逐发确认。
+
+## 条件区间与纯估速全片
+
+用户要求区间时，设置`showUncertainty=true`，输入同版本已接受的`modelUncertainty`，由[共同舍入函数](serve-speed-joint-api.md)给CSV与视频相同中心整数和向外取整上下界。计划新增`uncertaintyRangeKph/uncertaintyLabel/uncertaintyText`，编辑器在球速下方按既有样式合成一行“模型不确定范围”/“Model uncertainty”，与速度同帧进出；七个正式JSX模板本身不变，执行层必须验证额外行实际可见。无区间版仅隐藏该行，中心值和时序不变。N/A不加区间；缺失/未接受区间不能以敏感性范围或固定±数值替代。
+
+纯估速任务保留全部输入源帧、原剪口、原声、失误和let，不按精剪规则删发球。物理模型的捕获时钟/滚动读出只用于推算，不能改标签或音频时间；成片仍使用源PTS。逐发检查四个边界画面并全量核帧数/PTS、剪口和解码音频，完整要求见[架构与验收](serve-speed-pipeline.md)。条件区间非已校准置信区间，不标雷达精度。

@@ -1,5 +1,6 @@
 """Classify an already observed single point's service sequence; no vision/scoring inference."""
 import copy
+from joint_speed_quality import require_joint_acceptance
 
 NON_CONTACT = frozenset(('toss_catch', 'aborted_toss', 'practice_swing', 'serve_miss'))
 
@@ -48,4 +49,5 @@ def require_speed_eligible(record):
         raise ValueError('Let-speed inclusion requires an explicit alternative statistical scope')
     if record.get('method')=='partial_trajectory_model' and record.get('qualityAccepted') is not True:
         raise ValueError('Partial-trajectory candidate must pass evidence and stability screening before aggregation')
+    require_joint_acceptance(record)
     return True

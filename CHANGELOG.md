@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026.10.28-v27.0
+
+- Add the comprehensive serve-speed architecture: immutable source PTS versus capture hypotheses, independent camera/registration evidence, joint toss/contact/flight/first-collision reconstruction, covariance-aware observations and integrated 3D path metrics.
+- Add a reusable conditional joint fitter, full-objective diagnostics and candidate-bound acceptance; preserve endpoint/partial routes and resolve joint applicability in new final-N/A audits.
+- Separate broad stress tests from conditional model ranges with paired scenario refits, failure/boundary accounting, supported alternatives and shared CSV/label rounding. Optional uncertainty metadata retains the same centre and frame window; editor composition remains an explicit adapter responsibility.
+- Document full-length speed-only preservation, net/let distinctions, media QA, identifiability and uncertainty limits. Add independent analytic synthetic regressions and a generated example; leave all seven JSX templates unchanged.
+
 ## 2026.10.21-v26.0
 
 - Render final H.264/AAC directly from identity-bound originals through bounded raw-frame/PCM streams; encode video and audio once, with one cumulative sample clock.

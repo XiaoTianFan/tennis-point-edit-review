@@ -1,6 +1,18 @@
 # Serve-speed recovery / 发球估速恢复
 
-Revision **2026.10.19-v25.14**. Video/model estimates remain conditional; the seven JSX templates are unchanged.
+Revision **2026.10.28-v27.0**. Video/model estimates remain conditional; the seven JSX templates are unchanged.
+
+## Joint reconstruction and honest uncertainty
+
+The endpoint and partial-flight recovery described below remain supported. The new [comprehensive architecture](../skills/tennis-point-edit-review/references/serve-speed-pipeline.md) adds a joint route when the source supports it: independently calibrated camera geometry, a shared toss/outgoing contact state and time, covariance-weighted flight observations, and first-collision constraints. A separate two-axis image curve can use nearby rebound points to localize a bounce without counting them as serve flight. First net contact ends the model; legal let classification remains independent.
+
+The physical model fits initial velocity and the curved 3D path together. Full path distance is the integral of speed to the first collision; path length divided by flight time is the path **average**, whereas the displayed launch estimate is the initial velocity magnitude. Horizontal displacement/time remains a diagnostic. None of these distances is an independently measured 3D ground truth from a single camera.
+
+Native source PTS govern clips, labels and audio. A separate evidence-based capture clock may test omitted intervals or rolling readout, including correction of the collision's sensor row. Timing hypotheses from one recording must not be inherited by the next. Whole-camera refits, paired trajectory refits and correlated localization errors feed the [conditional model range](../skills/tennis-point-edit-review/references/serve-speed-uncertainty.md). Failure/boundary counts and broad stress alternatives remain visible. A smaller range must be supported by evidence, not a desired fixed ± value; percentile ranges are not automatically calibrated confidence intervals.
+
+The [joint API](../skills/tennis-point-edit-review/references/serve-speed-joint-api.md) implements reusable fitting, path metrics, quality/uncertainty contracts and optional label-plan metadata. Source review, camera/registration adapters, ensemble orchestration, net clearance and editor composition remain explicit work, not claimed automatic features. Full-length speed-only delivery retains every source frame, cut, fault/let and original audio. Hiding the uncertainty row leaves the same adopted centre and label window.
+
+新版在原端点/部分轨迹恢复之上增加有证据支持的联合重建：独立相机标定、抛球与出球共享触拍状态/时刻、协方差加权观测、首碰撞约束及双轴局部反弹定位。完整3D路径积分与水平距离、路径均速、初速分开；源PTS与物理捕获时钟分开。全相机与轨迹成对扰动产生条件模型区间，保留失败/贴边计数和宽压力测试，不能为窄区间隐藏不利结果，也不能冒称已验证95%置信区间或雷达精度。纯估速交付保留全片及原声，隐藏区间不改中心值。详见上述架构、区间与API说明。
 
 ## What changed and why
 
