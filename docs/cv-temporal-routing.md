@@ -62,3 +62,22 @@ python tools/cv_temporal_evaluate.py --run RAW_RUN_DIRECTORY --reference FROZEN_
 判读候选时，整体精度为null。时间命中不独立验证球身份、碰撞语义、赢家
 或统计；配对操作成本也保持独立。检查命令：
 `python -m unittest discover -s tools -p 'test_cv_temporal*.py'`。
+
+轨迹断裂补查使用独立研究工具 `tools/cv_gap_review_routes.py`：
+
+```text
+python tools/cv_gap_review_routes.py --run RAW_TEMPORAL_RUN --windows SAME_WINDOWS_JSON --config GAP_CONFIG_JSON --output NEW_GAP_RUN
+```
+
+它核验上游已提交块和实际PTS，仅对同视图断裂两侧有足够真实观察的路径
+拟合速度，检查几何相容性及相对平滑飞行的拟合收益。短、静止、单侧或
+不相容路径保留在上游数据中，不凭空补球；端点竞争配对全部保留并标记。
+输出的 `gapRoutes` 是待查区间，`exactEventFrame` 始终为null，不能传成
+50ms碰撞候选或采用事件。原始时刻候选完全保留在上游冻结结果中。
+
+`reviewCards` 合并重叠的检查范围并列出所有成员ID，不认定成员是同一球
+或同一次碰撞。基准检查卡与新增区间分别统计；空卡窗口回退，非空仍需
+遗漏审计。建议时长不含回退、未知补查或实际操作，不能据此计算成本节省。
+配置默认为0.50秒最大断裂、每侧至少3个观察；全部参数在工具 `DEFAULTS`
+中。每轮先冻结代码、参数和预测，再在未参与调整的片段建立独立参考。
+针对性检查：`python -m unittest discover -s tools -p 'test_cv*routes.py'`。
