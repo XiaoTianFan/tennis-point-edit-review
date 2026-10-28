@@ -37,3 +37,28 @@ python tools/cv_temporal_routes.py --stream STREAM_RESULT --windows WINDOWS_JSON
 
 针对性检查：`python -m unittest discover -s tools -p test_cv_temporal_routes.py`。
 覆盖平滑球路、静止竞争响应、网区歧义、缺帧、跨视图保留和非法输入。
+
+独立参考冻结后，用 `tools/cv_temporal_evaluate.py` 比较原始候选：
+
+```text
+python tools/cv_temporal_evaluate.py --run RAW_RUN_DIRECTORY --reference FROZEN_REFERENCE_JSON --windows WINDOWS_JSON --output NEW_EVALUATION_JSON
+```
+
+参考格式为 `tennis-temporal-route-reference/v1`，包含 `sourceIdentity`、
+`priorPredictions.sha256`、`segmentIds`、`events`、`unknowns` 和
+`observableIntervals`。事件提供唯一 `id`、`segmentId`、`event`、
+`frameBracket`、`intervalSeconds`；实际原帧可用 `sourceFrames` 附带
+`ordinal/pts/timeBase`。不确定区间和可判区间同样提供片段ID与源时间区间。
+可判区间必须由连续原生证据支持，不能把稀疏导航或未读区域标成负例。
+
+比较器验证源身份、冻结预测与窗口哈希，以有理数保留PTS精度；50ms容差
+内执行最大匹配数的一对一配对。同一事件的额外候选单列重复并计入候选
+精度分母。没有匹配的候选按未决参考、明确可判区间和未充分判读区间
+分开记录；只有可判区间内才能认定误报。已知事件即使位于路由窗口外，
+仍保留为漏检并注明窗口遗漏，不从召回分母移除。输出文件不可覆盖。
+
+`knownEventTimingRecall` 只针对已知可观察事件；
+`adjudicatedCandidateTimingPrecision` 只针对可判候选。仍有未决或未充分
+判读候选时，整体精度为null。时间命中不独立验证球身份、碰撞语义、赢家
+或统计；配对操作成本也保持独立。检查命令：
+`python -m unittest discover -s tools -p 'test_cv_temporal*.py'`。
