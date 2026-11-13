@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026.11.13-v27.1
+
+- Integrate the v27.0 joint serve-speed pipeline with the complete v26.1–v26.9 local development history, retaining endpoint audits, bounded working media, optional vision observations, integrated point/event review and temporal-routing experiments.
+- Preserve source-bound review and adoption rules, all seven canonical JSX templates, existing endpoint/partial speed routes, and the joint model's separate acceptance and conditional-uncertainty gates. Vision candidates remain observations for review, not automatic scoring or accepted speed evidence.
+- Reconcile both sets of workflow-contract checks, align the entry, bilingual READMEs, manifest and package metadata, and regenerate the recovery archive from the combined package. See the [integration record](docs/v27-integration.md) for scope and validation.
+
+## 2026.10.28-v27.0
+
+- Add the comprehensive serve-speed architecture: immutable source PTS versus capture hypotheses, independent camera/registration evidence, joint toss/contact/flight/first-collision reconstruction, covariance-aware observations and integrated 3D path metrics.
+- Add a reusable conditional joint fitter, full-objective diagnostics and candidate-bound acceptance; preserve endpoint/partial routes and resolve joint applicability in new final-N/A audits.
+- Separate broad stress tests from conditional model ranges with paired scenario refits, failure/boundary accounting, supported alternatives and shared CSV/label rounding. Optional uncertainty metadata retains the same centre and frame window; editor composition remains an explicit adapter responsibility.
+- Document full-length speed-only preservation, net/let distinctions, media QA, identifiability and uncertainty limits. Add independent analytic synthetic regressions and a generated example; leave all seven JSX templates unchanged.
+
 ## 2026.10.26-v26.7
 
 - Add optional source-bound forward ending reviews with distinct continuation, cessation-only, verified dead-ball bracket, source truncation and non-play states.

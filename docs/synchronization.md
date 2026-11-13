@@ -10,6 +10,22 @@ symlink. A temporary/local extracted package is a snapshot of that record.
 The durable editable package in this repository is:
 `skills/tennis-point-edit-review/`.
 
+## Local and cloud Git branches
+
+`origin` names the GitHub remote; `origin/main` is its last fetched main branch.
+A cloud feature branch and local main can each contain changes absent from the
+other, even when the feature branch has a newer package version. Fetch first,
+compare their merge base and unique commits, then merge the histories while
+retaining both sets of workflow obligations. Resolve source and metadata
+conflicts before regenerating the archive, validating and committing.
+
+When publication is authorized, push the combined main without force, verify
+local/remote commit equality and CI, then remove integrated feature branches.
+Preserve linked-worktree files when retiring their branch names. This Git
+workflow does not update an account-saved Skill; account snapshots use the
+separate process below. The [v27.1 integration](v27-integration.md) records one
+such reconciliation.
+
 The helper below works with **exported JSON files**. It does not implement a
 ChatCut login, call a private API, install an account Skill or push a Git remote.
 

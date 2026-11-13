@@ -6,6 +6,7 @@ that this module can recognize contact, let, bounce, or ball identity from pixel
 import copy,itertools,math
 from launch_speed import reconstruct
 from serve_event_audit import NON_CONTACT
+from joint_speed_quality import require_joint_acceptance
 
 def finite(value):
     if isinstance(value,bool) or not isinstance(value,(float,int)) or not math.isfinite(value):
@@ -71,6 +72,9 @@ def impute_same_group(target,records):
         if r.get('method')=='model_imputed' or r.get('serveId')==target.get('serveId'):continue
         if not all(r.get(k) is True for k in ('contactVerified','ballIdentityVerified','flightSegmentVerified')):continue
         if r.get('method')=='partial_trajectory_model' and r.get('qualityAccepted') is not True:continue
+        if r.get('method')=='joint_trajectory_model':
+            try:require_joint_acceptance(r)
+            except ValueError:continue
         key=r['serveId']
         if key in seen:raise ValueError('Duplicate support serve')
         seen.add(key);v=finite(r['launchSpeedKphEstimate'])
@@ -98,7 +102,10 @@ def unavailable_reason(audit):
         if key in methods:raise ValueError('Duplicate recovery method')
         methods[key]=item
     reasons=[]
-    for name in ('endpoint_physics','partial_trajectory_model'):
+    routes=('endpoint_physics','partial_trajectory_model')
+    if audit.get('methodologyVersion')=='joint-v1':routes+=('joint_trajectory_model',)
+    elif 'methodologyVersion' in audit:raise ValueError('Unknown speed recovery methodology version')
+    for name in routes:
         item=methods.get(name,{})
         if item.get('status') not in ('rejected','unavailable','not_applicable') or not item.get('reason'):
             raise ValueError('Resolve applicable method before N/A: '+name)
